@@ -49,6 +49,5 @@ def add_comment(request, grill_id):
         if add_form.is_valid():
             new_comment = Comment(grill = grill_id,author = 1, contents = add_form.cleaned_data['contents'])
             new_comment.save()
-            # return redirect(new_comment.get_absolute_url())
             return redirect(reverse_lazy('view_grill', kwargs = {'grill_id':grill_id}))
 
