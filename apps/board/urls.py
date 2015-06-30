@@ -15,20 +15,6 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from settings import BASE_DIR
-import os
 
 urlpatterns = [
-    # Araplus Apps
-    url(r'^board/', include('apps.board.urls')),
-    url(r'^grill/', include('apps.grill.urls')),
-    url(r'^session/', include('apps.session.urls')),
-
-    # Admin Page
-    url(r'^admin/', include(admin.site.urls)),
-
-    # Media Root
-    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': os.path.join(BASE_DIR, 'static')}),
 ]
-
