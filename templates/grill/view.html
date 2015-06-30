@@ -1,0 +1,24 @@
+<form
+	method = "POST"
+	action = "{% url 'add_comment' grill_id %}"
+	enctype = "multipart/form-data"
+>
+	{% csrf_token %}
+	{{form.as_p}}
+	<p>
+		<input type = "submit"/>
+	</p>
+</form>
+
+{% if comments|length %}
+	<ul>
+	{% for comment in comments %}
+		<li>{{comment.author}}님이 {{comment.created_at}}에 남긴 글
+		<p>{{comment.contents}}</p></li>	
+	{% endfor %}
+	</ul>
+	{% else %}
+	글이 없습니다.
+{% endif %}
+
+
