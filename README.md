@@ -1,2 +1,2 @@
-# araplus
+# ARAPLUS
 2015 ARA Project
