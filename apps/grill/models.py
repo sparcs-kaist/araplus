@@ -3,7 +3,7 @@ from django.db import models
 from django.core.urlresolvers import reverse_lazy
 import re
 
-# Create your models here.
+
 class Grill(models.Model):
     title = models.CharField(max_length=80)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -12,7 +12,7 @@ class Grill(models.Model):
     contents = models.TextField()
 
     def get_absolute_url(self):
-        return reverse_lazy('view_grill', kwargs = {'grill_id':self.id})
+        return reverse_lazy('view_grill', kwargs={'grill_id': self.id})
 
 
 class Comment(models.Model):
@@ -30,4 +30,3 @@ class Comment(models.Model):
     # 일단 두 번째 방법으로 구현
     def replace_tags(self):
         return re.sub(r'@(?P<target>\d+)', r'<a href="#comment_\g<target>">@\g<target></a>', self.contents)
-        

@@ -17,8 +17,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
-	url(r'^$', 'apps.grill.views.home'),
-	url(r'^add_grill/', 'apps.grill.views.add_grill', name = 'add_grill'),
-	url(r'^(?P<grill_id>\d+)$', 'apps.grill.views.view_grill', name = 'view_grill'),
-	url(r'^(?P<grill_id>\d+)/add_comment/$', 'apps.grill.views.add_comment', name = 'add_comment'),
+    url(r'^$', 'apps.grill.views.home'),
+    url(r'^add_grill/', 'apps.grill.views.add_grill', name='add_grill'),
+    url(r'^(?P<grill_id>\d+)$',
+        'apps.grill.views.view_grill', name='view_grill'),
+    url(r'^(?P<grill_id>\d+)/add_comment/$',
+        'apps.grill.views.add_comment', name='add_comment'),
 ]
