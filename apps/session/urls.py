@@ -17,4 +17,6 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
+	url(r'^login/', 'apps.session.views.user_login'),
+	url(r'^logout/', 'apps.session.views.user_logout')
 ]

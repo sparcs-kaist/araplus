@@ -1,3 +1,11 @@
-{% block test %}
-hahahahahaha
+
+{% if user.is_authenticated %}
+<li> Hello, {{ user }} </span> </li>
+<li> <a href="/session/logout/" class="btn btn-default">Logout</a> </li>
+{% else %}
+<li> <a href="/session/login/" class="btn btn-primary">Login</a> </li>
+{% endif %}
+
+{% block content %}
+default content block
 {% endblock %}
