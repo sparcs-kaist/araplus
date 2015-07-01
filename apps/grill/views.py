@@ -19,6 +19,10 @@ def view_grill(request, grill_id):
 
     edit_form = CommentAddForm()
     comments = Comment.objects.filter(grill = grill_id).order_by('created_at')
+    for comment in comments:
+        #WARNING! 사용자가 HTML 코드를 작성하면 그대로 반영
+        comment.contents = comment.replace_tags()
+
     return render(request,
         'grill/view.html',
         {

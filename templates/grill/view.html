@@ -23,7 +23,7 @@
 	<ul>
 	{% for comment in comments %}
 		<li>{{comment.author}}님이 {{comment.created_at}}에 남긴 글
-		<p>{{comment.contents}}</p></li>	
+		<p>{{comment.contents|safe}}</p></li>	
 	{% endfor %}
 	</ul>
 	{% else %}
