@@ -29,5 +29,5 @@ class Comment(models.Model):
     # 매 번 comment를 부를 때 마다 만들어줘야하나
     # 일단 두 번째 방법으로 구현
     def replace_tags(self):
-        # may have some bugs
-        return re.sub(r'[\D]?@(?P<target>\d+)(?P<suff>\s|\Z)', r'<a href="#comment_\g<target>">@\g<target></a>\g<suff>', self.contents)
+        return re.sub(r'@(?P<target>\d+)', r'<a href="#comment_\g<target>">@\g<target></a>', self.contents)
+        
