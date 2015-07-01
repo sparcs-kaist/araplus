@@ -10,6 +10,15 @@
 	</p>
 </form>
 
+<p>
+	작성자 : {{grill.author}}, 작성일 : {{grill.created_at}}, 최근댓글 : {{grill.commented_at}}
+</p>
+
+<p>
+	Contents
+	 {{grill.contents}}
+</p>
+
 {% if comments|length %}
 	<ul>
 	{% for comment in comments %}

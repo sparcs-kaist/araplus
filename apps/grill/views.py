@@ -1,9 +1,10 @@
 # -*- coding: utf-8
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Comment, Grill
 from .forms import GrillAddForm, CommentAddForm
 from django.core.urlresolvers import reverse_lazy
+import datetime
 
 # Create your views here.
 def home(request):
@@ -14,6 +15,8 @@ def home(request):
         })
 
 def view_grill(request, grill_id):
+    grill = get_object_or_404(Grill, pk = grill_id)
+
     edit_form = CommentAddForm()
     comments = Comment.objects.filter(grill = grill_id).order_by('created_at')
     return render(request,
@@ -22,6 +25,7 @@ def view_grill(request, grill_id):
             'form':edit_form,
             'grill_id':grill_id,
             'comments':comments,
+            'grill':grill,
         })
 
 def add_grill(request):
@@ -44,10 +48,13 @@ def add_grill(request):
 
 
 def add_comment(request, grill_id):
+    grill = get_object_or_404(Grill, pk = grill_id)
     if request.method == "POST":
         add_form = CommentAddForm(request.POST)
         if add_form.is_valid():
             new_comment = Comment(grill = grill_id,author = 1, contents = add_form.cleaned_data['contents'])
             new_comment.save()
+            setattr(grill, 'commented_at', datetime.datetime.now())
+            grill.save()
             return redirect(reverse_lazy('view_grill', kwargs = {'grill_id':grill_id}))
 
