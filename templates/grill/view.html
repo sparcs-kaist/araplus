@@ -1,33 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ARA Grill</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+    </script>
+    <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
+    <script>
+        $(document).ready(function(){
+            var csrftoken = getCookie('csrftoken');
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+
+            $("#comment_form").on('submit',function(event){
+                event.preventDefault();
+                add_comment({{grill.id}});
+                console.log("PLZ");
+            })           
+            
+        });
+                                              
+    </script>
+</head>
+
+<body>
 <form
-	method = "POST"
-	action = "{% url 'add_comment' grill_id %}"
-	enctype = "multipart/form-data"
+    id = "comment_form"
+    method = "POST"
 >
-	{% csrf_token %}
-	{{form.as_p}}
-	<p>
-		<input type = "submit"/>
-	</p>
+    {% csrf_token %}
+    <input type="text" id="new_content" style="width:300px;"/> 
+    <p>
+        <input type = "submit" id="submit_comment"/>
+    </p>
 </form>
 
 <p>
-	작성자 : {{grill.author}}, 작성일 : {{grill.created_at}}, 최근댓글 : {{grill.commented_at}}
+    작성자 : {{grill.author}}, 작성일 : {{grill.created_at}}, 최근댓글 : {{grill.commented_at}}
 </p>
 
 <p>
-	Contents
-	 {{grill.contents}}
+    Contents
+     {{grill.contents}}
 </p>
 
+<div id="results"></div> 
+<ul id="result_list">
 {% if comments|length %}
-	<ul>
-	{% for comment in comments %}
-		<li>{{comment.author}}님이 {{comment.created_at}}에 남긴 글
-		<p>{{comment.contents|safe}}</p></li>	
-	{% endfor %}
-	</ul>
-	{% else %}
-	글이 없습니다.
+    {% for comment in comments %}
+        <li>{{comment.author}}님이 {{comment.created_at}}에 남긴 글
+        <p>{{comment.contents|safe}}</p></li>   
+    {% endfor %}
+    {% else %}
+    글이 없습니다.
 {% endif %}
+</ul>
 
-
+</body>
+</html>

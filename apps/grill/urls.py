@@ -18,6 +18,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^$', 'apps.grill.views.home'),
+    url(r'^(?P<grill_id>\d+)$/get_comment/$', 'apps.grill.views.get_comment', name='get_comment'),
     url(r'^add_grill/', 'apps.grill.views.add_grill', name='add_grill'),
     url(r'^(?P<grill_id>\d+)$',
         'apps.grill.views.view_grill', name='view_grill'),
