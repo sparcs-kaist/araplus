@@ -31,7 +31,8 @@ var add_comment = function(grill_id){
             success: function(json){
                 refresh_comment(grill_id);
             },
-            error: function(e) {console.log('error:' + e.status);}
+            error:function(request,status,error){
+            console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
         });
         return false;
     };

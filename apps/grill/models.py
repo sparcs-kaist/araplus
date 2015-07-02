@@ -27,7 +27,7 @@ class GrillComment(models.Model):
             self.order = 1
         super(GrillComment, self).save(*args, **kwargs)
 
-    grill = models.IntegerField()
+    grill = models.ForeignKey(Grill)
     author = models.IntegerField()
     content = models.TextField(max_length=140)
     created_time = models.DateTimeField(auto_now_add=True)
@@ -36,8 +36,8 @@ class GrillComment(models.Model):
 
     def to_json(self):
         return dict(
-            grill=self.grill, author=self.author,
-            content=self.content,
+            author=self.author,
+            content=self.replace_tags(),
             created_time=self.created_time.isoformat(),
             order=self.order)
 

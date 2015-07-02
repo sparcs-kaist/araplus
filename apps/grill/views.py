@@ -59,10 +59,12 @@ def add_comment(request, grill_id):
     post_data = request.POST
     grill = get_object_or_404(Grill, pk=grill_id)
     new_comment = GrillComment(
-        grill=grill_id, author=1, content=post_data.get('new_content'))
+        grill=grill, author=1, content=post_data.get('new_content'))
     new_comment.save()
-    setattr(grill, 'updated_time', datetime.datetime.now())
-    grill.save()
+    new_comment.grill.updated_time = datetime.datetime.now()
+    new_comment.grill.save()
+    # setattr(grill, 'updated_time', datetime.datetime.now())
+    # grill.save()
     data = {'new_content': new_comment.replace_tags()}
     data['order'] = new_comment.order
     data['author'] = 1
@@ -77,7 +79,7 @@ def refresh_comment(request, grill_id):
     if not new_index:
         new_index = 1
     comments = GrillComment.objects.filter(
-        grill=grill_id, order__gte=new_index)
+        grill__id=grill_id, order__gte=new_index)
     json_comments = map(lambda x: x.to_json(), list(comments))
     data = {'comments': json_comments}
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
