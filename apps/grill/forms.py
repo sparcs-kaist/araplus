@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 from django import forms
-from .models import Grill, Comment
+from .models import Grill, GrillComment
 
 
 class GrillAddForm(forms.ModelForm):
@@ -16,5 +16,5 @@ class GrillAddForm(forms.ModelForm):
 class CommentAddForm(forms.ModelForm):
 
     class Meta:
-        model = Comment
-        fields = ["contents"]
+        model = GrillComment
+        fields = ["content"]

@@ -21,6 +21,7 @@ function csrfSafeMethod(method) {
 
 var add_comment = function(grill_id){
         var form_content = $("#new_content").val()
+        $("#new_content").val('');
         $.ajax({
             type: 'POST',
             url: '/grill/'+grill_id+'/add_comment/',
@@ -28,9 +29,14 @@ var add_comment = function(grill_id){
                 },
             dataType: 'json',
             success: function(json){
-                console.log("good");
-                var ms = "<li>" + json.author;
-                ms += "님이 " + json.commented_at;
+                console.log(typeof(json.commented_at));
+                var options = {
+                    year: "numeric", month: "short",
+                    day: "numeric", hour: "2-digit", minute: "2-digit"
+                };
+                var temp_date = new Date(json.commented_at);
+                var ms = "<li>" + json.order +"번째. "+json.author;
+                ms += "님이 " + temp_date.toLocaleTimeString("ko-KR",options);
                 ms += "에 남긴 글 <p>" + json.new_content + "</p></li>";
                 $("#result_list").prepend(ms);
                 

@@ -6,27 +6,39 @@ import re
 
 class Grill(models.Model):
     title = models.CharField(max_length=80)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_time = models.DateTimeField(auto_now_add=True)
     author = models.IntegerField()
-    commented_at = models.DateTimeField(auto_now_add=True)
-    contents = models.TextField()
+    updated_time = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
 
     def get_absolute_url(self):
         return reverse_lazy('view_grill', kwargs={'grill_id': self.id})
 
 
-class Comment(models.Model):
+class GrillComment(models.Model):
     # grill = models.ForeignKey(Grill)
+
+    def save(self, *args, **kwargs):
+        no = GrillComment.objects.filter(grill=self.grill).count()
+        print no
+        if no:
+            self.order = no + 1
+        else:
+            self.order = 1
+        super(GrillComment, self).save(*args, **kwargs)
+
     grill = models.IntegerField()
     author = models.IntegerField()
-    contents = models.TextField(max_length=280)
-    created_at = models.DateTimeField(auto_now_add=True)
-    like_num = models.IntegerField(default=0)
-    report_num = models.IntegerField(default=0)
+    content = models.TextField(max_length=280)
+    created_time = models.DateTimeField(auto_now_add=True)
+    order = models.IntegerField(
+        db_index=True)
 
     # return new contents with tags
     # 태그를 <a>로 바꿔서 contents에 저장해둬야하나 아니면
     # 매 번 comment를 부를 때 마다 만들어줘야하나
     # 일단 두 번째 방법으로 구현
     def replace_tags(self):
-        return re.sub(r'@(?P<target>\d+)', r'<a href="#comment_\g<target>">@\g<target></a>', self.contents)
+        return re.sub(r'@(?P<target>\d+)',
+                      '<a href="#comment_\g<target>">@\g<target></a>',
+                      self.content)

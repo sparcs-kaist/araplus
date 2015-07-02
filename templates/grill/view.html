@@ -41,7 +41,7 @@
 </form>
 
 <p>
-    작성자 : {{grill.author}}, 작성일 : {{grill.created_at}}, 최근댓글 : {{grill.commented_at}}
+    작성자 : {{grill.author}}, 작성일 : {{grill.created_time}}, 최근댓글 : {{grill.updated_time}}
 </p>
 
 <p>
@@ -53,8 +53,9 @@
 <ul id="result_list">
 {% if comments|length %}
     {% for comment in comments %}
-        <li>{{comment.author}}님이 {{comment.created_at}}에 남긴 글
-        <p>{{comment.contents|safe}}</p></li>   
+        <li id="comment_{{comment.order}}"> {{comment.order}}번째.
+            {{comment.author}}님이 {{comment.created_time}}에 남긴 글
+        <p>{{comment.content|safe}}</p></li>   
     {% endfor %}
     {% else %}
     글이 없습니다.
