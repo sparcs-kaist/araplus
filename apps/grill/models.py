@@ -29,7 +29,7 @@ class GrillComment(models.Model):
 
     grill = models.IntegerField()
     author = models.IntegerField()
-    content = models.TextField(max_length=280)
+    content = models.TextField(max_length=140)
     created_time = models.DateTimeField(auto_now_add=True)
     order = models.IntegerField(
         db_index=True)
