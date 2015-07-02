@@ -17,7 +17,4 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^post/$', 'apps.board.views.board_write'),
-    url(r'^([1-9][0-9]*)/$', 'apps.board.views.board_read'),
-
 ]
