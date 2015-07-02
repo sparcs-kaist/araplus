@@ -44,7 +44,7 @@ def add_grill(request):
         if edit_form.is_valid():
             new_grill = Grill(title=edit_form.cleaned_data['title'],
                               author=1,
-                              content=edit_form.cleaned_data['contents'])
+                              content=edit_form.cleaned_data['content'])
             new_grill.save()
             return redirect(new_grill.get_absolute_url())
 
@@ -72,5 +72,13 @@ def add_comment(request, grill_id):
                         content_type="application/json")
 
 
-def get_comment(request):
-    return HttpResponse("hi")
+def refresh_comment(request, grill_id):
+    new_index = request.POST['required_index']
+    if not new_index:
+        new_index = 1
+    comments = GrillComment.objects.filter(
+        grill=grill_id, order__gte=new_index)
+    json_comments = map(lambda x: x.to_json(), list(comments))
+    data = {'comments': json_comments}
+    return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
+                        content_type="application/json")

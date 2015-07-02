@@ -34,6 +34,13 @@ class GrillComment(models.Model):
     order = models.IntegerField(
         db_index=True)
 
+    def to_json(self):
+        return dict(
+            grill=self.grill, author=self.author,
+            content=self.content,
+            created_time=self.created_time.isoformat(),
+            order=self.order)
+
     # return new contents with tags
     # 태그를 <a>로 바꿔서 contents에 저장해둬야하나 아니면
     # 매 번 comment를 부를 때 마다 만들어줘야하나
