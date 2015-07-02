@@ -15,7 +15,8 @@ class Attachment(models.Model):
 
 
 class BoardComment(models.Model):
-    post = models.OneToOneField('BoardPost', related_name="comment")
+    content = models.OneToOneField('BoardContent', related_name="comment")
+    post = models.ForeignKey('BoardPost', related_name="comment")
     # author = models.ForeignKey(session.UserProfile, related_name="board_comment")
 
 
@@ -30,10 +31,6 @@ class BoardReport(models.Model):
     created_time = models.DateTimeField(null=False)
     board_content = models.ForeignKey('BoardContent', related_name="report")
     # userprofile = models.ForeignKey(session.UserProfile, related_name="board_report")
-    content = models.TextField(null=False)
-    created_time = models.DateTimeField(null=False)
-    is_deleted = models.BooleanField(default=False, null=False)
-    is_anonymous = models.BooleanField(default=False, null=False)
 
 
 class Attachment(models.Model):
