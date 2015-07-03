@@ -81,7 +81,6 @@ def board_modify(request, id, error=''):
 
         title = request.POST.get('title','')
         content = request.POST.get('content','')
-        anonymous = request.POST.get('anonymous','')
         if title == '':
             error = 'title missing!'
         if content == '':
@@ -89,8 +88,6 @@ def board_modify(request, id, error=''):
         if error:
             return render(request, 'board/board_write.html', {'error':error,'title':title,'content':content})
         _BoardContent.content = content
-        if anonymous=='on':
-            _BoardContent.is_anonymous = True
         _BoardContent.save()
         _BoardPost.title = title
         _BoardPost.save()
