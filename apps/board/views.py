@@ -35,7 +35,9 @@ def board_write(request):
         _BoardPost = BoardPost()
         _BoardPost.title = title
         _BoardPost.board_content = _BoardContent
+        _BoardPost.board_content_id = _BoardContent.id
         _BoardPost.author = _UserProfile
+        _BoardPost.author_id = _UserProfile.id
         _BoardPost.save()
         return redirect('../%d/' %_BoardPost.id)
     return render(request, 'board/board_write.html')
