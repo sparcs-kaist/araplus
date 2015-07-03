@@ -26,4 +26,6 @@ urlpatterns = [
         'apps.grill.views.view_grill', name='view_grill'),
     url(r'^(?P<grill_id>\d+)/add_comment/$',
         'apps.grill.views.add_comment', name='add_comment'),
+    url(r'^(?P<grill_id>\d+)/vote_comment/$',
+        'apps.grill.views.vote_comment', name='vote_comment'),
 ]

@@ -40,7 +40,15 @@
     {% for comment in comments %}
         <li id="comment_{{comment.order}}"> {{comment.order}}번째.
             {{comment.author.id}}님이 {{comment.created_time}}에 남긴 글
-        <p>{{comment.content|safe}}</p></li>   
+        <p>{{comment.content|safe}} 
+            {% if comment.vote_disable %}
+                <button class="vote_up" disabled> 추천 (+{{comment.like}}) </button>
+            {% else %}
+                <button class="vote_up"> 추천 (+{{comment.like}})</button>
+            {% endif %}
+        </p>
+
+        </li>   
     {% endfor %}
     {% else %}
     글이 없습니다.

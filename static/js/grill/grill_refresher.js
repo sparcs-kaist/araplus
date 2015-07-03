@@ -1,4 +1,5 @@
 var refresh_timer;
+var last_update = new Date().toJSON();
 
 function getCookie(name) {
     var cookieValue = null;
@@ -31,11 +32,10 @@ var add_comment = function(grill_id){
                 },
             dataType: 'json',
             success: function(json){
-                console.log("debug")
                 clearInterval(refresh_timer);
                 refresh_comment(grill_id);
                 refresh_timer = setInterval(function(){
-                    console.log("auto");refresh_comment(grill_id);},5000);
+                    refresh_comment(grill_id);},5000);
             },
             error:function(request,status,error){
             console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
@@ -54,13 +54,11 @@ function refresh_comment (grill_id) {
         url: '/grill/' + grill_id + '/refresh_comment/',
         data: {
             required_index: current_index*1+1,
+            last_update: last_update,
         },
         dataType: 'json',
         success: function(json){
-            if (json.comments.length==0)
-                {
-                    return false;
-                };
+            //Update Comments
             for (var i = json.comments.length - 1; i >= 0; i--) {
                 var target = json.comments[i];
                 var options = {
@@ -70,9 +68,43 @@ function refresh_comment (grill_id) {
                 var temp_date = new Date(target.created_time);
                 var ms = '<li id="comment_'+target.order+'">' + target.order +"번째. "+target.author;
                 ms += "님이 " + temp_date.toLocaleTimeString("ko-KR",options);
-                ms += "에 남긴 글 <p>" + target.content + "</p></li>";
+                ms += "에 남긴 글 <p>" + target.content + ' <button class="vote_up"> 추천 (+0)</button></p></li>';
                 $("#result_list").prepend(ms);   
             };
+
+            //Update Votes
+            last_update = json.last_update
+            if (!json.new_votes) {
+                return false;
+            };
+            for (var i = json.new_votes.length - 1; i >= 0; i--) {
+                var target = json.new_votes[i]
+                var target_order = target.grill_comment
+                var target_new_like = target.new_count
+                var target_button = $($("#comment_"+target_order+">p>button")[0])
+                target_new_like += target_button.text().trim().split('+')[1].slice(0, -1)*1;
+                target_button.text("추천 (+"+target_new_like+")")
+            };
+            
+        }, error:function(request,status,error){
+            console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
+    });
+}
+
+function vote_up(grill_id, order) {
+    $.ajax({
+        type: 'POST',
+        url: '/grill/' + grill_id + '/vote_comment/',
+        data: {
+            grill_comment_order: order,
+            is_up: true,
+        },
+        dataType: 'json',
+        success: function(json){
+            clearInterval(refresh_timer);
+            refresh_comment(grill_id);
+            refresh_timer = setInterval(function(){
+                refresh_comment(grill_id);},5000);
         }, error:function(request,status,error){
             console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
     });
@@ -90,6 +122,12 @@ $(document).ready(function(){
             });
 
             refresh_timer = setInterval(function(){refresh_comment(grill_id);},5000);
+
+            $(".vote_up").on('click',function(){
+                $(this).attr('disabled',true);
+                vote_up(grill_id, $(this).parent().parent()[0].id.split("_")[1]*1);
+
+            })
 
             $("#comment_form").on('submit',function(event){
                 event.preventDefault();

@@ -52,6 +52,6 @@ class GrillComment(models.Model):
 
 class GrillCommentVote(models.Model):
     grill_comment = models.ForeignKey(GrillComment, null=False)
-    userprofile = models.ForeignKey(UserProfile,
-                                    related_name="grill_comment_vote")
+    userprofile = models.ForeignKey(UserProfile)
     is_up = models.BooleanField()
+    created_time = models.DateTimeField(auto_now_add=True, db_index=True)

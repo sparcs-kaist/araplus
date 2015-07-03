@@ -5,6 +5,7 @@ from .models import GrillComment, Grill, GrillCommentVote
 from apps.session.models import UserProfile
 from .forms import GrillAddForm, CommentAddForm
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Count
 import json
 import datetime
 
@@ -23,9 +24,16 @@ def view_grill(request, grill_id):
     edit_form = CommentAddForm()
     comments = GrillComment.objects.filter(
         grill=grill_id).order_by('created_time').reverse()
+    profile = get_object_or_404(UserProfile, user=request.user)
+    user_vote = GrillCommentVote.objects.filter(userprofile=profile)
     for comment in comments:
         # WARNING! 사용자가 HTML 코드를 작성하면 그대로 반영
         comment.content = comment.replace_tags()
+        comment.like = GrillCommentVote.objects.filter(
+            grill_comment=comment,
+            is_up=True).count()
+        if user_vote.filter(grill_comment=comment):
+            comment.vote_disable = True
 
     return render(request,
                   'grill/view.html',
@@ -66,8 +74,6 @@ def add_comment(request, grill_id):
     new_comment.save()
     new_comment.grill.updated_time = datetime.datetime.now()
     new_comment.grill.save()
-    # setattr(grill, 'updated_time', datetime.datetime.now())
-    # grill.save()
     data = {'new_content': new_comment.replace_tags()}
     data['order'] = new_comment.order
     data['author'] = 1
@@ -78,32 +84,52 @@ def add_comment(request, grill_id):
 
 
 def refresh_comment(request, grill_id):
+    grill = get_object_or_404(Grill, pk=grill_id)
+    # Update Comments
     new_index = request.POST['required_index']
     if not new_index:
         new_index = 1
     comments = GrillComment.objects.filter(
-        grill__id=grill_id, order__gte=new_index)
+        grill=grill, order__gte=new_index)
     json_comments = map(lambda x: x.to_json(), list(comments))
     data = {'comments': json_comments}
+
+    # Update Votes
+    last_update = request.POST['last_update']
+    votes = GrillCommentVote.objects.filter(
+        grill_comment__grill=grill,
+        created_time__gte=last_update).values('grill_comment')
+    last_update = datetime.datetime.now()
+    votes = votes.annotate(new_count=Count('is_up'))
+    # XXX: 어떻게 grill_comment가 알아서 order가 되지?
+    # now, elem of votes : {'grill_comment', 'new_count'}
+    data['new_votes'] = list(votes)
+    data['last_update'] = last_update
+    print "ALLRIGHT"
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
                         content_type="application/json")
 
 
-def vote_up(request, grill_id):
+def vote_comment(request, grill_id):
     # Input : Grill, GrillCommentOrder, User, is_up이 담긴 POST
     # Process : 1. User가 이 코멘트에 대해 투표했었는지 확인 - 했다면 exception?
     #           2. 투표 처리
     post_data = request.POST
     target_order = post_data['grill_comment_order']
     is_up = post_data['is_up']
-    profile = UserProfile.objects.filter(user=request.user)
-    target_comment = GrillComment.objects.get_object_or_404(grill__id=grill_id,
-                                                            order=target_order)
+    profile = get_object_or_404(UserProfile, user=request.user)
+    target_comment = get_object_or_404(GrillComment, grill__id=grill_id,
+                                       order=target_order)
+    print type(profile), type(target_comment)
+    print GrillCommentVote.objects.filter(grill_comment=target_comment,
+                                          userprofile=profile).count()
     if GrillCommentVote.objects.filter(grill_comment=target_comment,
                                        userprofile=profile).count():
-        return 0
+        return HttpResponse("0")
+    print "CHECK"
     new_vote = GrillCommentVote(userprofile=profile,
                                 grill_comment=target_comment,
                                 is_up=is_up)
     new_vote.save()
-    return 0
+    print "Here?"
+    return HttpResponse("1")
