@@ -1,13 +1,14 @@
 # -*- coding: utf-8
 from django.db import models
 from django.core.urlresolvers import reverse_lazy
+from apps.session.models import UserProfile
 import re
 
 
 class Grill(models.Model):
     title = models.CharField(max_length=80)
     created_time = models.DateTimeField(auto_now_add=True)
-    author = models.IntegerField()
+    author = models.ForeignKey(UserProfile)
     updated_time = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
 
@@ -19,7 +20,6 @@ class GrillComment(models.Model):
 
     def save(self, *args, **kwargs):
         no = GrillComment.objects.filter(grill=self.grill).count()
-        print no
         if no:
             self.order = no + 1
         else:
@@ -27,7 +27,7 @@ class GrillComment(models.Model):
         super(GrillComment, self).save(*args, **kwargs)
 
     grill = models.ForeignKey(Grill)
-    author = models.IntegerField()
+    author = models.ForeignKey(UserProfile)
     content = models.TextField(max_length=140)
     created_time = models.DateTimeField(auto_now_add=True)
     order = models.IntegerField(
@@ -35,7 +35,7 @@ class GrillComment(models.Model):
 
     def to_json(self):
         return dict(
-            author=self.author,
+            author=self.author.id,
             content=self.replace_tags(),
             created_time=self.created_time.isoformat(),
             order=self.order)
@@ -52,6 +52,6 @@ class GrillComment(models.Model):
 
 class GrillCommentVote(models.Model):
     grill_comment = models.ForeignKey(GrillComment, null=False)
-    # userprofile = models.ForeignKey(session.UserProfile,
-    #                                 related_name="grill_comment_vote")
+    userprofile = models.ForeignKey(UserProfile,
+                                    related_name="grill_comment_vote")
     is_up = models.BooleanField()

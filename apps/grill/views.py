@@ -1,7 +1,8 @@
 # -*- coding: utf-8
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import GrillComment, Grill
+from .models import GrillComment, Grill, GrillCommentVote
+from apps.session.models import UserProfile
 from .forms import GrillAddForm, CommentAddForm
 from django.core.serializers.json import DjangoJSONEncoder
 import json
@@ -42,8 +43,9 @@ def add_grill(request):
     elif request.method == "POST":
         edit_form = GrillAddForm(request.POST)
         if edit_form.is_valid():
+            userprofile = UserProfile.objects.get(user=request.user)
             new_grill = Grill(title=edit_form.cleaned_data['title'],
-                              author=1,
+                              author=userprofile,
                               content=edit_form.cleaned_data['content'])
             new_grill.save()
             return redirect(new_grill.get_absolute_url())
@@ -58,8 +60,9 @@ def add_grill(request):
 def add_comment(request, grill_id):
     post_data = request.POST
     grill = get_object_or_404(Grill, pk=grill_id)
+    userprofile = UserProfile.objects.get(user=request.user)
     new_comment = GrillComment(
-        grill=grill, author=1, content=post_data.get('new_content'))
+        grill=grill, author=userprofile, content=post_data.get('new_content'))
     new_comment.save()
     new_comment.grill.updated_time = datetime.datetime.now()
     new_comment.grill.save()
@@ -84,3 +87,23 @@ def refresh_comment(request, grill_id):
     data = {'comments': json_comments}
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
                         content_type="application/json")
+
+
+def vote_up(request, grill_id):
+    # Input : Grill, GrillCommentOrder, User, is_up이 담긴 POST
+    # Process : 1. User가 이 코멘트에 대해 투표했었는지 확인 - 했다면 exception?
+    #           2. 투표 처리
+    post_data = request.POST
+    target_order = post_data['grill_comment_order']
+    is_up = post_data['is_up']
+    profile = UserProfile.objects.filter(user=request.user)
+    target_comment = GrillComment.objects.get_object_or_404(grill__id=grill_id,
+                                                            order=target_order)
+    if GrillCommentVote.objects.filter(grill_comment=target_comment,
+                                       userprofile=profile).count():
+        return 0
+    new_vote = GrillCommentVote(userprofile=profile,
+                                grill_comment=target_comment,
+                                is_up=is_up)
+    new_vote.save()
+    return 0

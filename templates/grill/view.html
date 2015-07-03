@@ -26,7 +26,7 @@
 </form>
 
 <p>
-    작성자 : {{grill.author}}, 작성일 : {{grill.created_time}}, 최근댓글 : {{grill.updated_time}}
+    작성자 : {{grill.author.id}}, 작성일 : {{grill.created_time}}, 최근댓글 : {{grill.updated_time}}
 </p>
 
 <p>
@@ -39,7 +39,7 @@
 {% if comments|length %}
     {% for comment in comments %}
         <li id="comment_{{comment.order}}"> {{comment.order}}번째.
-            {{comment.author}}님이 {{comment.created_time}}에 남긴 글
+            {{comment.author.id}}님이 {{comment.created_time}}에 남긴 글
         <p>{{comment.content|safe}}</p></li>   
     {% endfor %}
     {% else %}
