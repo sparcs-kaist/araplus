@@ -8,6 +8,16 @@ class BoardContent(models.Model):
     is_deleted = models.BooleanField(default=False, null=False)
     is_anonymous = models.BooleanField(default=False, null=False)
 
+    def __str__(self):
+        if(self.id%10==1):
+            return "%dst content created in %s" %(self.id, self.created_time)
+        elif(self.id%10==2):
+            return "%dnd content created in %s" %(self.id, self.created_time)
+        elif(self.id%10==2):
+            return "%dnd content created in %s" %(self.id, self.created_time)
+        else:
+            return "%dth content created in %s" %(self.id, self.created_time)
+
 
 class Attachment(models.Model):
     file = models.FileField(null=False)
@@ -58,3 +68,5 @@ class BoardPost(models.Model):
     board_content = models.OneToOneField('BoardContent', null=False)
     # board_category = models.ForeignKey('BoardCategory', related_name='category', null=False)
 
+    def __str__(self):
+        return "title: %s created in %s , authored by %s" %(self.title, self.board_content.created_time, self.author.user)
