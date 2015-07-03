@@ -123,7 +123,7 @@ $(document).ready(function(){
 
             refresh_timer = setInterval(function(){refresh_comment(grill_id);},5000);
 
-            $(".vote_up").on('click',function(){
+            $(document).on('click','button.vote_up',function(){
                 $(this).attr('disabled',true);
                 vote_up(grill_id, $(this).parent().parent()[0].id.split("_")[1]*1);
 
