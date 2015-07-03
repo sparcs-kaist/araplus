@@ -54,7 +54,7 @@ class BoardPost(models.Model):
     title = models.CharField(max_length=45, null=False)
     is_notice = models.BooleanField(default=False,null=False)
     # board = models.ForeignKey('Board', related_name='board', null=False)
-    # author = models.ForeignKey('UserProfile', related_name='board_post')
+    author = models.ForeignKey('session.UserProfile', related_name='board_post')
     board_content = models.OneToOneField('BoardContent', null=False)
     # board_category = models.ForeignKey('BoardCategory', related_name='category', null=False)
 

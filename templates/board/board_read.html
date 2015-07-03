@@ -4,10 +4,17 @@
     {% if error %}
         {{error}}
     {% else %}
-        <p>id : {{id}}</p>
-        <p>title : {{title}}</p>
-        <p>created_time : {{created_time}}</p>
-        <p>content : {{content}}</p>
+        <p> id : {{id}} </p>
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <div class="span5"> {{ title }} </div>
+                <div class="span7"> {{ created_time }}</div>
+            </div>
+            <div class="panel-body"> {{ username }} </div>
+        </div>
+        <div class="border-box">
+            {{content}}
+        </div>
     {% endif %}
 </div>
 {% endblock %}
