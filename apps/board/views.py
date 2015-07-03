@@ -9,7 +9,7 @@ import datetime
 
 
 @login_required(login_url='/session/login')
-def board_write(request):
+def board_write(request, error=''):
     if request.method == 'POST':
         if not request.user.is_authenticated():
             return redirect('session/login')
@@ -19,13 +19,12 @@ def board_write(request):
         title = request.POST.get('title','')
         content = request.POST.get('content','')
         anonymous = request.POST.get('anonymous','')
-        print anonymous
         if title == '':
             error = 'title missing!'
-            return render(request, 'board/board_write.html', {'error':error})
         if content == '':
             error = 'body missing!'
-            return render(request, 'board/board_write.html', {'error':error})
+        if error:
+            return render(request, 'board/board_write.html', {'error':error,'title':title,'content':content})
         _BoardContent = BoardContent()
         _BoardContent.content = content
         _BoardContent.created_time = datetime.datetime.today()
@@ -42,7 +41,8 @@ def board_write(request):
         return redirect('../%d/' %_BoardPost.id)
     return render(request, 'board/board_write.html')
 
-def board_read(request, id):
+@login_required(login_url='/session/login')
+def board_read(request, id, error=''):
     _BoardPost = BoardPost.objects.filter(id=id)
     if _BoardPost:
         _BoardPost = _BoardPost[0]
@@ -58,4 +58,43 @@ def board_read(request, id):
     created_time = _BoardContent.created_time
     if _BoardContent.is_anonymous:
         username = 'anonymous'
-    return render(request, 'board/board_read.html', {'id':id,'username':username,'title':title,'content':content,'created_time':created_time})
+    return render(request, 'board/board_read.html', {'error':error,'id':id,'username':username,'title':title,'content':content,'created_time':created_time})
+
+@login_required(login_url='/session/login')
+def board_modify(request, id, error=''):
+    _User = request.user
+    _BoardPost = BoardPost.objects.filter(id=id)
+    if _BoardPost:
+        _BoardPost = _BoardPost[0]
+    else:
+        error = "No post"
+    if _BoardPost.author_id != _User.id:
+        error = "Not allowed"
+    if error:
+        return redirect('../')
+    _BoardContent = _BoardPost.board_content
+    if request.method == 'POST':
+        if not request.user.is_authenticated():
+            return redirect('session/login')
+        _User = request.user
+        _UserProfile = _User.userprofile
+
+        title = request.POST.get('title','')
+        content = request.POST.get('content','')
+        anonymous = request.POST.get('anonymous','')
+        if title == '':
+            error = 'title missing!'
+        if content == '':
+            error = 'body missing!'
+        if error:
+            return render(request, 'board/board_write.html', {'error':error,'title':title,'content':content})
+        _BoardContent.content = content
+        if anonymous=='on':
+            _BoardContent.is_anonymous = True
+        _BoardContent.save()
+        _BoardPost.title = title
+        _BoardPost.save()
+        return redirect('../')
+    title = _BoardPost.title
+    content = _BoardContent.content
+    return render(request, 'board/board_write.html', {'title':title,'content':content})

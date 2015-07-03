@@ -1,23 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    {% if error %}
-        {{error}}
-    {% else %}
-        <p class="col-md-12"> id : {{id}} </p>
-        <div class="col-md-12">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <div class="span5"> {{ title }} </div>
-                    <div class="span7"> {{ created_time }}</div>
-                </div>
-                <div class="panel-body"> {{ username }} </div>
+    {{error}}
+    <p class="col-md-12"> id : {{id}} </p>
+    <div class="col-md-12">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <div class="span5"> {{ title }} </div>
+                <div class="span7"> {{ created_time }}</div>
             </div>
-            <div class="border-box">
-                {{content}}
-             </div>
+            <div class="panel-body"> {{ username }} </div>
         </div>
-    {% endif %}
+        <div class="border-box">
+            {{content}}
+        </div>
+        <a class="btn btn-primary" href="./modify">Modify</a>
+    </div>
 </div>
 {% endblock %}
 
