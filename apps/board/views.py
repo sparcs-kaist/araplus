@@ -15,6 +15,8 @@ def board_write(request):
             # return redirect('session/login')
         title = request.POST.get('title','')
         body = request.POST.get('body','')
+        anonymous = request.POST.get('anonymous','')
+        print anonymous
         if title == '':
             error = 'title missing!'
             return render(request, 'board/board_write.html', {'error':error})
@@ -38,8 +40,10 @@ def board_read(request, id):
     if _BoardPost:
         _BoardPost = _BoardPost[0]
     else:
-        render(request, 'board/board_read.html', {'error':error})
+        error = "No post"
+        return render(request, 'board/board_read.html', {'error':error})
     _BoardContent = _BoardPost.board_content
     title = _BoardPost.title
     content = _BoardContent.content
-    return render(request, 'board/board_read.html', {'id':id,'title':title,'content':content})
+    created_time = _BoardContent.created_time
+    return render(request, 'board/board_read.html', {'id':id,'title':title,'content':content,'created_time':created_time})
