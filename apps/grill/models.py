@@ -16,7 +16,6 @@ class Grill(models.Model):
 
 
 class GrillComment(models.Model):
-    # grill = models.ForeignKey(Grill)
 
     def save(self, *args, **kwargs):
         no = GrillComment.objects.filter(grill=self.grill).count()
@@ -49,3 +48,10 @@ class GrillComment(models.Model):
         return re.sub(r'@(?P<target>\d+)',
                       '<a href="#comment_\g<target>">@\g<target></a>',
                       self.content)
+
+
+class GrillCommentVote(models.Model):
+    grill_comment = models.ForeignKey(GrillComment, null=False)
+    # userprofile = models.ForeignKey(session.UserProfile,
+    #                                 related_name="grill_comment_vote")
+    is_up = models.BooleanField()
