@@ -1,3 +1,5 @@
+var refresh_timer;
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -29,7 +31,11 @@ var add_comment = function(grill_id){
                 },
             dataType: 'json',
             success: function(json){
+                console.log("debug")
+                clearInterval(refresh_timer);
                 refresh_comment(grill_id);
+                refresh_timer = setInterval(function(){
+                    console.log("auto");refresh_comment(grill_id);},5000);
             },
             error:function(request,status,error){
             console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
@@ -72,3 +78,22 @@ function refresh_comment (grill_id) {
     });
 }
 
+$(document).ready(function(){
+            var csrftoken = getCookie('csrftoken');
+            var grill_id = document.URL.split("/")[4];
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+
+            refresh_timer = setInterval(function(){refresh_comment(grill_id);},5000);
+
+            $("#comment_form").on('submit',function(event){
+                event.preventDefault();
+                add_comment(grill_id);
+            });           
+            
+        });

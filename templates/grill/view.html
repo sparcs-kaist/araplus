@@ -8,24 +8,7 @@
     <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
     <script>
 
-        $(document).ready(function(){
-            var csrftoken = getCookie('csrftoken');
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    }
-                }
-            });
-
-            setInterval(function(){refresh_comment({{grill.id}});},5000);
-
-            $("#comment_form").on('submit',function(event){
-                event.preventDefault();
-                add_comment({{grill.id}});
-            });           
-            
-        });
+        
                                               
     </script>
 </head>
