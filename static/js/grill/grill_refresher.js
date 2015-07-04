@@ -51,7 +51,7 @@ function refresh_comment (grill_id) {
     }
     $.ajax({
         type: 'POST',
-        url: '/grill/' + grill_id + '/refresh_comment/',
+        url: '/grill/'+grill_id +'/refresh_comment/',
         data: {
             required_index: current_index*1+1,
             last_update: last_update,
@@ -112,7 +112,7 @@ function vote_up(grill_id, order) {
 
 $(document).ready(function(){
             var csrftoken = getCookie('csrftoken');
-            var grill_id = document.URL.split("/")[4];
+            var grill_id = document.URL.split("/")[4].split("#")[0];
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -127,6 +127,10 @@ $(document).ready(function(){
                 $(this).attr('disabled',true);
                 vote_up(grill_id, $(this).parent().parent()[0].id.split("_")[1]*1);
 
+            })
+
+            $("#new_content").on('keyup',function(event){
+                console.log(140 - $($("#new_content")[0]).val().length)
             })
 
             $("#comment_form").on('submit',function(event){

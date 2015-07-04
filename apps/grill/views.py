@@ -105,7 +105,6 @@ def refresh_comment(request, grill_id):
     # now, elem of votes : {'grill_comment', 'new_count'}
     data['new_votes'] = list(votes)
     data['last_update'] = last_update
-    print "ALLRIGHT"
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
                         content_type="application/json")
 
@@ -120,16 +119,11 @@ def vote_comment(request, grill_id):
     profile = get_object_or_404(UserProfile, user=request.user)
     target_comment = get_object_or_404(GrillComment, grill__id=grill_id,
                                        order=target_order)
-    print type(profile), type(target_comment)
-    print GrillCommentVote.objects.filter(grill_comment=target_comment,
-                                          userprofile=profile).count()
     if GrillCommentVote.objects.filter(grill_comment=target_comment,
                                        userprofile=profile).count():
         return HttpResponse("0")
-    print "CHECK"
     new_vote = GrillCommentVote(userprofile=profile,
                                 grill_comment=target_comment,
                                 is_up=is_up)
     new_vote.save()
-    print "Here?"
     return HttpResponse("1")
