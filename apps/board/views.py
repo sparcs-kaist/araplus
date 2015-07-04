@@ -132,3 +132,30 @@ def comment_write(request, pid, error=''):
         _BoardComment.save()
         return redirect('../')
     return redirect('../')
+
+
+@login_required(login_url='/session/login')
+def comment_modify(request, error=''):
+    _User = request.user
+    cid = request.POST.get('cid','')
+    _BoardComment = BoardComment.objects.filter(id = cid)
+    if _BoardComment:
+        _BoardComment = _BoardComment[0]
+        if _BoardComment.author_id != _User.id:
+            error = "Not allowd"
+    else:
+        error = "No Comment"
+    if error:
+        return redirect('../')
+    _BoardContent = _BoardComment.board_content
+    if request.method == 'POST':
+        _UserProfie = _User.userprofile
+        content = request.POST.get('content', '')
+        if content == '':
+            error = 'No comment content'
+        if error:
+            return redirect('../')
+        _BoardContent.content = content
+        _BoardContent.save()
+        return redirect('../')
+    return redirect('../')
