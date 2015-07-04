@@ -5,3 +5,4 @@ from apps.board.models import *
 admin.site.register(BoardContent)
 admin.site.register(BoardPost)
 admin.site.register(BoardComment)
+admin.site.register(BoardContentVote)

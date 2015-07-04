@@ -18,6 +18,42 @@
                                     "</button></div></div></form>"
             $(mod_comment).replaceAll("#comment_content"+cid);
         });
+		$(".up").click(function() {
+			<!-- 1. Content id 불러오기-->
+			var uid=$(this).attr("id").slice(3);
+			<!-- 2. ajax request 날리기-->
+			$.ajax(
+			{
+				url : '/board/up/',
+				data : { id : uid },
+				success : function(data){
+					if(data=="success") {
+						console.log("추천 성공!");
+					}
+					else {
+						console.log("추천 실패!");
+					}
+				}
+			});
+		
+		});
+		$(".down").click(function() {
+			<!-- 1. Content id 불러오기-->
+			var uid=$(this).attr("id").slice(5);
+			<!-- 2. ajax request 날리기-->
+			$.ajax({
+				url : '/board/down/',
+				data : { id : uid},
+				success : function(data){
+					if(data=="success") {
+						console.log("반대 성공!");
+					}
+					else {
+						console.log("반대 실패!");
+					}
+				}
+			});
+		});
     });
 </script>
 {% endblock %}
@@ -37,8 +73,13 @@
             </div>
             <div class="panel-body">
                 {{content}}
-                <div class="col-md-12">
-                    <a class="btn btn-info col-md-1 col-md-offset-11" href="./modify">Modify</a>
+				<div class="col-md-12">
+					<div class="row">
+						<div class="col-md-9"></div>
+						<button class="btn btn-success col-md-1 up" id="up_{{content_id}}">Up</button>
+						<button class="btn btn-danger col-md-1 down" id="down_{{content_id}}">Down</button>
+						<a class="btn btn-info col-md-1" href="./modify">Modify</a>
+					</div>
                 </div>
             </div>
         </div>
@@ -60,7 +101,12 @@
                 <div id="comment_content{{ comment.id }}">
                     <div id="comment{{comment.id}}">{{ comment.board_content.content }}</div>
                     <div class="col-md-12">
-                        <button type="submit" class="btn btn-info col-md-1 col-md-offset-11 comment" id="btn{{comment.id}}">Modify</button>
+						<div class="row">
+							<div class="col-md-9"></div>
+							<button class="btn btn-success col-md-1 up" id="up_{{comment.board_content.id}}">Up</button>
+							<button class="btn btn-danger col-md-1 down" id="up_{{comment.board_content.id}}">Down</button>
+							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
+						</div>
                     </div>
                 </div>
             </div>

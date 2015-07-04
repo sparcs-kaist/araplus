@@ -55,11 +55,15 @@ def post_read(request, pid, error=''):
     username = _User.username
     title = _BoardPost.title
     content = _BoardContent.content
+    content_id = _BoardContent.id
     created_time = _BoardContent.created_time
     comments = _BoardPost.comment.all()
     if _BoardContent.is_anonymous:
         username = 'anonymous'
-    return render(request, 'board/board_read.html', {'error':error,'id':pid,'username':username,'title':title,'content':content,'created_time':created_time,'comments':comments})
+    return render(request, 'board/board_read.html', \
+            {'error':error,'id':pid,'username':username,'title':title,\
+            'content':content,'content_id':content_id,\
+            'created_time':created_time, 'comments':comments})
 
 @login_required(login_url='/session/login')
 def post_modify(request, pid, error=''):
@@ -159,3 +163,71 @@ def comment_modify(request, error=''):
         _BoardContent.save()
         return redirect('../')
     return redirect('../')
+
+@login_required(login_url='/session/login')
+def post_list(request, error=''):
+    _BoardPost=BoardPost.objects.all()
+    posts = []
+    for bp in _BoardPost:
+        post = {}
+        if bp.board_content.is_anonymous:
+            post['username']="annonymous"
+        else:
+            post['username']=bp.author.user.username
+        post['board']="sdskjflsd"
+        post['title']=bp.title
+        post['created_time']=bp.board_content.created_time
+        post['id']=bp.id
+        up = 0
+        down = 0
+        for content_vote in bp.board_content.content_vote.all():
+            if content_vote.is_up:
+                up=up+1
+            else:
+               down= down+1
+
+        post['up']=up
+        post['down']=down
+        posts.append(post)
+    return render(request, 'board/board_list.html',{'Posts': posts})
+
+@login_required(login_url='/session/login')
+def up(request):
+    id = request.GET.get('id')
+    _BoardContent = BoardContent.objects.filter(id=id)[0]
+    _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+    if _BoardContentVote:
+        vote = _BoardContentVote[0]
+        if vote.is_up:
+            return HttpResponse("fail")
+        else:
+            vote.is_up = True
+            vote.save()
+            return HttpResponse("success")
+    else:
+        vote = BoardContentVote()
+        vote.is_up = True
+        vote.userprofile = request.user.userprofile
+        vote.board_content = BoardContent.objects.filter(id=id)[0]
+        vote.save()
+        return HttpResponse("success")
+
+def down(request):
+    id = request.GET.get('id')
+    _BoardContent = BoardContent.objects.filter(id=id)[0]
+    _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+    if _BoardContentVote:
+        vote = _BoardContentVote[0]
+        if not vote.is_up:
+            return HttpResponse("fail")
+        else:
+            vote.is_up = False
+            vote.save()
+            return HttpResponse("success")
+    else:
+        vote = BoardContentVote()
+        vote.is_up = False
+        vote.userprofile = request.user.userprofile
+        vote.board_content = BoardContent.objects.filter(id=id)[0]
+        vote.save()
+        return HttpResponse("success")

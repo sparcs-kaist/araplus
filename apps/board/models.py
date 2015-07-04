@@ -15,7 +15,7 @@ class BoardContent(models.Model):
             return "%dnd content created in %s" %(self.id, self.created_time)
         elif(self.id%10==2):
             return "%dnd content created in %s" %(self.id, self.created_time)
-        else:
+        else:   
             return "%dth content created in %s" %(self.id, self.created_time)
 
 
@@ -35,7 +35,7 @@ class BoardComment(models.Model):
 
 class BoardContentVote(models.Model):
     board_content = models.ForeignKey('BoardContent', related_name="content_vote", null=False)
-    # userprofile = models.ForeignKey(session.UserProfile, related_name="board_comment_vote")
+    userprofile = models.ForeignKey('session.UserProfile', related_name="board_comment_vote")
     is_up = models.BooleanField(null=False)
 
 
