@@ -1,20 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    {{error}}
-    <p class="col-md-12"> id : {{id}} </p>
     <div class="col-md-12">
+        <p>{{error}}</p>
         <div class="panel panel-success">
             <div class="panel-heading">
-                <div class="span5"> {{ title }} </div>
-                <div class="span7"> {{ created_time }}</div>
+                <div>
+                    <label> {{ title }} </label>
+                    <span> {{ username }}</span>
+                </div>
+                <div> 
+                    <span>{{created_time}}</span>
+                </div>
             </div>
-            <div class="panel-body"> {{ username }} </div>
+            <div class="panel-body">
+                {{content}}
+                <div class="col-md-12">
+                    <a class="btn btn-info col-md-1 col-md-offset-11" href="./modify">Modify</a>
+                </div>
+            </div>
         </div>
-        <div class="border-box">
-            {{content}}
+        {% for comment in comments %}
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <div>
+                    {% if comment.board_content.is_anonymous %}
+                    <span> anonymous </span>
+                    {% else %}
+                    <span> {{ comment.author.user.username }}</span>
+                    {% endif %}
+                </div>
+                <div> 
+                    <span>{{ comment.board_content.created_time }}</span>
+                </div>
+            </div>
+            <div class="panel-body">{{ comment.board_content.content }} </div>
         </div>
-        <a class="btn btn-primary" href="./modify">Modify</a>
+        {% endfor %}
+        <div>
+            <form action="./comment/" method="POST">
+                {%csrf_token%}
+                 {{ error }}
+                <input type="hidden" name="next" value="{{ next }}">
+                <div class="form-group">
+                    <label>Anonymous</label>
+                    <input type="checkbox" name="anonymous">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" name="content"></textarea>
+                </div>
+                <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
+            </form>
+        </div>
+
     </div>
 </div>
 {% endblock %}

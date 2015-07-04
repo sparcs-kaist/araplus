@@ -5,10 +5,12 @@
         {%csrf_token%}
         {{ error }}
         <input type="hidden" name="next" value="{{ next }}">
+        {% if new %}
         <div class="form-group">
             <label>Anonymous</label>
             <input type="checkbox" name="anonymous">
         </div>
+        {% endif %}
         <div class="form-group">
             <label>Title:</label>
             <input type="text" class="form-control" name="title" value="{{title}}">

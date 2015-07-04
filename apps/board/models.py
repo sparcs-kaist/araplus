@@ -27,7 +27,10 @@ class Attachment(models.Model):
 class BoardComment(models.Model):
     board_content = models.OneToOneField('BoardContent', related_name="comment", null=False)
     board_post = models.ForeignKey('BoardPost', related_name="comment", null=False)
-    # author = models.ForeignKey(session.UserProfile, related_name="board_comment")
+    author = models.ForeignKey('session.UserProfile', related_name="board_comment")
+
+    def __str__(self):
+        return "created in %s, authored by %s" %(self.board_content.created_time, self.author.user)
 
 
 class BoardContentVote(models.Model):
