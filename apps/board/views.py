@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from apps.board.models import *
 import datetime
+import json
 # Create your views here.
 
 
@@ -52,18 +53,33 @@ def post_read(request, pid, error=''):
     _BoardContent = _BoardPost.board_content
     _UserProfile = _BoardPost.author
     _User = _UserProfile.user
-    username = _User.username
-    title = _BoardPost.title
-    content = _BoardContent.content
-    content_id = _BoardContent.id
-    created_time = _BoardContent.created_time
-    comments = _BoardPost.comment.all()
+    post = {}
+    post["username"] = _User.username
+    post["title"] = _BoardPost.title
+    post["content"] = _BoardContent.content
+    post["content_id"] = _BoardContent.id
+    post["created_time"] = _BoardContent.created_time
     if _BoardContent.is_anonymous:
-        username = 'anonymous'
+        post["username"] = 'anonymous'
+    post["vote"] = get_vote(_BoardContent)
+    comments = []
+    for cm in _BoardPost.comment.all():
+        _BoardContent = cm.board_content
+        _UserProfile = cm.author
+        _User = _UserProfile.user
+        comment = {}
+        comment["username"] = _User.username
+        comment["title"] = _BoardPost.title
+        comment["comment_id"] = cm.id
+        comment["content"] = _BoardContent.content
+        comment["content_id"] = _BoardContent.id
+        comment["created_time"] = _BoardContent.created_time
+        if _BoardContent.is_anonymous:
+            comment["username"] = 'anonymous'
+        comment["vote"] = get_vote(_BoardContent)
+        comments.append(comment)
     return render(request, 'board/board_read.html', \
-            {'error':error,'id':pid,'username':username,'title':title,\
-            'content':content,'content_id':content_id,\
-            'created_time':created_time, 'comments':comments})
+            {'error':error, 'post':post, 'comments':comments})
 
 @login_required(login_url='/session/login')
 def post_modify(request, pid, error=''):
@@ -197,39 +213,60 @@ def up(request):
     id = request.GET.get('id')
     _BoardContent = BoardContent.objects.filter(id=id)[0]
     _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+    message = ''
     if _BoardContentVote:
         vote = _BoardContentVote[0]
         if vote.is_up:
-            return HttpResponse("fail")
+            message = "fail"
         else:
             vote.is_up = True
             vote.save()
-            return HttpResponse("success")
+            message = "success"
     else:
         vote = BoardContentVote()
         vote.is_up = True
         vote.userprofile = request.user.userprofile
         vote.board_content = BoardContent.objects.filter(id=id)[0]
         vote.save()
-        return HttpResponse("success")
+        message = "success"
+    result = get_vote(_BoardContent)
+    result['message'] = message
+    return HttpResponse(json.dumps(result), content_type="application/json")
 
 @login_required(login_url='/session/login')
 def down(request):
     id = request.GET.get('id')
     _BoardContent = BoardContent.objects.filter(id=id)[0]
     _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+    message = ''
     if _BoardContentVote:
         vote = _BoardContentVote[0]
         if not vote.is_up:
-            return HttpResponse("fail")
+            message = "fail"
         else:
             vote.is_up = False
             vote.save()
-            return HttpResponse("success")
+            message = "success"
     else:
         vote = BoardContentVote()
         vote.is_up = False
         vote.userprofile = request.user.userprofile
         vote.board_content = BoardContent.objects.filter(id=id)[0]
         vote.save()
-        return HttpResponse("success")
+        message = "success"
+    result = get_vote(_BoardContent)
+    result['message'] = message
+    return HttpResponse(json.dumps(result), content_type="application/json")
+
+def get_vote(_BoardContent):
+    up = 0
+    down = 0
+    for content_vote in _BoardContent.content_vote.all():
+        if content_vote.is_up:
+            up=up+1
+        else:
+            down= down+1
+    vote = {}
+    vote['up']=up
+    vote['down']=down
+    return vote

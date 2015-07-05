@@ -26,13 +26,15 @@
 			{
 				url : '/board/up/',
 				data : { id : uid },
+                dataType : 'json',
 				success : function(data){
-					if(data=="success") {
+					if(data.message=="success") {
 						console.log("추천 성공!");
 					}
 					else {
 						console.log("추천 실패!");
-					}
+                    }
+                    $("#vote_"+uid).html("추천 +"+data.up+"/-"+data.down)
 				}
 			});
 		
@@ -44,13 +46,15 @@
 			$.ajax({
 				url : '/board/down/',
 				data : { id : uid},
+                dataType : 'json',
 				success : function(data){
-					if(data=="success") {
+					if(data.message=="success") {
 						console.log("반대 성공!");
 					}
 					else {
 						console.log("반대 실패!");
-					}
+                    }
+                    $("#vote_"+uid).html("추천 +"+data.up+"/-"+data.down)
 				}
 			});
 		});
@@ -64,20 +68,21 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 <div>
-                    <label> {{ title }} </label>
-                    <span> {{ username }}</span>
+                    <label> {{ post.title }} </label>
+                    <span> {{ post.username }}</span>
                 </div>
-                <div> 
-                    <span>{{created_time}}</span>
+                <div>
+                    <span class="col-md-10">{{post.created_time}}</span>
+                    <span id="vote_{{post.content_id}}">추천 +{{post.vote.up}}/-{{post.vote.down}}</span>
                 </div>
             </div>
             <div class="panel-body">
-                {{content}}
+                {{post.content}}
 				<div class="col-md-12">
 					<div class="row">
 						<div class="col-md-9"></div>
-                        <button class="btn btn-success col-md-1 up" id="up_{{content_id}}">Up</button>
-                        <button class="btn btn-danger col-md-1 down" id="down_{{content_id}}">Down</button>
+                        <button class="btn btn-success col-md-1 up" id="up_{{post.content_id}}">Up</button>
+                        <button class="btn btn-danger col-md-1 down" id="down_{{post.content_id}}">Down</button>
 						<a class="btn btn-info col-md-1" href="./modify">Modify</a>
 					</div>
                 </div>
@@ -87,25 +92,22 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 <div>
-                    {% if comment.board_content.is_anonymous %}
-                    <span> anonymous </span>
-                    {% else %}
-                    <span> {{ comment.author.user.username }}</span>
-                    {% endif %}
+                    <span> {{ comment.username }}</span>
                 </div>
                 <div> 
-                    <span>{{ comment.board_content.created_time }}</span>
+                    <span class="col-md-10">{{comment.created_time}}</span>
+                    <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
                 </div>
             </div>
             <div class="panel-body">
-                <div id="comment_content{{ comment.id }}">
-                    <div id="comment{{comment.id}}">{{ comment.board_content.content }}</div>
+                <div id="comment_content{{ comment.commend_id }}">
+                    <div id="comment{{comment.comment_id}}">{{ comment.content }}</div>
                     <div class="col-md-12">
 						<div class="row">
 							<div class="col-md-9"></div>
-							<button class="btn btn-success col-md-1 up" id="up_{{comment.board_content.id}}">Up</button>
-							<button class="btn btn-danger col-md-1 down" id="down_{{comment.board_content.id}}">Down</button>
-							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
+							<button class="btn btn-success col-md-1 up" id="up_{{comment.content_id}}">Up</button>
+							<button class="btn btn-danger col-md-1 down" id="down_{{comment.content_id}}">Down</button>
+							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.comment_id}}">Modify</button>
 						</div>
                     </div>
                 </div>
