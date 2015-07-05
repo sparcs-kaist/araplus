@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
+    nickname = models.TextField(max_length=12)
     points = models.IntegerField(default=0)
 
     def __str__(self):
-        return "User %s's profile object" % self.user
+        return "User %s (%s)'s profile object" % (self.user, self.nickname)
 
 
 class Message(models.Model):
