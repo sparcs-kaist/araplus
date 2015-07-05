@@ -34,7 +34,7 @@
 					else {
 						console.log("추천 실패!");
                     }
-                    $("#vote_"+uid).html("추천 +"+data.up+"/-"+data.down)
+                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down)
 				}
 			});
 		
@@ -54,7 +54,7 @@
 					else {
 						console.log("반대 실패!");
                     }
-                    $("#vote_"+uid).html("추천 +"+data.up+"/-"+data.down)
+                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down)
 				}
 			});
 		});
@@ -100,7 +100,7 @@
                 </div>
             </div>
             <div class="panel-body">
-                <div id="comment_content{{ comment.commend_id }}">
+                <div id="comment_content{{ comment.comment_id }}">
                     <div id="comment{{comment.comment_id}}">{{ comment.content }}</div>
                     <div class="col-md-12">
 						<div class="row">

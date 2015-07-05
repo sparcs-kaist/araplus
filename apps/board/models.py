@@ -18,6 +18,19 @@ class BoardContent(models.Model):
         else:
             return "%dth content created in %s" %(self.id, self.created_time)
 
+    def get_vote(self):
+        up = 0
+        down = 0
+        for content_vote in self.content_vote.all():
+            if content_vote.is_up:
+                up=up+1
+            else:
+                down= down+1
+        vote = {}
+        vote['up']=up
+        vote['down']=down
+        return vote
+
 
 class Attachment(models.Model):
     file = models.FileField(null=False)

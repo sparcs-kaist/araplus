@@ -61,7 +61,7 @@ def post_read(request, pid, error=''):
     post["created_time"] = _BoardContent.created_time
     if _BoardContent.is_anonymous:
         post["username"] = 'anonymous'
-    post["vote"] = get_vote(_BoardContent)
+    post["vote"] = _BoardContent.get_vote()
     comments = []
     for cm in _BoardPost.comment.all():
         _BoardContent = cm.board_content
@@ -76,7 +76,7 @@ def post_read(request, pid, error=''):
         comment["created_time"] = _BoardContent.created_time
         if _BoardContent.is_anonymous:
             comment["username"] = 'anonymous'
-        comment["vote"] = get_vote(_BoardContent)
+        comment["vote"] = _BoardContent.get_vote()
         comments.append(comment)
     return render(request, 'board/board_read.html', \
             {'error':error, 'post':post, 'comments':comments})
@@ -229,8 +229,9 @@ def up(request):
         vote.board_content = BoardContent.objects.filter(id=id)[0]
         vote.save()
         message = "success"
-    result = get_vote(_BoardContent)
+    result = {}
     result['message'] = message
+    result['vote'] = _BoardContent.get_vote()
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 @login_required(login_url='/session/login')
@@ -254,19 +255,8 @@ def down(request):
         vote.board_content = BoardContent.objects.filter(id=id)[0]
         vote.save()
         message = "success"
-    result = get_vote(_BoardContent)
+    result = {}
     result['message'] = message
+    result['vote'] = _BoardContent.get_vote()
     return HttpResponse(json.dumps(result), content_type="application/json")
 
-def get_vote(_BoardContent):
-    up = 0
-    down = 0
-    for content_vote in _BoardContent.content_vote.all():
-        if content_vote.is_up:
-            up=up+1
-        else:
-            down= down+1
-    vote = {}
-    vote['up']=up
-    vote['down']=down
-    return vote
