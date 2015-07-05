@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+	<table style="width:100%">
+		<thead>
+			<tr>
+				<th width="50">user</th>
+				<th width="50">board</th>
+				<th width="500">title</th>
+				<th width="50">+/-</th>
+				<th width="50">date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for post in Posts %}
+				<tr>
+					<td width="50">{{post.username}}</td>
+					<td width="50">{{post.board}}</td>
+					<td width="500"><a href="/board/{{post.id}}/">{{post.title}}</a></td>
+					<td width="50">+{{post.up}}/-{{post.down}}</td>
+					<td width="50">{{post.created_time}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+
+	</table>
+	<button><a href="/board/post">Write</a></button>
+{% endblock %}
+
+
