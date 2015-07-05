@@ -213,6 +213,7 @@ def up(request):
         vote.save()
         return HttpResponse("success")
 
+@login_required(login_url='/session/login')
 def down(request):
     id = request.GET.get('id')
     _BoardContent = BoardContent.objects.filter(id=id)[0]
