@@ -13,9 +13,9 @@ class BoardContent(models.Model):
             return "%dst content created in %s" %(self.id, self.created_time)
         elif(self.id%10==2):
             return "%dnd content created in %s" %(self.id, self.created_time)
-        elif(self.id%10==2):
+        elif(self.id%10==3):
             return "%dnd content created in %s" %(self.id, self.created_time)
-        else:   
+        else:
             return "%dth content created in %s" %(self.id, self.created_time)
 
 
