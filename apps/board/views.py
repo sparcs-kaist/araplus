@@ -23,6 +23,7 @@ def post_write(request):
         post["title"] = request.POST.get('title','')
         post["content"] = request.POST.get('content','')
         anonymous = request.POST.get('anonymous','')
+        adult = request.POST.get('adult','')
         if post["title"] == '':
             error = 'title missing!'
         if post["content"] == '':
@@ -34,6 +35,8 @@ def post_write(request):
         _BoardContent.created_time = datetime.datetime.today()
         if anonymous=='on':
             _BoardContent.is_anonymous = True
+        if adult=='on':
+            _BoardContent.is_adult = True
         _BoardContent.save()
         _BoardPost = BoardPost()
         _BoardPost.title = post["title"]
@@ -74,6 +77,7 @@ def post_read(request, pid, error=''):
     reading_id=request.user.userprofile.id
     post["return"]=(writing_id==reading_id)
     post["vote"] = _BoardContent.get_vote()
+    post["adult"] = _BoardContent.is_adult
     comments = []
     for cm in _BoardPost.comment.all():
         _BoardContent = cm.board_content
@@ -117,12 +121,17 @@ def post_modify(request, pid):
 
         post["title"] = request.POST.get('title','')
         post["content"] = request.POST.get('content','')
+        adult = request.POST.get('adult','')
         if post["title"] == '':
             error = 'title missing!'
         if post["content"] == '':
             error = 'body missing!'
         if error:
             return render(request, 'board/board_write.html', {"error":error,"post":post})
+        if adult:
+            _BoardContent.is_adult = True
+        else:
+            _BoardContent.is_adult = False
         _BoardContent.content = post["content"]
         _BoardContent.save()
         _BoardPost.title = post["title"]
@@ -197,9 +206,10 @@ def comment_modify(request, error=''):
     return redirect('../')
 
 @login_required(login_url='/session/login')
-def post_list(request, error=''):
-    _BoardPost=BoardPost.objects.all()
+def post_list(request):
+    adult_filter = request.GET.get('adult_filter')
     posts = []
+    _BoardPost = BoardPost.objects.all()
     for bp in _BoardPost:
         post = {}
         if bp.board_content.is_anonymous:
@@ -210,16 +220,11 @@ def post_list(request, error=''):
         post['title']=bp.title
         post['created_time']=bp.board_content.created_time
         post['id']=bp.id
-        up = 0
-        down = 0
-        for content_vote in bp.board_content.content_vote.all():
-            if content_vote.is_up:
-                up=up+1
-            else:
-               down= down+1
-
-        post['up']=up
-        post['down']=down
+        vote = bp.board_content.get_vote()
+        post['up']=vote['up']
+        post['down']=vote['down']
+        if adult_filter=='true' and bp.board_content.is_adult:
+            post['title'] = "filterd"
         posts.append(post)
     return render(request, 'board/board_list.html',{'Posts': posts})
 
