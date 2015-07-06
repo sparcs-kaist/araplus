@@ -24,5 +24,6 @@ urlpatterns = [
     url(r'^([1-9][0-9]*)/comment/$', 'apps.board.views.comment_write'),
     url(r'^[1-9][0-9]*/comment_mod/$', 'apps.board.views.comment_modify'),
     url(r'^up/$', 'apps.board.views.up'),
-    url(r'^down/$', 'apps.board.views.down')
+    url(r'^down/$', 'apps.board.views.down'),
+    url(r'^delete/$','apps.board.views.delete'),
 ]
