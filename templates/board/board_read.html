@@ -50,6 +50,9 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 <div>
+                    {% if post.adult %}
+                    <label style="color:red">+19</label>
+                    {% endif %}
                     <label> {{ post.title }} </label>
                     <span> {{ post.username }}</span>
                 </div>
