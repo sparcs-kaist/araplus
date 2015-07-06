@@ -209,6 +209,9 @@ def post_list(request, error=''):
     adult_filter=request.GET.get('adult_filter')
     board_filter=request.GET.get('board')
     cur_board=""
+    is_adult=False
+    if adult_filter == "true":
+        is_adult=True
     if board_filter:
         _BoardPost=BoardPost.objects.filter(board=board_filter)
         cur_board = Board.objects.filter(id=board_filter)[0]
@@ -236,7 +239,7 @@ def post_list(request, error=''):
         if adult_filter=='true' and bp.board_content.is_adult:
             post['title'] = "filterd"
         posts.append(post)
-    return render(request, 'board/board_list.html',{'Posts': posts, 'Boards': boards, 'Cur_board': cur_board})
+    return render(request, 'board/board_list.html',{'Posts': posts, 'Boards': boards, 'Cur_board': cur_board, 'Is_adult':is_adult})
 
 @login_required(login_url='/session/login')
 def up(request):
