@@ -68,8 +68,9 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 <div>
-                    <label> {{ post.title }} </label>
-                    <span> {{ post.username }}</span>
+                    <label class="col-md-2"> {{ post.title }} </label>
+                    <span class="col-md-2"> {{ post.username }}</span>
+                    <span class="col-md-2">{{post.board}}</span>
                 </div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>

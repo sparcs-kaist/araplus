@@ -3,27 +3,41 @@
 	<table style="width:100%">
 		<thead>
 			<tr>
-				<th width="50">user</th>
-				<th width="50">board</th>
-				<th width="500">title</th>
-				<th width="50">+/-</th>
-				<th width="50">date</th>
+				<th width="150">user</th>
+                <th width="100">
+                    <div class="dropdown">                  
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{Cur_board.name|default:"All"}}
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a href="?">All</a></li>
+                            {% for board in Boards %}
+                            <li><a href="?board={{board.id}}">{{ board.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </th>
+				<th width="350">title</th>
+				<th width="100">+/-</th>
+				<th width="150">date</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for post in Posts %}
 				<tr>
-					<td width="50">{{post.username}}</td>
-					<td width="50">{{post.board}}</td>
-					<td width="500"><a href="/board/{{post.id}}/">{{post.title}}</a></td>
-					<td width="50">+{{post.up}}/-{{post.down}}</td>
-					<td width="50">{{post.created_time}}</td>
+					<td width="150">{{post.username}}</td>
+                    <td width="150"><a href="?board={{post.board_id}}">{{post.board}}</a></td>
+                    <td width="350"><a href="/board/{{post.id}}/">{{post.title}}</a></td>
+					<td width="100">+{{post.up}}/-{{post.down}}</td>
+					<td width="150">{{post.created_time}}</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 
-	</table>
-	<button><a href="/board/post">Write</a></button>
+    </table>
+    {% if Cur_board.id %}
+    <button><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
+    {% endif %}
 {% endblock %}
 
 

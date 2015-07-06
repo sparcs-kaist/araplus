@@ -63,7 +63,8 @@ class BoardReport(models.Model):
 class Board(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=100, null=False)
-
+    def __str__(self):
+        return "board %s" %self.name
 
 class BoardCategory(models.Model):
     name = models.CharField(max_length=10, null=False)
@@ -79,7 +80,7 @@ class BoardPostVote(models.Model):
 class BoardPost(models.Model):
     title = models.CharField(max_length=45, null=False)
     is_notice = models.BooleanField(default=False,null=False)
-    # board = models.ForeignKey('Board', related_name='board', null=False)
+    board = models.ForeignKey('Board', related_name='board', null=False)
     author = models.ForeignKey('session.UserProfile', related_name='board_post')
     board_content = models.OneToOneField('BoardContent', null=False)
     # board_category = models.ForeignKey('BoardCategory', related_name='category', null=False)

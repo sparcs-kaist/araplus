@@ -17,6 +17,7 @@ def post_write(request, error=''):
         _User = request.user
         _UserProfile = _User.userprofile
 
+        board = request.GET.get('board')
         title = request.POST.get('title','')
         content = request.POST.get('content','')
         anonymous = request.POST.get('anonymous','')
@@ -38,9 +39,15 @@ def post_write(request, error=''):
         _BoardPost.board_content_id = _BoardContent.id
         _BoardPost.author = _UserProfile
         _BoardPost.author_id = _UserProfile.id
+        _Board = Board.objects.filter(id=board)
+        if _Board:
+            _BoardPost.board=_Board[0]
+        else:
+            return redirect('../')
         _BoardPost.save()
         return redirect('../%d/' %_BoardPost.id)
-    return render(request, 'board/board_write.html', {'new':True,})
+    if request.GET.get('board'):
+        return render(request, 'board/board_write.html', {'new':True,})
 
 @login_required(login_url='/session/login')
 def post_read(request, pid, error=''):
@@ -56,6 +63,7 @@ def post_read(request, pid, error=''):
     post = {}
     post["username"] = _User.username
     post["title"] = _BoardPost.title
+    post["board"] = _BoardPost.board.name
     post["content"] = _BoardContent.content
     post["content_id"] = _BoardContent.id
     post["created_time"] = _BoardContent.created_time
@@ -183,15 +191,26 @@ def comment_modify(request, error=''):
 
 @login_required(login_url='/session/login')
 def post_list(request, error=''):
-    _BoardPost=BoardPost.objects.all()
+    board_filter=request.GET.get('board')
+    cur_board=""
+    if board_filter:
+        _BoardPost=BoardPost.objects.filter(board=board_filter)
+        cur_board = Board.objects.filter(id=board_filter)[0]
+    else:
+        _BoardPost=BoardPost.objects.all()
+    _Board=Board.objects.all()
     posts = []
+    boards = []
+    for bd in _Board:
+        boards.append(bd)
     for bp in _BoardPost:
         post = {}
         if bp.board_content.is_anonymous:
             post['username']="annonymous"
         else:
             post['username']=bp.author.user.username
-        post['board']="sdskjflsd"
+        post['board']=bp.board.name
+        post['board_id']=bp.board.id
         post['title']=bp.title
         post['created_time']=bp.board_content.created_time
         post['id']=bp.id
@@ -206,7 +225,7 @@ def post_list(request, error=''):
         post['up']=up
         post['down']=down
         posts.append(post)
-    return render(request, 'board/board_list.html',{'Posts': posts})
+    return render(request, 'board/board_list.html',{'Posts': posts, 'Boards': boards, 'Cur_board': cur_board})
 
 @login_required(login_url='/session/login')
 def up(request):

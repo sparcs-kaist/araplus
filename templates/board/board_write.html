@@ -3,8 +3,13 @@
 <div class="container">
     <form method="POST">
         {%csrf_token%}
-        {{ error }}
-        <input type="hidden" name="next" value="{{ next }}">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            {{ error }}
+        </div>
+        {% endif %}
         {% if new %}
         <div class="form-group">
             <label>Anonymous</label>
