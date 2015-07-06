@@ -81,7 +81,7 @@ function refresh_comment (grill_id) {
                 var target = json.new_votes[i]
                 var target_order = target.grill_comment
                 var target_new_like = target.new_count
-                var target_button = $($("#comment_"+target_order+">p>button")[0])
+                var target_button = $($("#comment_"+target_order).find("button")[0])
                 target_new_like += target_button.text().trim().split('+')[1].slice(0, -1)*1;
                 target_button.text("추천 (+"+target_new_like+")")
             };
@@ -92,6 +92,8 @@ function refresh_comment (grill_id) {
 }
 
 function vote_up(grill_id, order) {
+    console.log("grill_id : " + grill_id + "/"+typeof(grill_id))
+    console.log("order : " + order + "/"+typeof(order) )
     $.ajax({
         type: 'POST',
         url: '/grill/' + grill_id + '/vote_comment/',
@@ -112,7 +114,7 @@ function vote_up(grill_id, order) {
 
 $(document).ready(function(){
             var csrftoken = getCookie('csrftoken');
-            var grill_id = document.URL.split("/")[4].split("#")[0];
+            var grill_id = document.URL.split("/")[4].split("#")[0]*1;
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -125,7 +127,7 @@ $(document).ready(function(){
 
             $(document).on('click','button.vote_up',function(){
                 $(this).attr('disabled',true);
-                vote_up(grill_id, $(this).parent().parent()[0].id.split("_")[1]*1);
+                vote_up(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1);
 
             })
 
@@ -133,7 +135,8 @@ $(document).ready(function(){
                 console.log(140 - $($("#new_content")[0]).val().length)
             })
 
-            $("#comment_form").on('submit',function(event){
+            $("#add_comment_button").click(function(event){
+                console.log("HI")
                 event.preventDefault();
                 add_comment(grill_id);
             });           

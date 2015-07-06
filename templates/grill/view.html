@@ -6,7 +6,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
     </script>
     <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
+    <link rel="stylesheet" href="/media/css/grill/grill.css">
     <script>
+
 
         
                                               
@@ -14,6 +16,39 @@
 </head>
 
 <body>
+    <div id="comment_container" class="comment-container">
+        <div id="comment_form_container comment_form" class="comment-form-container" method="POST">
+            <div id="comment_add_container" class="comment-add-container">
+                <textarea id="new_content" class="comment-addbox" placeholder="댓글을 입력하세요"></textarea>
+            </div>
+            <div id="comment_button_container" class="comment-button-container">
+                <div id="comment_length_container" class="comment-length-container">(0/140)</div>
+                <button type="submit" id="add_comment_button">댓글달기</button>
+            </div>
+        </div>
+        <div id="comment_list_container" class="comment-list-container">
+            <ul id='result_list'>
+             {% if comments|length %}
+                 {% for comment in comments %}
+                    {% include 'grill/comments.html' %}
+                {% endfor %}
+             {% else %}
+            글이 없습니다.
+             {% endif %}
+            </ul>
+        </div>
+    </div>
+    <div id="content_container" class="content-container">
+        <div>
+            작성자 : {{grill.author}}, 작성일 : {{grill.created_time}}, 최근댓글 : {{grill.updated_time}}
+        </div>
+        <div> Content : {{grill.contents}} </div>
+    </div>
+</body>
+
+
+
+<!-- <body>
 <form
     id = "comment_form"
     method = "POST"
@@ -55,5 +90,5 @@
 {% endif %}
 </ul>
 
-</body>
+</body>-->
 </html>
