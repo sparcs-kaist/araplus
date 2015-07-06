@@ -62,3 +62,6 @@ target/
 
 # SQLITE3 Test database
 db.*
+
+# Mac OS Env
+.DS_Store
