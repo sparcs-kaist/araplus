@@ -48,14 +48,16 @@ def user_register(request):
         return render(request, 'session/register_complete.html')
     return render(request, 'session/register.html')
 
+
 def send_message(request):
     if request.method == "POST":
         if request.user.is_authenticated():
-           sender = UserProfile.objects.get(user=request.user)
-           print sender
+            sender = UserProfile.objects.get(user=request.user)
+            print sender
         else:
             error = "Login required"
-            return render(request, 'session/write_message.html')
+            return render(request,
+                          'session/write_message.html', {'error': error})
         content = request.POST['content']
         receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
         new_message = Message(content=content,
@@ -66,15 +68,3 @@ def send_message(request):
 
         return render(request, 'session/message_success.html')
     return render(request, 'session/write_message.html')
-
-
-
-
-
-
-
-
-
-
-
-

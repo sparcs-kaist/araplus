@@ -14,10 +14,11 @@ class UserProfile(models.Model):
 class Message(models.Model):
     content = models.TextField()
     sender = models.ForeignKey('UserProfile', related_name='message_sent')
-    receiver = models.ForeignKey('UserProfile', related_name='message_received')
+    receiver = models.ForeignKey('UserProfile',
+                                 related_name='message_received')
     created_time = models.DateTimeField(auto_now=True)
     is_read = models.BooleanField()
 
     def __str__(self):
         return "Message from %s to %s at %s" % \
-            (sender, receiver, created_time)
+            (self.sender, self.receiver, self.created_time)
