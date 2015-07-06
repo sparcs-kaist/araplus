@@ -7,6 +7,7 @@ class BoardContent(models.Model):
     created_time = models.DateTimeField(null=False)
     is_deleted = models.BooleanField(default=False, null=False)
     is_anonymous = models.BooleanField(default=False, null=False)
+    is_adult = models.BooleanField(default=False, null=False)
 
     def __str__(self):
         if(self.id%10==1):
@@ -50,6 +51,7 @@ class BoardContentVote(models.Model):
     board_content = models.ForeignKey('BoardContent', related_name="content_vote", null=False)
     userprofile = models.ForeignKey('session.UserProfile', related_name="board_comment_vote")
     is_up = models.BooleanField(null=False)
+    is_adult = models.BooleanField(default=False, null=False)
 
 
 class BoardReport(models.Model):

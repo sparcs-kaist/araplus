@@ -18,43 +18,25 @@
                                     "</button></div></div></form>"
             $(mod_comment).replaceAll("#comment_content"+cid);
         });
-		$(".up").click(function() {
-			<!-- 1. Content id 불러오기-->
-			var uid=$(this).attr("id").slice(3);
-			<!-- 2. ajax request 날리기-->
+		$(".vote").click(function() {
+			var vote_uid;
+			var vote_url;
+			if($(this).hasClass("up")) {
+				vote_uid = $(this).attr("id").slice(3);
+				vote_url = '/board/up/';
+			}
+			else if($(this).hasClass("down")) {
+				vote_uid = $(this).attr("id").slice(5);
+				vote_url = '/board/down';
+			}
 			$.ajax(
 			{
-				url : '/board/up/',
-				data : { id : uid },
-                dataType : 'json',
+				url : vote_url,
+				data : { id : vote_uid },
+				dataType : 'json',
 				success : function(data){
-					if(data.message=="success") {
-						console.log("추천 성공!");
-					}
-					else {
-						console.log("추천 실패!");
-                    }
-                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down)
-				}
-			});
-		
-		});
-		$(".down").click(function() {
-			<!-- 1. Content id 불러오기-->
-			var uid=$(this).attr("id").slice(5);
-			<!-- 2. ajax request 날리기-->
-			$.ajax({
-				url : '/board/down/',
-				data : { id : uid},
-                dataType : 'json',
-				success : function(data){
-					if(data.message=="success") {
-						console.log("반대 성공!");
-					}
-					else {
-						console.log("반대 실패!");
-                    }
-                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down)
+					console.log(data.message);
+					$("#vote_"+vote_uid).html("추천 +"+data.vote.up+"/-"+data.vote.down);
 				}
 			});
 		});
@@ -68,9 +50,12 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 <div>
-                    <label class="col-md-2"> {{ post.title }} </label>
-                    <span class="col-md-2"> {{ post.username }}</span>
-                    <span class="col-md-2">{{post.board}}</span>
+                    {% if post.adult %}
+                    <label style="color:red">+19</label>
+                    {% endif %}
+                    <label> {{ post.title }} </label>
+                    <span> {{ post.username }}</span>
+                    <span> {{post.board}}</span>
                 </div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>
@@ -82,8 +67,8 @@
 				<div class="col-md-12">
 					<div class="row">
 						<div class="col-md-9"></div>
-                        <button class="btn btn-success col-md-1 up" id="up_{{post.content_id}}">Up</button>
-                        <button class="btn btn-danger col-md-1 down" id="down_{{post.content_id}}">Down</button>
+                        <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
 						<a class="btn btn-info col-md-1" href="./modify">Modify</a>
 					</div>
                 </div>
