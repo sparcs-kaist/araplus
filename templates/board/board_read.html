@@ -28,13 +28,8 @@
 				data : { id : uid },
                 dataType : 'json',
 				success : function(data){
-					if(data.message=="success") {
-						console.log("추천 성공!");
-					}
-					else {
-						console.log("추천 실패!");
-                    }
-                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down)
+                    console.log(data.message);
+                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down);
 				}
 			});
 		
@@ -48,13 +43,8 @@
 				data : { id : uid},
                 dataType : 'json',
 				success : function(data){
-					if(data.message=="success") {
-						console.log("반대 성공!");
-					}
-					else {
-						console.log("반대 실패!");
-                    }
-                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down)
+                    console.log(data.message);
+                    $("#vote_"+uid).html("추천 +"+data.vote.up+"/-"+data.vote.down);
 				}
 			});
 		});

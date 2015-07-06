@@ -210,25 +210,30 @@ def post_list(request, error=''):
 
 @login_required(login_url='/session/login')
 def up(request):
+    message = ""
     id = request.GET.get('id')
-    _BoardContent = BoardContent.objects.filter(id=id)[0]
-    _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
-    message = ''
-    if _BoardContentVote:
-        vote = _BoardContentVote[0]
-        if vote.is_up:
-            message = "fail"
+    _BoardContent = BoardContent.objects.filter(id=id)
+    if _BoardContent:
+        _BoardContent = _BoardContent[0]
+        _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+        if _BoardContentVote:
+            vote = _BoardContentVote[0]
+            if vote.is_up:
+                vote.delete()
+                message = "success_up_cancle"
+            else:
+                vote.is_up = True
+                vote.save()
+                message = "success_up"
         else:
+            vote = BoardContentVote()
             vote.is_up = True
+            vote.userprofile = request.user.userprofile
+            vote.board_content = _BoardContent
             vote.save()
-            message = "success"
-    else:
-        vote = BoardContentVote()
-        vote.is_up = True
-        vote.userprofile = request.user.userprofile
-        vote.board_content = BoardContent.objects.filter(id=id)[0]
-        vote.save()
-        message = "success"
+            message = "success_up"
+    else :
+        message = "fail"
     result = {}
     result['message'] = message
     result['vote'] = _BoardContent.get_vote()
@@ -236,25 +241,30 @@ def up(request):
 
 @login_required(login_url='/session/login')
 def down(request):
+    message = ""
     id = request.GET.get('id')
-    _BoardContent = BoardContent.objects.filter(id=id)[0]
-    _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
-    message = ''
-    if _BoardContentVote:
-        vote = _BoardContentVote[0]
-        if not vote.is_up:
-            message = "fail"
+    _BoardContent = BoardContent.objects.filter(id=id)
+    if _BoardContent:
+        _BoardContent = _BoardContent[0]
+        _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+        if _BoardContentVote:
+            vote = _BoardContentVote[0]
+            if not vote.is_up:
+                vote.delete()
+                message = "success_down_cancle"
+            else:
+                vote.is_up = False
+                vote.save()
+                message = "success_down"
         else:
+            vote = BoardContentVote()
             vote.is_up = False
+            vote.userprofile = request.user.userprofile
+            vote.board_content = _BoardContent
             vote.save()
-            message = "success"
-    else:
-        vote = BoardContentVote()
-        vote.is_up = False
-        vote.userprofile = request.user.userprofile
-        vote.board_content = BoardContent.objects.filter(id=id)[0]
-        vote.save()
-        message = "success"
+            message = "success_down"
+    else :
+        message = "fail"
     result = {}
     result['message'] = message
     result['vote'] = _BoardContent.get_vote()
