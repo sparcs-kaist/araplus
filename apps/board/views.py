@@ -10,37 +10,40 @@ import json
 
 
 @login_required(login_url='/session/login')
-def post_write(request, error=''):
+def post_write(request):
+    post = {}
+    post["new"] = True
+    error = ""
     if request.method == 'POST':
         if not request.user.is_authenticated():
             return redirect('session/login')
         _User = request.user
         _UserProfile = _User.userprofile
 
-        title = request.POST.get('title','')
-        content = request.POST.get('content','')
+        post["title"] = request.POST.get('title','')
+        post["content"] = request.POST.get('content','')
         anonymous = request.POST.get('anonymous','')
-        if title == '':
+        if post["title"] == '':
             error = 'title missing!'
-        if content == '':
+        if post["content"] == '':
             error = 'content missing!'
         if error:
-            return render(request, 'board/board_write.html', {'error':error,'new':True,'title':title,'content':content})
+            return render(request, 'board/board_write.html', {"error":error,"post":post})
         _BoardContent = BoardContent()
-        _BoardContent.content = content
+        _BoardContent.content = post["content"]
         _BoardContent.created_time = datetime.datetime.today()
         if anonymous=='on':
             _BoardContent.is_anonymous = True
         _BoardContent.save()
         _BoardPost = BoardPost()
-        _BoardPost.title = title
+        _BoardPost.title = post["title"]
         _BoardPost.board_content = _BoardContent
         _BoardPost.board_content_id = _BoardContent.id
         _BoardPost.author = _UserProfile
         _BoardPost.author_id = _UserProfile.id
         _BoardPost.save()
         return redirect('../%d/' %_BoardPost.id)
-    return render(request, 'board/board_write.html', {'new':True,})
+    return render(request, 'board/board_write.html', {"post":post})
 
 @login_required(login_url='/session/login')
 def post_read(request, pid, error=''):
@@ -82,7 +85,10 @@ def post_read(request, pid, error=''):
             {'error':error, 'post':post, 'comments':comments})
 
 @login_required(login_url='/session/login')
-def post_modify(request, pid, error=''):
+def post_modify(request, pid):
+    post = {}
+    post["new"] = False
+    error = ""
     _User = request.user
     _BoardPost = BoardPost.objects.filter(id=pid)
     if _BoardPost:
@@ -100,22 +106,22 @@ def post_modify(request, pid, error=''):
         _User = request.user
         _UserProfile = _User.userprofile
 
-        title = request.POST.get('title','')
-        content = request.POST.get('content','')
-        if title == '':
+        post["title"] = request.POST.get('title','')
+        post["content"] = request.POST.get('content','')
+        if post["title"] == '':
             error = 'title missing!'
-        if content == '':
+        if post["content"] == '':
             error = 'body missing!'
         if error:
-            return render(request, 'board/board_write.html', {'error':error,'title':title,'content':content})
-        _BoardContent.content = content
+            return render(request, 'board/board_write.html', {"error":error,"post":post})
+        _BoardContent.content = post["content"]
         _BoardContent.save()
-        _BoardPost.title = title
+        _BoardPost.title = post["title"]
         _BoardPost.save()
         return redirect('../')
-    title = _BoardPost.title
-    content = _BoardContent.content
-    return render(request, 'board/board_write.html', {'title':title,'content':content})
+    post["title"] = _BoardPost.title
+    post["content"] = _BoardContent.content
+    return render(request, 'board/board_write.html', {"post":post})
 
 @login_required(login_url='/session/login')
 def comment_write(request, pid, error=''):
