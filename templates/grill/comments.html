@@ -1,0 +1,31 @@
+<!--<ul id="result_list">
+{% if comments|length %}
+    {% for comment in comments %}
+        <li id="comment_{{comment.order}}"> {{comment.order}}번째.
+            {{comment.author}}님이 {{comment.created_time}}에 남긴 글
+        <p>{{comment.content|safe}}</p></li>   
+    {% endfor %}
+    {% else %}
+    글이 없습니다.
+{% endif %}
+</ul>-->
+
+<li id="comment_{{comment.order}}" class="a-comment-of-list">
+	<div class="a-comment-area">
+		<span>{{comment.order}}</span>
+		<div class="a-comment-content">{{comment.content|safe}}</div>
+		<div class="a-comment-info">
+			<div class="a-comment-author-container">
+				<span>{{comment.author}}</span>
+				<span class="a-comment-date">{{comment.created_time}}</span>
+			</div>
+			<div class="a-comment-vote-container">
+				{% if comment.vote_disable %}
+    			<button class="vote_up a-comment-vote" disabled> 추천 (+{{comment.like}}) </button>
+			{% else %}
+    		<button class="vote_up a-comment-vote"> 추천 (+{{comment.like}})</button>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+</li>
