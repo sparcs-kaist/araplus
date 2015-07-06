@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from apps.session.models import UserProfile
+from apps.session.models import UserProfile, Message
 
 
 def user_login(request):
@@ -40,8 +40,41 @@ def user_register(request):
                                             password=password,
                                             first_name=first_name,
                                             last_name=last_name)
-        new_user_profile = UserProfile(user=new_user)
+        nickname = request.POST['nickname']
+        new_user_profile = UserProfile(user=new_user,
+                                       nickname=nickname)
         new_user_profile.save()
 
         return render(request, 'session/register_complete.html')
     return render(request, 'session/register.html')
+
+def send_message(request):
+    if request.method == "POST":
+        if request.user.is_authenticated():
+           sender = UserProfile.objects.get(user=request.user)
+           print sender
+        else:
+            error = "Login required"
+            return render(request, 'session/write_message.html')
+        content = request.POST['content']
+        receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
+        new_message = Message(content=content,
+                              sender=sender,
+                              receiver=receiver,
+                              is_read=False)
+        new_message.save()
+
+        return render(request, 'session/message_success.html')
+    return render(request, 'session/write_message.html')
+
+
+
+
+
+
+
+
+
+
+
+
