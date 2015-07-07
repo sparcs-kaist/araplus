@@ -90,17 +90,15 @@ function delete_message(){
                 {{post.content}}
 				<div class="col-md-12">
 					<div class="row">
-						<div class="col-md-9"></div>
+						<div class="col-md-8"></div>
                         {% if not post.deleted %}
-			<button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
-				{% if post.return %}			
-						<a class="btn btn-info col-md-1" href="./modify">Modify</a>
-                        <button class="delete" id="delete_{{post.content_id}}">
-                            <span class="glyphicon glyphicon-remove"></span>Delete
-                        </button>
-				{% endif %}
-			{% endif %}		
+                        {% if post.return %}			
+                        <a class="btn btn-info col-md-1" href="./modify">Modify</a>
+                        <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
+                        {% endif %}
+                        {% endif %}		
 					</div>
                 </div>
             </div>
@@ -121,16 +119,22 @@ function delete_message(){
                     <div id="comment{{comment.comment_id}}">{{ comment.content }}</div>
                     <div class="col-md-12">
 						<div class="row">
-							<div class="col-md-9"></div>
-							<button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
-							<button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+						    <div class="col-md-8"></div>
+                            {% if not comment.deleted %}
+                            <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
+                            <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {% if comment.return %}			
 							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.comment_id}}">Modify</button>
+                            <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
+                            {% endif %}
+                            {% endif %}		
 						</div>
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
+        {% if not post.deleted %}
         <div>
             <form action="./comment/" method="POST">
                 {%csrf_token%}
@@ -146,6 +150,7 @@ function delete_message(){
                 <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
             </form>
         </div>
+        {% endif %}
 
     </div>
 </div>
