@@ -20,24 +20,24 @@ def post_write(request):
         _User = request.user
         _UserProfile = _User.userprofile
         board = request.GET.get('board')
-        title = request.POST.get('title','')
-        content = request.POST.get('content','')
-        post["title"] = request.POST.get('title','')
-        post["content"] = request.POST.get('content','')
-        anonymous = request.POST.get('anonymous','')
-        adult = request.POST.get('adult','')
+        post["title"] = request.POST.get('title', '')
+        post["content"] = request.POST.get('content', '')
+        anonymous = request.POST.get('anonymous', '')
+        adult = request.POST.get('adult', '')
         if post["title"] == '':
             error = 'title missing!'
         if post["content"] == '':
             error = 'content missing!'
         if error:
-            return render(request, 'board/board_write.html', {"error":error,"post":post})
+            return render(request,
+                          'board/board_write.html',
+                          {"error": error, "post": post})
         _BoardContent = BoardContent()
         _BoardContent.content = post["content"]
         _BoardContent.created_time = datetime.datetime.today()
-        if anonymous=='on':
+        if anonymous == 'on':
             _BoardContent.is_anonymous = True
-        if adult=='on':
+        if adult == 'on':
             _BoardContent.is_adult = True
         _BoardContent.save()
         _BoardPost = BoardPost()
@@ -48,12 +48,13 @@ def post_write(request):
         _BoardPost.author_id = _UserProfile.id
         _Board = Board.objects.filter(id=board)
         if _Board:
-            _BoardPost.board=_Board[0]
+            _BoardPost.board = _Board[0]
         else:
             return redirect('../')
         _BoardPost.save()
-        return redirect('../%d/' %_BoardPost.id)
-    return render(request, 'board/board_write.html', {"post":post})
+        return redirect('../%d/' % _BoardPost.id)
+    return render(request, 'board/board_write.html', {"post": post})
+
 
 @login_required(login_url='/session/login')
 def post_read(request, pid, error=''):
@@ -62,7 +63,7 @@ def post_read(request, pid, error=''):
         _BoardPost = _BoardPost[0]
     else:
         error = "No post"
-        return render(request, 'board/board_read.html', {'error':error})
+        return render(request, 'board/board_read.html', {'error': error})
     _BoardContent = _BoardPost.board_content
     _UserProfile = _BoardPost.author
     _User = _UserProfile.user
@@ -93,8 +94,10 @@ def post_read(request, pid, error=''):
             comment["username"] = 'anonymous'
         comment["vote"] = _BoardContent.get_vote()
         comments.append(comment)
-    return render(request, 'board/board_read.html', \
-            {'error':error, 'post':post, 'comments':comments})
+    return render(request,
+                  'board/board_read.html',
+                  {'error': error, 'post': post, 'comments': comments})
+
 
 @login_required(login_url='/session/login')
 def post_modify(request, pid):
@@ -116,17 +119,17 @@ def post_modify(request, pid):
         if not request.user.is_authenticated():
             return redirect('session/login')
         _User = request.user
-        _UserProfile = _User.userprofile
-
-        post["title"] = request.POST.get('title','')
-        post["content"] = request.POST.get('content','')
-        adult = request.POST.get('adult','')
+        post["title"] = request.POST.get('title', '')
+        post["content"] = request.POST.get('content', '')
+        adult = request.POST.get('adult', '')
         if post["title"] == '':
             error = 'title missing!'
         if post["content"] == '':
             error = 'body missing!'
         if error:
-            return render(request, 'board/board_write.html', {"error":error,"post":post})
+            return render(request,
+                          'board/board_write.html',
+                          {"error": error, "post": post})
         if adult:
             _BoardContent.is_adult = True
         else:
@@ -138,7 +141,10 @@ def post_modify(request, pid):
         return redirect('../')
     post["title"] = _BoardPost.title
     post["content"] = _BoardContent.content
-    return render(request, 'board/board_write.html', {"post":post})
+    return render(request,
+                  'board/board_write.html',
+                  {"post": post})
+
 
 @login_required(login_url='/session/login')
 def comment_write(request, pid, error=''):
@@ -156,8 +162,8 @@ def comment_write(request, pid, error=''):
         _User = request.user
         _UserProfile = _User.userprofile
 
-        content = request.POST.get('content','')
-        anonymous = request.POST.get('anonymous','')
+        content = request.POST.get('content', '')
+        anonymous = request.POST.get('anonymous', '')
         if content == '':
             error = 'content missing!'
         if error:
@@ -165,7 +171,7 @@ def comment_write(request, pid, error=''):
         _BoardContent = BoardContent()
         _BoardContent.content = content
         _BoardContent.created_time = datetime.datetime.today()
-        if anonymous=='on':
+        if anonymous == 'on':
             _BoardContent.is_anonymous = True
         _BoardContent.save()
         _BoardComment = BoardComment()
@@ -181,18 +187,17 @@ def comment_write(request, pid, error=''):
 def comment_modify(request, error=''):
     if request.method == "POST":
         _User = request.user
-        cid = request.POST.get('cid','')
-        _BoardComment = BoardComment.objects.filter(id = cid)
+        cid = request.POST.get('cid', '')
+        _BoardComment = BoardComment.objects.filter(id=cid)
         if _BoardComment:
-           _BoardComment = _BoardComment[0]
-           if _BoardComment.author_id != _User.id:
-               error = "Not allowd"
+            _BoardComment = _BoardComment[0]
+            if _BoardComment.author_id != _User.id:
+                error = "Not allowd"
         else:
             error = "No Comment"
         if error:
             return redirect('../')
         _BoardContent = _BoardComment.board_content
-        _UserProfie = _User.userprofile
         content = request.POST.get('content', '')
         if content == '':
             error = 'No comment content'
@@ -204,20 +209,21 @@ def comment_modify(request, error=''):
     error = "Invalid access"
     return redirect('../')
 
+
 @login_required(login_url='/session/login')
 def post_list(request, error=''):
-    adult_filter=request.GET.get('adult_filter')
-    board_filter=request.GET.get('board')
-    cur_board=""
-    is_adult=False
+    adult_filter = request.GET.get('adult_filter')
+    board_filter = request.GET.get('board')
+    cur_board = ""
+    is_adult = False
     if adult_filter == "true":
-        is_adult=True
+        is_adult = True
     if board_filter:
-        _BoardPost=BoardPost.objects.filter(board=board_filter)
+        _BoardPost = BoardPost.objects.filter(board=board_filter)
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
-        _BoardPost=BoardPost.objects.all()
-    _Board=Board.objects.all()
+        _BoardPost = BoardPost.objects.all()
+    _Board = Board.objects.all()
     posts = []
     boards = []
     for bd in _Board:
@@ -225,21 +231,29 @@ def post_list(request, error=''):
     for bp in _BoardPost:
         post = {}
         if bp.board_content.is_anonymous:
-            post['username']="annonymous"
+            post['username'] = "annonymous"
         else:
-            post['username']=bp.author.user.username
-        post['board']=bp.board.name
-        post['board_id']=bp.board.id
-        post['title']=bp.title
-        post['created_time']=bp.board_content.created_time
-        post['id']=bp.id
+            post['username'] = bp.author.user.username
+        post['board'] = bp.board.name
+        post['board_id'] = bp.board.id
+        post['title'] = bp.title
+        post['created_time'] = bp.board_content.created_time
+        post['id'] = bp.id
         vote = bp.board_content.get_vote()
-        post['up']=vote['up']
-        post['down']=vote['down']
-        if adult_filter=='true' and bp.board_content.is_adult:
+        post['up'] = vote['up']
+        post['down'] = vote['down']
+        if adult_filter == 'true' and bp.board_content.is_adult:
             post['title'] = "filterd"
         posts.append(post)
-    return render(request, 'board/board_list.html',{'Posts': posts, 'Boards': boards, 'Cur_board': cur_board, 'Is_adult':is_adult})
+    return render(request,
+                  'board/board_list.html',
+                  {
+                      'Posts': posts,
+                      'Boards': boards,
+                      'Cur_board': cur_board,
+                      'Is_adult': is_adult
+                  })
+
 
 @login_required(login_url='/session/login')
 def up(request):
@@ -248,7 +262,9 @@ def up(request):
     _BoardContent = BoardContent.objects.filter(id=id)
     if _BoardContent:
         _BoardContent = _BoardContent[0]
-        _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+        _BoardContentVote = BoardContentVote.objects.filter(
+            board_content=_BoardContent,
+            userprofile=request.user.userprofile)
         if _BoardContentVote:
             vote = _BoardContentVote[0]
             if vote.is_up:
@@ -265,12 +281,13 @@ def up(request):
             vote.board_content = _BoardContent
             vote.save()
             message = "success_up"
-    else :
+    else:
         message = "fail"
     result = {}
     result['message'] = message
     result['vote'] = _BoardContent.get_vote()
     return HttpResponse(json.dumps(result), content_type="application/json")
+
 
 @login_required(login_url='/session/login')
 def down(request):
@@ -279,7 +296,9 @@ def down(request):
     _BoardContent = BoardContent.objects.filter(id=id)
     if _BoardContent:
         _BoardContent = _BoardContent[0]
-        _BoardContentVote=BoardContentVote.objects.filter(board_content=_BoardContent,userprofile=request.user.userprofile)
+        _BoardContentVote = BoardContentVote.objects.filter(
+            board_content=_BoardContent,
+            userprofile=request.user.userprofile)
         if _BoardContentVote:
             vote = _BoardContentVote[0]
             if not vote.is_up:
@@ -296,10 +315,9 @@ def down(request):
             vote.board_content = _BoardContent
             vote.save()
             message = "success_down"
-    else :
+    else:
         message = "fail"
     result = {}
     result['message'] = message
     result['vote'] = _BoardContent.get_vote()
     return HttpResponse(json.dumps(result), content_type="application/json")
-
