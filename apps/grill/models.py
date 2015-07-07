@@ -35,7 +35,7 @@ class GrillComment(models.Model):
 
     def to_json(self):
         return dict(
-            author=self.author.id,
+            author=self.author.nickname,
             content=self.replace_tags(),
             created_time=self.created_time.isoformat(),
             order=self.order)
