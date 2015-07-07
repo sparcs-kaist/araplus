@@ -98,6 +98,8 @@ def post_read(request, pid, error=''):
         comment["content"] = _BoardContent.content
         comment["content_id"] = _BoardContent.id
         comment["created_time"] = _BoardContent.created_time
+        comment["return"] = (_UserProfile.id
+                == request.user.userprofile.id)
         if _BoardContent.is_anonymous:
             comment["username"] = 'anonymous'
         comment["vote"] = _BoardContent.get_vote()
@@ -249,6 +251,7 @@ def post_list(request, error=''):
             post['title'] = bp.title
         post['created_time'] = bp.board_content.created_time
         post['id'] = bp.id
+        post['board_id'] = bp.board.id
         vote = bp.board_content.get_vote()
         post['up'] = vote['up']
         post['down'] = vote['down']

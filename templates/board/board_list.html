@@ -41,9 +41,7 @@
         <a href="/board/?board={{Cur_board.id}}&adult_filter=true" id='1'>Filter Adult Post</a>
         {% endif %}
     </button>
-    {% if Cur_board.id %}
-    <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
-    {% endif %}
+    <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id|default:1}}">Write</a></button>
 {% endblock %}
 
 

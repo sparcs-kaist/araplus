@@ -54,16 +54,17 @@ function delete_message(){
                 console.log(data);
 				location.reload();	
 			}	
-		}
-		);
+        }
+        );
 		return true;
 	}
 	else{
 		return false;
-	}
-} );
+}
+});
 
 });
+
 	
 </script>
 {% endblock %}
@@ -92,10 +93,10 @@ function delete_message(){
 					<div class="row">
 						<div class="col-md-9"></div>
                         {% if not post.deleted %}
-			<button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
-                        <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+			<button class="btn btn-sm btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        <button class="btn btn-sm btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
 				{% if post.return %}			
-						<a class="btn btn-info col-md-1" href="./modify">Modify</a>
+						<a class="btn btn-sm btn-info col-md-1" href="./modify">Modify</a>
                         <button class="delete" id="delete_{{post.content_id}}">
                             <span class="glyphicon glyphicon-remove"></span>Delete
                         </button>
@@ -122,9 +123,11 @@ function delete_message(){
                     <div class="col-md-12">
 						<div class="row">
 							<div class="col-md-9"></div>
-							<button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
-							<button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
-							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.comment_id}}">Modify</button>
+							<button class="btn btn-sm btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
+                            <button class="btn btn-sm btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {% if comment.return %}
+                            <button type="submit" class="btn btn-sm btn-info col-md-1 comment" id="btn{{comment.comment_id}}">Modify</button>
+                            {% endif %}
 						</div>
                     </div>
                 </div>
