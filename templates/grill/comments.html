@@ -10,7 +10,11 @@
 {% endif %}
 </ul>-->
 
+{% if comment.like == 0 %}
 <li id="comment_{{comment.order}}" class="a-comment-of-list">
+{% else %}
+<li id="comment_{{comment.order}}" class="a-comment-of-list-highlight">
+{% endif %}
 	<div class="a-comment-area">
 		<span>{{comment.order}}</span>
 		<div class="a-comment-content">{{comment.content|safe}}</div>

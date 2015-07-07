@@ -96,6 +96,11 @@ button#add_comment_button
 	/*background: #2b2e3d;*/
 }
 
+.a-comment-of-list-highlight
+{
+    background: #00ffff;
+}
+
 .a-comment-area
 {
 	padding: 5px 0px 5px 0px;
