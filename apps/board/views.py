@@ -61,13 +61,13 @@ def post_read(request, pid, error=''):
     _User = _UserProfile.user
     post = {}
     if _BoardContent.is_deleted:
-	post["title"]="--Deleted--"
-    	post["content"]="--Deleted--"
-	post["deleted"]=True
+        post["title"]="--Deleted--"
+        post["content"]="--Deleted--"
+        post["deleted"]=True
     else:
-	post["title"]=_BoardPost.title
-	post["content"]=_BoardContent.content
-	post["deleted"]=False
+        post["title"]=_BoardPost.title
+        post["content"]=_BoardContent.content
+        post["deleted"]=False
     post["content_id"] = _BoardContent.id
     post["created_time"] = _BoardContent.created_time
     post["username"] = _User.username
@@ -217,7 +217,11 @@ def post_list(request):
         else:
             post['username']=bp.author.user.username
         post['board']="sdskjflsd"
-        post['title']=bp.title
+        print bp.board_content.is_deleted
+        if bp.board_content.is_deleted:
+            post['title']="--Deleted--"
+        else:
+            post['title']=bp.title
         post['created_time']=bp.board_content.created_time
         post['id']=bp.id
         vote = bp.board_content.get_vote()
@@ -293,15 +297,20 @@ def down(request):
 
 @login_required(login_url='/session/login')
 def delete(request):
-	message=""
-	id= request.GET.get('id')
-	_BoardContents = BoardContent.objects.filter(id=id)
-
-	BoardCont=_BoardContents[0]
-	BoardCont.is_deleted=True
-
-	BoardCont.save()
-	return HttpResponse()
+    message=""
+    id= request.GET.get('id')
+    _BoardContents = BoardContent.objects.filter(id=id)
+    if _BoardContents:
+        BoardCont=_BoardContents[0]
+        if BoardCont.boardpost.author == request.user.userprofile:
+            BoardCont.is_deleted=True
+            BoardCont.save()
+            message = "success"
+        else:
+            message = "not allowed"
+    else:
+        message = "no content"
+    return HttpResponse(message)
 
 
 
