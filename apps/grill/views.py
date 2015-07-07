@@ -11,16 +11,20 @@ import datetime
 
 
 def home(request):
+    if not request.user.is_authenticated():
+        return redirect('/session/login')
+
     grills = Grill.objects.all().order_by('created_time')  # 나중에 업데이트 순서로 바꾸기?
     return render(request, 'grill/main.html',
-                  {
-                      'grills': grills,
-                  })
-
+                    {
+                        'grills': grills,
+                    })
 
 def view_grill(request, grill_id):
-    grill = get_object_or_404(Grill, pk=grill_id)
+    if not request.user.is_authenticated():
+        return redirect('/session/login')
 
+    grill = get_object_or_404(Grill, pk=grill_id)
     edit_form = CommentAddForm()
     comments = GrillComment.objects.filter(
         grill=grill_id).order_by('created_time').reverse()
@@ -46,6 +50,9 @@ def view_grill(request, grill_id):
 
 
 def add_grill(request):
+    if not request.user.is_authenticated():
+        return redirect('session/login')
+
     if request.method == "GET":
         edit_form = GrillAddForm()
     elif request.method == "POST":

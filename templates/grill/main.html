@@ -12,7 +12,7 @@
               {% for grill in grills %}
               <tr>
               <td width=50><p align=center>{{ grill.id }}</p></td>
-              <td width=100><p align=center>{{ grill.author }}</p></td>
+              <td width=100><p align=center>{{ grill.author.nickname }}</p></td>
               <td width=320>
                   <p align=center>
                       <a href="./{{grill.id}}">{{ grill.title }}

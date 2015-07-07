@@ -16,15 +16,15 @@
 		<div class="a-comment-content">{{comment.content|safe}}</div>
 		<div class="a-comment-info">
 			<div class="a-comment-author-container">
-				<span>{{comment.author}}</span>
+				<span>{{comment.author.nickname}}</span>
 				<span class="a-comment-date">{{comment.created_time}}</span>
 			</div>
 			<div class="a-comment-vote-container">
 				{% if comment.vote_disable %}
-    			<button class="vote_up a-comment-vote" disabled> 추천 (+{{comment.like}}) </button>
-			{% else %}
-    		<button class="vote_up a-comment-vote"> 추천 (+{{comment.like}})</button>
-			{% endif %}
+        			<button class="vote_up a-comment-vote" disabled> 추천 (+{{comment.like}}) </button>
+    			{% else %}
+            		<button class="vote_up a-comment-vote"> 추천 (+{{comment.like}})</button>
+    			{% endif %}
 			</div>
 		</div>
 	</div>
