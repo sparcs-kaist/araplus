@@ -336,8 +336,8 @@ def down(request):
 @login_required(login_url='/session/login')
 def delete(request):
     message = ""
-    id = request.GET.get('id')
-    _BoardContents = BoardContent.objects.filter(id=id)
+    cid = request.GET.get('id')
+    _BoardContents = BoardContent.objects.filter(id=cid)
     if _BoardContents:
         BoardCont = _BoardContents[0]
         if BoardCont.boardpost.author == request.user.userprofile:

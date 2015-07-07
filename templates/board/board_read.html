@@ -80,9 +80,6 @@ function delete_message(){
                     <label> {{ post.title }} </label>
                     <span> {{ post.username }}</span>
                     <span> {{post.board}}</span>
-                    <button class="btn btn-default btn-sm pull-right">
-                        <span class="glyphicon glyphicon-remove" style="color:red"></span>Remove
-                    </button>
                 </div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>
@@ -99,7 +96,9 @@ function delete_message(){
                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
 				{% if post.return %}			
 						<a class="btn btn-info col-md-1" href="./modify">Modify</a>
-						<button class="delete" id="delete_{{post.content_id}}">Delete</button>
+                        <button class="delete" id="delete_{{post.content_id}}">
+                            <span class="glyphicon glyphicon-remove"></span>Delete
+                        </button>
 				{% endif %}
 			{% endif %}		
 					</div>
@@ -111,9 +110,6 @@ function delete_message(){
             <div class="panel-heading">
                 <div>
                     <span> {{ comment.username }}</span>
-                    <button class="btn btn-default btn-sm pull-right">
-                        <span class="glyphicon glyphicon-remove" style="color:red"></span>Remove
-                    </button>
                 </div>
                 <div> 
                     <span class="col-md-10">{{comment.created_time}}</span>
