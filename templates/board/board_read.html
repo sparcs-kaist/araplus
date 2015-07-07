@@ -51,6 +51,7 @@ function delete_message(){
 			url:'/board/delete',
 			data:{id : delete_uid},
 			success : function(data){
+                console.log(data);
 				location.reload();	
 			}	
 		}

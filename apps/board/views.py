@@ -69,22 +69,21 @@ def post_read(request, pid, error=''):
     _User = _UserProfile.user
     post = {}
     if _BoardContent.is_deleted:
-	post["title"]="--Deleted--"
-    	post["content"]="--Deleted--"
-	post["deleted"]=True
+        post["title"] = "--Deleted--"
+        post["content"] = "--Deleted--"
+        post["deleted"] = True
     else:
-	post["title"]=_BoardPost.title
-	post["content"]=_BoardContent.content
-	post["deleted"]=False
->>>>>>> dd4e8ed212d37ca0246b532f7d7c243287aca4f2
+        post["title"] = _BoardPost.title
+        post["content"] = _BoardContent.content
+        post["deleted"] = False
     post["content_id"] = _BoardContent.id
     post["created_time"] = _BoardContent.created_time
     post["username"] = _User.username
     if _BoardContent.is_anonymous:
         post["username"] = 'anonymous'
-    writing_id= _UserProfile.id
-    reading_id=request.user.userprofile.id
-    post["return"]=(writing_id==reading_id)
+    writing_id = _UserProfile.id
+    reading_id = request.user.userprofile.id
+    post["return"] = (writing_id == reading_id)
     post["vote"] = _BoardContent.get_vote()
     post["adult"] = _BoardContent.is_adult
     comments = []
@@ -244,8 +243,10 @@ def post_list(request, error=''):
         else:
             post['username'] = bp.author.user.username
         post['board'] = bp.board.name
-        post['board_id'] = bp.board.id
-        post['title'] = bp.title
+        if bp.board_content.is_deleted:
+            post['title'] = "--Deleted--"
+        else:
+            post['title'] = bp.title
         post['created_time'] = bp.board_content.created_time
         post['id'] = bp.id
         vote = bp.board_content.get_vote()
@@ -305,7 +306,6 @@ def down(request):
     _BoardContent = BoardContent.objects.filter(id=id)
     if _BoardContent:
         _BoardContent = _BoardContent[0]
-<<<<<<< HEAD
         _BoardContentVote = BoardContentVote.objects.filter(
             board_content=_BoardContent,
             userprofile=request.user.userprofile)
@@ -335,12 +335,17 @@ def down(request):
 
 @login_required(login_url='/session/login')
 def delete(request):
-	message=""
-	id= request.GET.get('id')
-	_BoardContents = BoardContent.objects.filter(id=id)
-
-	BoardCont=_BoardContents[0]
-	BoardCont.is_deleted=True
-
-	BoardCont.save()
-	return HttpResponse()
+    message = ""
+    id = request.GET.get('id')
+    _BoardContents = BoardContent.objects.filter(id=id)
+    if _BoardContents:
+        BoardCont = _BoardContents[0]
+        if BoardCont.boardpost.author == request.user.userprofile:
+            BoardCont.is_deleted = True
+            BoardCont.save()
+            message = "success"
+        else:
+            message = "not allowed"
+    else:
+        message = "no content"
+    return HttpResponse(message)
