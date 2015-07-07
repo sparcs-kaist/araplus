@@ -56,6 +56,9 @@
                     <label> {{ post.title }} </label>
                     <span> {{ post.username }}</span>
                     <span> {{post.board}}</span>
+                    <button class="btn btn-default btn-sm pull-right">
+                        <span class="glyphicon glyphicon-remove" style="color:red"></span>Remove
+                    </button>
                 </div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>
@@ -79,6 +82,9 @@
             <div class="panel-heading">
                 <div>
                     <span> {{ comment.username }}</span>
+                    <button class="btn btn-default btn-sm pull-right">
+                        <span class="glyphicon glyphicon-remove" style="color:red"></span>Remove
+                    </button>
                 </div>
                 <div> 
                     <span class="col-md-10">{{comment.created_time}}</span>
