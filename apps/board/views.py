@@ -93,15 +93,22 @@ def post_read(request, pid, error=''):
         _User = _UserProfile.user
         comment = {}
         comment["username"] = _User.username
-        comment["title"] = _BoardPost.title
+        if _BoardContent.is_deleted:
+            comment["title"] = "--Deleted--"
+            comment["content"] = "--Deleted--"
+            comment["deleted"] = True
+        else:
+            comment["title"] = _BoardPost.title
+            comment["content"] = _BoardContent.content
+            comment["deleted"] = False
         comment["comment_id"] = cm.id
-        comment["content"] = _BoardContent.content
         comment["content_id"] = _BoardContent.id
         comment["created_time"] = _BoardContent.created_time
         comment["return"] = (_UserProfile.id
                 == request.user.userprofile.id)
         if _BoardContent.is_anonymous:
             comment["username"] = 'anonymous'
+        comment["return"] = (_UserProfile.id == reading_id)
         comment["vote"] = _BoardContent.get_vote()
         comments.append(comment)
     return render(request,
@@ -343,7 +350,14 @@ def delete(request):
     _BoardContents = BoardContent.objects.filter(id=cid)
     if _BoardContents:
         BoardCont = _BoardContents[0]
-        if BoardCont.boardpost.author == request.user.userprofile:
+        if hasattr(BoardCont, 'boardpost'):
+            author = BoardCont.boardpost.author
+        elif hasattr(BoardCont, 'comment'):
+            author = BoardCont.comment.author
+        else:
+            message = "no post or comment"
+            return HttpResponse(message)
+        if author == request.user.userprofile:
             BoardCont.is_deleted = True
             BoardCont.save()
             message = "success"
