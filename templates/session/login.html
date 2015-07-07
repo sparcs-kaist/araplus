@@ -3,6 +3,7 @@
 <div class="container">
     <form method="POST">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
         <div class="form-group">
             <label>USERNAME</label>
             <input type="username" class="form-control" name="username" placeholder="Username">
