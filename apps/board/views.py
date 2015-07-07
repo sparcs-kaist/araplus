@@ -68,14 +68,23 @@ def post_read(request, pid, error=''):
     _UserProfile = _BoardPost.author
     _User = _UserProfile.user
     post = {}
-    post["username"] = _User.username
-    post["title"] = _BoardPost.title
-    post["board"] = _BoardPost.board.name
-    post["content"] = _BoardContent.content
+    if _BoardContent.is_deleted:
+	post["title"]="--Deleted--"
+    	post["content"]="--Deleted--"
+	post["deleted"]=True
+    else:
+	post["title"]=_BoardPost.title
+	post["content"]=_BoardContent.content
+	post["deleted"]=False
+>>>>>>> dd4e8ed212d37ca0246b532f7d7c243287aca4f2
     post["content_id"] = _BoardContent.id
     post["created_time"] = _BoardContent.created_time
+    post["username"] = _User.username
     if _BoardContent.is_anonymous:
         post["username"] = 'anonymous'
+    writing_id= _UserProfile.id
+    reading_id=request.user.userprofile.id
+    post["return"]=(writing_id==reading_id)
     post["vote"] = _BoardContent.get_vote()
     post["adult"] = _BoardContent.is_adult
     comments = []
@@ -296,6 +305,7 @@ def down(request):
     _BoardContent = BoardContent.objects.filter(id=id)
     if _BoardContent:
         _BoardContent = _BoardContent[0]
+<<<<<<< HEAD
         _BoardContentVote = BoardContentVote.objects.filter(
             board_content=_BoardContent,
             userprofile=request.user.userprofile)
@@ -321,3 +331,16 @@ def down(request):
     result['message'] = message
     result['vote'] = _BoardContent.get_vote()
     return HttpResponse(json.dumps(result), content_type="application/json")
+
+
+@login_required(login_url='/session/login')
+def delete(request):
+	message=""
+	id= request.GET.get('id')
+	_BoardContents = BoardContent.objects.filter(id=id)
+
+	BoardCont=_BoardContents[0]
+	BoardCont.is_deleted=True
+
+	BoardCont.save()
+	return HttpResponse()
