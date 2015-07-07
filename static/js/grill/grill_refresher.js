@@ -68,10 +68,9 @@ function refresh_comment (grill_id) {
                 var temp_date = new Date(target.created_time);
 				/*
                 var ms = '<li id="comment_'+target.order+'">' + target.order +"번째. "+target.author;
-                ms += "님이 " + temp_date.toLocaleTimeString("ko-KR",options);
+                ms += "님이 " + temp_date.toLocaleTimeString("ko-KR",options)
                 ms += "에 남긴 글 <p>" + target.content + ' <button class="vote_up"> 추천 (+0)</button></p></li>';*/
 
-				/*var ms = '<li id="comment_'+target.order+'" class="a-comment-of-list">	<div class="a-comment-area">		<span>'+target.order+'</span>		<div class="a-comment-content">'+target.content+'|safe}}</div>		<div class="a-comment-info">			<div class="a-comment-author-container">				<span>'+target.author+'</span>				<span class="a-comment-date">'+temp_date.toLocaleTimeString("ko-KR",options)+'</span>			</div>			<div class="a-comment-vote-container">				{% if '+target.vote_disable+' %}    			<button class="vote_up a-comment-vote" disabled> 추천 (+'+target.like+') </button>			{% else %}    		<button class="vote_up a-comment-vote"> 추천 (+'+target.like+')</button>			{% endif %}			</div>		</div>	</div></li>';*/
 				var ms = '<li id="comment_'+target.order+'" class="a-comment-of-list">';
 				ms += '<div class="a-comment-area">';
 				ms += '	<span>'+target.order+'</span>';
