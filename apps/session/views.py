@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from apps.session.models import UserProfile, Message
 from django.contrib.auth.decorators import login_required
 
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -16,7 +17,8 @@ def user_login(request):
         else:
             error = "Invalid login"
         return render(request, 'session/login.html', {'error': error})
-    return render(request, 'session/login.html', {'next': request.GET.get('next', '/')})
+    return render(request, 'session/login.html',
+                  {'next': request.GET.get('next', '/')})
 
 
 def user_logout(request):
