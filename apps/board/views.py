@@ -15,8 +15,6 @@ def post_write(request):
     post["new"] = True
     error = ""
     if request.method == 'POST':
-        if not request.user.is_authenticated():
-            return redirect('session/login')
         _User = request.user
         _UserProfile = _User.userprofile
         board = request.POST.get('board', '')
@@ -142,9 +140,11 @@ def post_modify(request, pid):
             error = "Not allowed"
     else:
         error = "No post"
+    _BoardContent = _BoardPost.board_content
+    if _BoardContent.is_deleted:
+        error = "Deleted"
     if error:
         return redirect('../')
-    _BoardContent = _BoardPost.board_content
     if request.method == 'POST':
         if not request.user.is_authenticated():
             return redirect('session/login')
@@ -353,6 +353,56 @@ def down(request):
     result = {}
     result['message'] = message
     result['vote'] = _BoardContent.get_vote()
+    return HttpResponse(json.dumps(result), content_type="application/json")
+
+
+@login_required(login_url='/session/login')
+def vote_adult(request):
+    message = ""
+    id = request.GET.get('id')
+    _BoardContent = BoardContent.objects.filter(id=id)
+    if _BoardContent:
+        _BoardContent = _BoardContent[0]
+        _BoardContentVoteAdult = BoardContentVoteAdult.objects.filter(
+            board_content=_BoardContent,
+            userprofile=request.user.userprofile)
+        if _BoardContentVoteAdult:
+            message = "already voted_adult"
+        else:
+            vote = BoardContentVoteAdult()
+            vote.userprofile = request.user.userprofile
+            vote.board_content = _BoardContent
+            vote.save()
+            message = "success"
+    else:
+        message = "content not exist"
+    result = {}
+    result['message'] = message
+    return HttpResponse(json.dumps(result), content_type="application/json")
+
+
+@login_required(login_url='/session/login')
+def vote_political(request):
+    message = ""
+    id = request.GET.get('id')
+    _BoardContent = BoardContent.objects.filter(id=id)
+    if _BoardContent:
+        _BoardContent = _BoardContent[0]
+        _BoardContentVotePolitical = BoardContentVotePolitical.objects.filter(
+            board_content=_BoardContent,
+            userprofile=request.user.userprofile)
+        if _BoardContentVotePolitical:
+            message = "already voted_political"
+        else:
+            vote = BoardContentVotePolitical()
+            vote.userprofile = request.user.userprofile
+            vote.board_content = _BoardContent
+            vote.save()
+            message = "success"
+    else:
+        message = "content not exist"
+    result = {}
+    result['message'] = message
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 

@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^up/$', 'apps.board.views.up'),
     url(r'^down/$', 'apps.board.views.down'),
     url(r'^delete/$','apps.board.views.delete'),
+    url(r'^vote_adult/$', 'apps.board.views.vote_adult'),
+    url(r'^vote_political/$', 'apps.board.views.vote_political'),
 ]
