@@ -2,18 +2,20 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from apps.session.models import UserProfile, Message
+from django.contrib.auth.decorators import login_required
 
 
 def user_login(request):
     if request.method != 'POST':
-        return render(request, 'session/login.html')
+        return render(request, 'session/login.html',
+                      {'next': request.GET.get('next', '/')})
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(username=username, password=password)
 
     if user is not None and user.is_active:
         login(request, user)
-        return render(request, 'session/login_complete.html')
+        return redirect(request.POST['next'])
     else:
         error = "Invalid login"
     return render(request, 'session/login.html', {'error': error})
@@ -46,6 +48,7 @@ def user_register(request):
     return render(request, 'session/register_complete.html')
 
 
+@login_required(login_url='/session/login/')
 def send_message(request):
     if request.method != "POST":
         return render(request, 'session/write_message.html')
@@ -64,6 +67,7 @@ def send_message(request):
     return render(request, 'session/message_success.html')
 
 
+@login_required(login_url='/session/login/')
 def check_message(request):
     if request.user.is_authenticated():
         sender = UserProfile.objects.get(user=request.user)
