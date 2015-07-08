@@ -1,3 +1,24 @@
-{% block test %}
-hahahahahaha
-{% endblock %}
+<!DOCTYPE HTML>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <title{% block title %}ARA Plus{% endblock %}</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        {% block css %}{% endblock %}
+        <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        {% block js %}{% endblock %}
+    </head>
+    <body>
+        {% if user.is_authenticated %}
+        <li>Hello, {{ user }}</span></li>
+        <li><a href="/session/logout/" class="btn btn-default">Logout</a></li>
+        {% else %}
+        <li><a href="/session/login/" class="btn btn-primary">Login</a></li>
+        <li><a href="/session/register/" class="btn btn-default">Join Araplus!</a></li>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>
