@@ -52,7 +52,7 @@ def post_write(request):
         _BoardPost.save()
         return redirect('../%d/' % _BoardPost.id)
     cur_board = request.GET.get("board")
-    Cur_board = Board.objects.filter(id=cur_board)
+    Cur_board = Board.objects.filter(id=cur_board)[0]
     _Board = Board.objects.all()
     boards = []
     for bd in _Board:
