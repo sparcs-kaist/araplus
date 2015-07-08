@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, primary_key=True, related_name='userprofile')
+    user = models.OneToOneField(User,
+                                primary_key=True, related_name='userprofile')
     nickname = models.TextField(max_length=12)
     points = models.IntegerField(default=0)
 

@@ -53,7 +53,7 @@ def send_message(request):
     if request.method != "POST":
         return render(request, 'session/write_message.html')
     if request.user.is_authenticated():
-        sender = request.user.userprofile 
+        sender = request.user.userprofile
     else:
         error = "Login required"
         return render(request,
@@ -82,5 +82,5 @@ def check_message(request):
 @login_required(login_url='/session/login/')
 def check_my_message(request):
     messages = Message.objects.filter(sender=request.user.userprofile)
-    return render(request, 
+    return render(request,
                   'session/check_my_message.html', {'messages': messages})
