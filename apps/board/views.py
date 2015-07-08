@@ -15,8 +15,6 @@ def post_write(request):
     post["new"] = True
     error = ""
     if request.method == 'POST':
-        if not request.user.is_authenticated():
-            return redirect('session/login')
         _User = request.user
         _UserProfile = _User.userprofile
         board = request.GET.get('board')
@@ -127,9 +125,11 @@ def post_modify(request, pid):
             error = "Not allowed"
     else:
         error = "No post"
+    _BoardContent = _BoardPost.board_content
+    if _BoardContent.is_deleted:
+        error = "Deleted"
     if error:
         return redirect('../')
-    _BoardContent = _BoardPost.board_content
     if request.method == 'POST':
         if not request.user.is_authenticated():
             return redirect('session/login')
