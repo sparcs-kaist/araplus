@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <ul>
+    {% for message in messages %}
+        <li> Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </li>
+        <li> Content : {{ message.content }} </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+
