@@ -19,7 +19,7 @@ def post_write(request):
             return redirect('session/login')
         _User = request.user
         _UserProfile = _User.userprofile
-        board = request.GET.get('board')
+        board = request.POST.get('board', '')
         post["title"] = request.POST.get('title', '')
         post["content"] = request.POST.get('content', '')
         anonymous = request.POST.get('anonymous', '')
@@ -53,7 +53,19 @@ def post_write(request):
             return redirect('../')
         _BoardPost.save()
         return redirect('../%d/' % _BoardPost.id)
-    return render(request, 'board/board_write.html', {"post": post})
+    cur_board = request.GET.get("board")
+    Cur_board = Board.objects.filter(id=cur_board)
+    _Board = Board.objects.all()
+    boards = []
+    for bd in _Board:
+        board = {}
+        board['name'] = bd.name
+        board['id'] = bd.id
+        board['description'] = bd.description
+        boards.append(board)
+    return render(request,
+                  'board/board_write.html',
+                  {"post": post, "Boards": boards, "Cur_board": Cur_board})
 
 
 @login_required(login_url='/session/login')
@@ -79,6 +91,7 @@ def post_read(request, pid, error=''):
     post["content_id"] = _BoardContent.id
     post["created_time"] = _BoardContent.created_time
     post["username"] = _User.username
+    post["board"] = _BoardPost.board.name
     if _BoardContent.is_anonymous:
         post["username"] = 'anonymous'
     writing_id = _UserProfile.id
@@ -105,7 +118,7 @@ def post_read(request, pid, error=''):
         comment["content_id"] = _BoardContent.id
         comment["created_time"] = _BoardContent.created_time
         comment["return"] = (_UserProfile.id
-                == request.user.userprofile.id)
+                             == request.user.userprofile.id)
         if _BoardContent.is_anonymous:
             comment["username"] = 'anonymous'
         comment["return"] = (_UserProfile.id == reading_id)
