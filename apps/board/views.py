@@ -341,6 +341,56 @@ def down(request):
 
 
 @login_required(login_url='/session/login')
+def vote_adult(request):
+    message = ""
+    id = request.GET.get('id')
+    _BoardContent = BoardContent.objects.filter(id=id)
+    if _BoardContent:
+        _BoardContent = _BoardContent[0]
+        _BoardContentVoteAdult = BoardContentVoteAdult.objects.filter(
+            board_content=_BoardContent,
+            userprofile=request.user.userprofile)
+        if _BoardContentVoteAdult:
+            message = "already voted_adult"
+        else:
+            vote = BoardContentVoteAdult()
+            vote.userprofile = request.user.userprofile
+            vote.board_content = _BoardContent
+            vote.save()
+            message = "success"
+    else:
+        message = "content not exist"
+    result = {}
+    result['message'] = message
+    return HttpResponse(json.dumps(result), content_type="application/json")
+
+
+@login_required(login_url='/session/login')
+def vote_political(request):
+    message = ""
+    id = request.GET.get('id')
+    _BoardContent = BoardContent.objects.filter(id=id)
+    if _BoardContent:
+        _BoardContent = _BoardContent[0]
+        _BoardContentVotePolitical = BoardContentVotePolitical.objects.filter(
+            board_content=_BoardContent,
+            userprofile=request.user.userprofile)
+        if _BoardContentVotePolitical:
+            message = "already voted_political"
+        else:
+            vote = BoardContentVotePolitical()
+            vote.userprofile = request.user.userprofile
+            vote.board_content = _BoardContent
+            vote.save()
+            message = "success"
+    else:
+        message = "content not exist"
+    result = {}
+    result['message'] = message
+    return HttpResponse(json.dumps(result), content_type="application/json")
+
+
+@login_required(login_url='/session/login')
 def delete(request):
     message = ""
     cid = request.GET.get('id')
