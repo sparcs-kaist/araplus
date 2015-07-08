@@ -5,18 +5,18 @@ from apps.session.models import UserProfile, Message
 
 
 def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
+    if request.method != 'POST':
+        return render(request, 'session/login.html')
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
 
-        if user is not None and user.is_active:
-            login(request, user)
-            return render(request, 'session/login_complete.html')
-        else:
-            error = "Invalid login"
-        return render(request, 'session/login.html', {'error': error})
-    return render(request, 'session/login.html')
+    if user is not None and user.is_active:
+        login(request, user)
+        return render(request, 'session/login_complete.html')
+    else:
+        error = "Invalid login"
+    return render(request, 'session/login.html', {'error': error})
 
 
 def user_logout(request):
@@ -26,47 +26,42 @@ def user_logout(request):
 
 
 def user_register(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        if password != request.POST['password_confirmation']:
-            error = "Password doesn't match the confirmation"
-            return render(request, "session/register.html", {'error': error})
-        email = request.POST['email']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        new_user = User.objects.create_user(username=username,
-                                            email=email,
-                                            password=password,
-                                            first_name=first_name,
-                                            last_name=last_name)
-        nickname = request.POST['nickname']
-        new_user_profile = UserProfile(user=new_user,
-                                       nickname=nickname)
-        new_user_profile.save()
-
-        return render(request, 'session/register_complete.html')
-    return render(request, 'session/register.html')
+    if request.method != "POST":
+        return render(request, 'session/register.html')
+    username = request.POST['username']
+    password = request.POST['password']
+    if password != request.POST['password_confirmation']:
+        error = "Password doesn't match the confirmation"
+        return render(request, "session/register.html", {'error': error})
+    email = request.POST['email']
+    first_name = request.POST['first_name']
+    last_name = request.POST['last_name']
+    new_user = User.objects.create_user(username=username,
+                                        email=email,
+                                        password=password,
+                                        first_name=first_name,
+                                        last_name=last_name)
+    nickname = request.POST['nickname']
+    UserProfile.objects.create(user=new_user, nickname=nickname)
+    return render(request, 'session/register_complete.html')
 
 
 def send_message(request):
-    if request.method == "POST":
-        if request.user.is_authenticated():
-            sender = UserProfile.objects.get(user=request.user)
-        else:
-            error = "Login required"
-            return render(request,
-                          'session/write_message.html', {'error': error})
-        content = request.POST['content']
-        receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
-        new_message = Message(content=content,
-                              sender=sender,
-                              receiver=receiver,
-                              is_read=False)
-        new_message.save()
-
-        return render(request, 'session/message_success.html')
-    return render(request, 'session/write_message.html')
+    if request.method != "POST":
+        return render(request, 'session/write_message.html')
+    if request.user.is_authenticated():
+        sender = UserProfile.objects.get(user=request.user)
+    else:
+        error = "Login required"
+        return render(request,
+                      'session/write_message.html', {'error': error})
+    content = request.POST['content']
+    receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
+    Message.objects.create(content=content,
+                           sender=sender,
+                           receiver=receiver,
+                           is_read=False)
+    return render(request, 'session/message_success.html')
 
 
 def check_message(request):
