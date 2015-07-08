@@ -53,7 +53,6 @@ def send_message(request):
     if request.method != "POST":
         return render(request, 'session/write_message.html')
     if request.user.is_authenticated():
-        print request.user
         sender = request.user.userprofile 
     else:
         error = "Login required"
