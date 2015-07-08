@@ -23,7 +23,7 @@ function csrfSafeMethod(method) {
 };    
 
 var add_comment = function(grill_id){
-        var form_content = $("#new_content").val()
+        var form_content = $("#new_content").val().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
         $("#new_content").val('');
         $.ajax({
             type: 'POST',
