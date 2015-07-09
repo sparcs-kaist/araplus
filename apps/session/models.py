@@ -24,6 +24,10 @@ class Message(models.Model):
         return "Message from %s to %s at %s" % \
             (self.sender, self.receiver, self.created_time)
 
+    def read(self):
+        self.is_read = True
+        self.save()
+
 
 class Block(models.Model):
     sender = models.ForeignKey('UserProfile',

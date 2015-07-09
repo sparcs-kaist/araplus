@@ -69,12 +69,14 @@ def check_message(request):
     messages = Message.objects.filter(receiver=receiver)
     for block in blocks:
         messages = messages.exclude(sender=block.sender)
+    for message in messages:
+        message.read()
     return render(request,
                   'session/check_message.html', {'messages': messages})
 
 
 @login_required(login_url='/session/login/')
-def check_my_message(request):
+def check_sent_message(request):
     messages = Message.objects.filter(sender=request.user.userprofile)
     return render(request,
                   'session/check_message.html', {'messages': messages})
