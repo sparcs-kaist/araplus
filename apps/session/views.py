@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from apps.session.models import UserProfile, Message
+from apps.session.models import UserProfile, Message, Block
 from django.contrib.auth.decorators import login_required
 
 
@@ -64,8 +64,11 @@ def send_message(request):
 
 @login_required(login_url='/session/login/')
 def check_message(request):
-    sender = request.user.userprofile
-    messages = Message.objects.filter(receiver=sender)
+    receiver = request.user.userprofile
+    blocks = Block.objects.filter(receiver=receiver)
+    messages = Message.objects.filter(receiver=receiver)
+    for block in blocks:
+        messages = messages.exclude(sender=block.sender)
     return render(request,
                   'session/check_message.html', {'messages': messages})
 
@@ -75,3 +78,13 @@ def check_my_message(request):
     messages = Message.objects.filter(sender=request.user.userprofile)
     return render(request,
                   'session/check_message.html', {'messages': messages})
+
+
+@login_required(login_url='/session/login')
+def block(request):
+    if request.method != "POST":
+        return render(request, 'session/block.html')
+    receiver = request.user.userprofile
+    sender = UserProfile.objects.get(nickname=request.POST['nickname'])
+    Block.objects.create(sender=sender, receiver=receiver)
+    return render(request, 'session/block_success.html')

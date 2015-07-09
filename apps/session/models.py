@@ -23,3 +23,13 @@ class Message(models.Model):
     def __str__(self):
         return "Message from %s to %s at %s" % \
             (self.sender, self.receiver, self.created_time)
+
+
+class Block(models.Model):
+    sender = models.ForeignKey('UserProfile',
+                               related_name='block_message_from')
+    receiver = models.ForeignKey('UserProfile',
+                                 related_name='block_message_to')
+
+    def __str__(self):
+        return "%s blocked message from %s" % (self.receiver, self.sender)
