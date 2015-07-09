@@ -1,7 +1,9 @@
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from apps.board.models import *
 import datetime
@@ -14,6 +16,7 @@ def post_write(request):
     post = {}
     post["new"] = True
     error = ""
+    
     if request.method == 'POST':
         if not request.user.is_authenticated():
             return redirect('session/login')
@@ -234,16 +237,24 @@ def post_list(request, error=''):
     if adult_filter == "true":
         is_adult = True
     if board_filter:
-        _BoardPost = BoardPost.objects.filter(board=board_filter)
+        _BoardPost= BoardPost.objects.filter(board=board_filter).order_by('-id')
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
-        _BoardPost = BoardPost.objects.all()
+        _BoardPost = BoardPost.objects.all().order_by('-id')
+    
+
     _Board = Board.objects.all()
+    paginator=Paginator(_BoardPost,10)
+    try:
+        page=int(request.GET['page'])
+    except:
+        page=1
+    _PageBoardPost=paginator.page(page)
     posts = []
     boards = []
     for bd in _Board:
         boards.append(bd)
-    for bp in _BoardPost:
+    for bp in _PageBoardPost:
         post = {}
         if bp.board_content.is_anonymous:
             post['username'] = "annonymous"
@@ -256,19 +267,36 @@ def post_list(request, error=''):
             post['title'] = bp.title
         post['created_time'] = bp.board_content.created_time
         post['id'] = bp.id
+        post['board_id']=bp.board.id
         vote = bp.board_content.get_vote()
         post['up'] = vote['up']
         post['down'] = vote['down']
         if adult_filter == 'true' and bp.board_content.is_adult:
             post['title'] = "filterd"
         posts.append(post)
+    if page==1:
+        prevPage=0
+    else:
+        prevPage= paginator.page(page).previous_page_number()
+    if page==paginator.num_pages:
+        nextPage=page
+    else:
+        nextPage= paginator.page(page).next_page_number()
     return render(request,
                   'board/board_list.html',
                   {
                       'Posts': posts,
                       'Boards': boards,
                       'Cur_board': cur_board,
-                      'Is_adult': is_adult
+                      'Is_adult': is_adult,
+                      'show_paginator':paginator.num_pages>1,
+                      'has_prev':paginator.page(page).has_previous(),
+                      'has_next':paginator.page(page).has_next(),
+                      'page':page,
+                      'pages':paginator.num_pages,
+                      'next_page':nextPage,
+                      'prev_page':prevPage,
+
                   })
 
 
