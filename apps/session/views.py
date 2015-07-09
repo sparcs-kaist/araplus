@@ -67,8 +67,7 @@ def check_message(request):
     sender = request.user.userprofile
     messages = Message.objects.filter(receiver=sender)
     for message in messages:
-        message.is_read = True
-        message.save()
+        message.read()
     return render(request,
                   'session/check_message.html', {'messages': messages})
 
