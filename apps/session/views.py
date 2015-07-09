@@ -52,12 +52,7 @@ def user_register(request):
 def send_message(request):
     if request.method != "POST":
         return render(request, 'session/write_message.html')
-    if request.user.is_authenticated():
-        sender = request.user.userprofile
-    else:
-        error = "Login required"
-        return render(request,
-                      'session/write_message.html', {'error': error})
+    sender = request.user.userprofile
     content = request.POST['content']
     receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
     Message.objects.create(content=content,
@@ -69,11 +64,7 @@ def send_message(request):
 
 @login_required(login_url='/session/login/')
 def check_message(request):
-    if request.user.is_authenticated():
-        sender = request.user.userprofile
-    else:
-        error = "Login required"
-        return render(request, 'session/check_message.html', {'error': error})
+    sender = request.user.userprofile
     messages = Message.objects.filter(receiver=sender)
     return render(request,
                   'session/check_message.html', {'messages': messages})
