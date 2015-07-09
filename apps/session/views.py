@@ -83,4 +83,4 @@ def check_message(request):
 def check_my_message(request):
     messages = Message.objects.filter(sender=request.user.userprofile)
     return render(request,
-                  'session/check_my_message.html', {'messages': messages})
+                  'session/check_message.html', {'messages': messages})
