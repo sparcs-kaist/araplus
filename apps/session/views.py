@@ -66,12 +66,15 @@ def send_message(request):
 def check_message(request):
     sender = request.user.userprofile
     messages = Message.objects.filter(receiver=sender)
+    for message in messages:
+        message.is_read = True
+        message.save()
     return render(request,
                   'session/check_message.html', {'messages': messages})
 
 
 @login_required(login_url='/session/login/')
-def check_my_message(request):
+def check_sent_message(request):
     messages = Message.objects.filter(sender=request.user.userprofile)
     return render(request,
-                  'session/check_message.html', {'messages': messages})
+                  'session/check_sent_message.html', {'messages': messages})

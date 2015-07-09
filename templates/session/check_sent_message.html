@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    <ul>
+    {% for message in messages %}
+        <li> Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </li>
+        <li> Content : {{ message.content }} </li>
+        {% if message.is_read %}
+            <li> message is read by {{ message.receiver.nickname }} </li>
+        {% else %}
+        	<li> message is not yet read </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% endblock %}
