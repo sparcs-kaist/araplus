@@ -63,7 +63,20 @@ class BoardContentVote(models.Model):
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="board_comment_vote")
     is_up = models.BooleanField(null=False)
-    is_adult = models.BooleanField(default=False, null=False)
+
+class BoardContentVoteAdult(models.Model):
+    board_content = models.ForeignKey('BoardContent',
+                                      related_name="content_vote_adult",
+                                      null=False)
+    userprofile = models.ForeignKey('session.UserProfile',
+                                    related_name="board_comment_vote_adult")
+
+class BoardContentVotePolitical(models.Model):
+    board_content = models.ForeignKey('BoardContent',
+                                      related_name="content_vote_political",
+                                      null=False)
+    userprofile = models.ForeignKey('session.UserProfile',
+                                    related_name="board_comment_vote_political")
 
 
 class BoardReport(models.Model):
@@ -72,8 +85,8 @@ class BoardReport(models.Model):
     board_content = models.ForeignKey('BoardContent',
                                       related_name="report",
                                       null=False)
-    """userprofile = models.ForeignKey(session.UserProfile,
-                                      related_name="board_report")"""
+    userprofile = models.ForeignKey('session.UserProfile',
+                                      related_name="board_report")
 
 
 class Board(models.Model):
@@ -87,15 +100,6 @@ class Board(models.Model):
 class BoardCategory(models.Model):
     name = models.CharField(max_length=10, null=False)
     board = models.ForeignKey('Board', related_name='category', null=False)
-
-
-class BoardPostVote(models.Model):
-    board_post = models.ForeignKey('BoardPost',
-                                   related_name='postvote',
-                                   null=False)
-    """userprofile = models.ForeignKey('UserProfile',
-                                       related_name='voted_board')"""
-    is_up = models.BooleanField(null=False)
 
 
 class BoardPost(models.Model):
