@@ -1,4 +1,3 @@
-var refresh_timer;
 var last_update = new Date().toJSON();
 
 function getCookie(name) {
@@ -39,35 +38,6 @@ function refresh_comment (grill_id) {
         },
         dataType: 'json',
         success: function(json){
-            //Update Comments
-            for (var i = json.comments.length - 1; i >= 0; i--) {
-                var target = json.comments[i];
-                var options = {
-                    year: "numeric", month: "short",
-                    day: "numeric", hour: "2-digit", minute: "2-digit"
-                };
-                var temp_date = new Date(target.created_time);
-				/*
-                var ms = '<li id="comment_'+target.order+'">' + target.order +"번째. "+target.author;
-                ms += "님이 " + temp_date.toLocaleTimeString("ko-KR",options)
-                ms += "에 남긴 글 <p>" + target.content + ' <button class="vote_up"> 추천 (+0)</button></p></li>';*/
-
-				var ms = '<li id="comment_'+target.order+'" class="a-comment-of-list">';
-				ms += '<div class="a-comment-area">';
-				ms += '	<span>'+target.order+'</span>';
-				ms += '<div class="a-comment-content">'+target.content+'</div>';
-				ms += '<div class="a-comment-info">';
-				ms += '<div class="a-comment-author-container">';
-				ms += '<span>'+target.author+'</span>';
-				ms += '<span class="a-comment-date">'+temp_date.toLocaleTimeString("ko-KR", options)+'</span>';
-				ms += '</div>';
-				ms += '<div class="a-comment-vote-container">';
-				ms += '<button class="vote_up a-comment-vote"> 추천 (+0) </button>';
-				ms += '</div></div></div></li>';
-
-                $("#result_list").prepend(ms);   
-            };
-
             //Update Votes
             last_update = json.last_update
             if (!json.new_votes) {
@@ -99,10 +69,7 @@ function vote(grill_id, order, updown) {
         },
         dataType: 'json',
         success: function(json){
-            clearInterval(refresh_timer);
-            refresh_comment(grill_id);
-            refresh_timer = setInterval(function(){
-                refresh_comment(grill_id);},5000);
+            
         }, error:function(request,status,error){
             console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
     });
@@ -115,6 +82,7 @@ var add_comment = function(grill_id, socket){
             return false;
         };
         $("#new_content").val('');
+        $("#text_counter").text('0');
         $.ajax({
             type: 'POST',
             url: '/grill/'+grill_id+'/add_comment/',
@@ -144,33 +112,28 @@ $(document).ready(function(){
                 }
             });
 
-            // refresh_timer = setInterval(function(){refresh_comment(grill_id);},5000);
+            $(document).on('click','button.vote_up',function(){
+                $(this).attr('disabled',true);
+                $(this).parent().children("button.vote_down").attr('disabled',true);
+                vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, true);
+                var target_new_like = $(this).text().trim().split('+')[1].slice(0, -1)*1 + 1;
+                $(this).text("추천 (+"+target_new_like+")")
+            })
 
-            //$(document).on('click','button.vote_up',function(){
-            //    console.log(grill_id);
-            //    console.log(true);
-            //    $(this).attr('disabled',true);
-            //    vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, true);
-//
-  //          })
-    //        $(document).on('click','button.vote_down',function(){
-      //          console.log(grill_id);
-        //        console.log(false);
-          //      $(this).attr('disabled',false);
-            //     vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, false);
-           // })
+            $(document).on('click','button.vote_down',function(){
+                $(this).attr('disabled',true);
+                $(this).parent().children("button.vote_up").attr('disabled',true);
+                vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, false);
+                var target_new_like = $(this).text().trim().split('-')[1].slice(0, -1)*1 + 1;
+                $(this).text("반대 (-"+target_new_like+")")
+            })
 
             $("#new_content").on('keyup',function(event){
                 $("#text_counter").text($($("#new_content")[0]).val().length);
             })   
 
-        // websocket part
+            // websocket Initialize
             var socket = io.connect('http://localhost:9779');
-
-
-            socket.on('connect', function(){
-                console.log("connection made with " + grill_id);
-            })
 
             socket.emit('adduser',grill_id);
             
@@ -187,6 +150,7 @@ $(document).ready(function(){
                 add_comment(grill_id, socket);
             });     
 
+            // 반대 많이 받은 댓글 다시 보여주기
             $(".open_comment").click(function(event){
                 console.log("open!")
                 console.log($(this).parent().children("#hate_comment_content"))
