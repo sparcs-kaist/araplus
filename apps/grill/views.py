@@ -16,9 +16,10 @@ def home(request):
 
     grills = Grill.objects.all().order_by('created_time')  # 나중에 업데이트 순서로 바꾸기?
     return render(request, 'grill/main.html',
-                    {
-                        'grills': grills,
-                    })
+                  {
+                      'grills': grills,
+                  })
+
 
 def view_grill(request, grill_id):
     if not request.user.is_authenticated():
@@ -81,11 +82,23 @@ def add_comment(request, grill_id):
     new_comment.save()
     new_comment.grill.updated_time = datetime.datetime.now()
     new_comment.grill.save()
-    data = {'new_content': new_comment.replace_tags()}
-    data['order'] = new_comment.order
-    data['author'] = 1
-    # 날짜 표현방식이 기존 댓글과 다르지만, '몇 초전', 'n분 전' 등으로 바꿀 예정이므로 무시.
-    data['commented_at'] = getattr(new_comment, 'created_time')
+
+    ms = '<li id="comment_' + str(new_comment.order) + \
+        '" class="a-comment-of-list">'
+    ms += '<div class="a-comment-area">'
+    ms += ' <span>' + str(new_comment.order) + '</span>'
+    ms += '<div class="a-comment-content">' + \
+        new_comment.replace_tags().encode('utf8') + '</div>'
+    ms += '<div class="a-comment-info">'
+    ms += '<div class="a-comment-author-container">'
+    ms += '<span>' + new_comment.author.nickname.encode('utf8') + '</span>'
+    ms += '<span class="a-comment-date">' + \
+        str(new_comment.created_time) + '</span>'
+    ms += '</div>'
+    ms += '<div class="a-comment-vote-container">'
+    ms += '<button class="vote_up a-comment-vote"> 추천 (+0) </button>'
+    ms += '</div></div></div></li>'
+    data = {'html': ms}
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
                         content_type="application/json")
 

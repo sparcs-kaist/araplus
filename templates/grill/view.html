@@ -5,6 +5,7 @@
     <title>ARA Grill</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
     </script>
+    <script src="http://localhost:9779/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
     <link rel="stylesheet" href="/media/css/grill/grill.css">
     <script>
@@ -46,49 +47,4 @@
     </div>
 </body>
 
-
-
-<!-- <body>
-<form
-    id = "comment_form"
-    method = "POST"
->
-    {% csrf_token %}
-    <input type="text" id="new_content" style="width:300px;"/> 
-    <p>
-        <input type = "submit" id="submit_comment"/>
-    </p>
-</form>
-
-<p>
-    작성자 : {{grill.author.id}}, 작성일 : {{grill.created_time}}, 최근댓글 : {{grill.updated_time}}
-</p>
-
-<p>
-    Contents
-     {{grill.contents}}
-</p>
-
-<div id="results"></div> 
-<ul id="result_list">
-{% if comments|length %}
-    {% for comment in comments %}
-        <li id="comment_{{comment.order}}"> {{comment.order}}번째.
-            {{comment.author.id}}님이 {{comment.created_time}}에 남긴 글
-        <p>{{comment.content|safe}} 
-            {% if comment.vote_disable %}
-                <button class="vote_up" disabled> 추천 (+{{comment.like}}) </button>
-            {% else %}
-                <button class="vote_up"> 추천 (+{{comment.like}})</button>
-            {% endif %}
-        </p>
-
-        </li>   
-    {% endfor %}
-    {% else %}
-    글이 없습니다.
-{% endif %}
-</ul>
-
-</body>-->
 </html>

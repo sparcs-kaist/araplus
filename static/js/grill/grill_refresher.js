@@ -22,26 +22,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 };    
 
-var add_comment = function(grill_id){
-        var form_content = $("#new_content").val().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-        $("#new_content").val('');
-        $.ajax({
-            type: 'POST',
-            url: '/grill/'+grill_id+'/add_comment/',
-            data: { new_content : form_content,
-                },
-            dataType: 'json',
-            success: function(json){
-                clearInterval(refresh_timer);
-                refresh_comment(grill_id);
-                refresh_timer = setInterval(function(){
-                    refresh_comment(grill_id);},5000);
-            },
-            error:function(request,status,error){
-            console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
-        });
-        return false;
-    };
+
 
 function refresh_comment (grill_id) {
     var current_index = 0
@@ -127,6 +108,31 @@ function vote_up(grill_id, order) {
     });
 }
 
+
+var add_comment = function(grill_id, socket){
+        var form_content = $("#new_content").val().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        if (!form_content) {
+            return false;
+        };
+        $("#new_content").val('');
+        $.ajax({
+            type: 'POST',
+            url: '/grill/'+grill_id+'/add_comment/',
+            data: { new_content : form_content,
+                },
+            dataType: 'json',
+            success: function(json){
+                // emit
+                var new_comment_html = json.html;
+                $("#result_list").prepend(new_comment_html);
+                socket.emit('send_message',new_comment_html);
+            },
+            error:function(request,status,error){
+            console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
+        });
+        return false;
+    };
+
 $(document).ready(function(){
             var csrftoken = getCookie('csrftoken');
             var grill_id = document.URL.split("/")[4].split("#")[0]*1;
@@ -138,22 +144,42 @@ $(document).ready(function(){
                 }
             });
 
-            refresh_timer = setInterval(function(){refresh_comment(grill_id);},5000);
+            // refresh_timer = setInterval(function(){refresh_comment(grill_id);},5000);
 
-            $(document).on('click','button.vote_up',function(){
-                $(this).attr('disabled',true);
-                vote_up(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1);
+            // $(document).on('click','button.vote_up',function(){
+            //     $(this).attr('disabled',true);
+            //     vote_up(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1);
 
-            })
+            // })
 
             $("#new_content").on('keyup',function(event){
                 console.log(140 - $($("#new_content")[0]).val().length)
+            })   
+
+        // websocket part
+            var socket = io.connect('http://localhost:9779');
+
+
+            socket.on('connect', function(){
+                console.log("connection made with " + grill_id);
             })
 
+            socket.emit('adduser',grill_id);
+            
+            // Receive Message
+            socket.on('message', function(message){
+                console.log("message : " + message);
+                $("#result_list").prepend(message);
+            });
+
+            // Sending Message
             $("#add_comment_button").click(function(event){
                 console.log("HI")
                 event.preventDefault();
-                add_comment(grill_id);
-            });           
-            
+                add_comment(grill_id, socket);
+            });     
+
+
+
+
         });

@@ -1,15 +1,3 @@
-<!--<ul id="result_list">
-{% if comments|length %}
-    {% for comment in comments %}
-        <li id="comment_{{comment.order}}"> {{comment.order}}번째.
-            {{comment.author}}님이 {{comment.created_time}}에 남긴 글
-        <p>{{comment.content|safe}}</p></li>   
-    {% endfor %}
-    {% else %}
-    글이 없습니다.
-{% endif %}
-</ul>-->
-
 {% if comment.like == 0 %}
 <li id="comment_{{comment.order}}" class="a-comment-of-list">
 {% else %}
