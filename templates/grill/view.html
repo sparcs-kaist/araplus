@@ -22,9 +22,12 @@
                 <textarea id="new_content" class="comment-addbox" placeholder="댓글을 입력하세요"></textarea>
             </div>
             <div id="comment_button_container" class="comment-button-container">
-                <div id="comment_length_container" class="comment-length-container">(0/140)</div>
-                <button type="submit" id="add_comment_button">댓글달기</button>
-            </div>
+                <a href="#comment_1"><button type="submit" id="first_comment_button" class="comment-button left">첫 코</button></a>
+                <div id="comment_right_container" class="comment-right-container">
+                    <div id="comment_length_container" class="comment-length-container">(0/140)</div>
+                    <button type="submit" id="add_comment_button" class="comment-button right">댓글달기</button>
+                </div>
+             </div>
         </div>
         <div id="comment_list_container" class="comment-list-container">
             <ul id='result_list'>
