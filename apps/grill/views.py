@@ -40,7 +40,7 @@ def view_grill(request, grill_id):
         comment.hate = GrillCommentVote.objects.filter(
             grill_comment=comment,
             is_up=False).count()
-        
+
         if user_vote.filter(grill_comment=comment):
             comment.vote_disable = True
 
@@ -101,6 +101,7 @@ def add_comment(request, grill_id):
     ms += '</div>'
     ms += '<div class="a-comment-vote-container">'
     ms += '<button class="vote_up a-comment-vote"> 추천 (+0) </button>'
+    ms += '<button class="vote_down a-comment-vote"> 반대 (-0)</button>'
     ms += '</div></div></div></li>'
     data = {'html': ms}
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
