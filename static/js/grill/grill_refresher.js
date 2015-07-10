@@ -153,7 +153,7 @@ $(document).ready(function(){
             // })
 
             $("#new_content").on('keyup',function(event){
-                console.log(140 - $($("#new_content")[0]).val().length)
+                $("#text_counter").text($($("#new_content")[0]).val().length);
             })   
 
         // websocket part
