@@ -170,3 +170,23 @@ ul{
     margin-left: 20px;
     padding-left: 0;
 }
+
+.span-comment
+{
+    word-wrap: break-word;
+}
+
+#hate_content
+{
+    display: block;
+}
+
+#hate_comment_content
+{
+    display: none;
+}
+
+.open_comment
+{
+    display: block;
+}
