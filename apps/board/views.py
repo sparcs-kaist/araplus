@@ -60,8 +60,9 @@ def post_write(request):
         boardID = str(Cur_board.id)
         postID = str(_BoardPost.id)
         return redirect('../'+postID+'/?board='+boardID)
-    cur_board = request.GET.get("board")
-    Cur_board = Board.objects.filter(id=cur_board)[0]
+    
+    cur_board = request.GET.get("board",)
+    Cur_board= Board.objects.filter(id=cur_board)
     _Board = Board.objects.all()
     #official=request.user.userprofile.is_official
     boards = []

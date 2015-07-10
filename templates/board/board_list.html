@@ -45,9 +45,7 @@
 		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=true" id='1'>Filter Adult Post</a>
         {% endif %}
     </button>
-    {% if Cur_board.id %}
     <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
-	{% endif %}
 	{% if show_paginator %}
 		<div class="paginator">
 			{% if has_prev %}

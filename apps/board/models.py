@@ -64,12 +64,14 @@ class BoardContentVote(models.Model):
                                     related_name="board_comment_vote")
     is_up = models.BooleanField(null=False)
 
+
 class BoardContentVoteAdult(models.Model):
     board_content = models.ForeignKey('BoardContent',
                                       related_name="content_vote_adult",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="board_comment_vote_adult")
+
 
 class BoardContentVotePolitical(models.Model):
     board_content = models.ForeignKey('BoardContent',
@@ -86,7 +88,7 @@ class BoardReport(models.Model):
                                       related_name="report",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
-                                      related_name="board_report")
+                                    related_name="board_report")
 
 
 class Board(models.Model):
@@ -109,9 +111,9 @@ class BoardPost(models.Model):
     author = models.ForeignKey('session.UserProfile',
                                related_name='board_post')
     board_content = models.OneToOneField('BoardContent', null=False)
-    """board_category = models.ForeignKey('BoardCategory',
-                                        related_name='category',
-                                        null=False)"""
+    board_category = models.ForeignKey('BoardCategory',
+                                       related_name='category',
+                                       null=False)
 
     def __str__(self):
         title = self.title
