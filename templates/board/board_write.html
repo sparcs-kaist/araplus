@@ -2,11 +2,19 @@
 {% block js %}
 <script>
     $(document).ready(function(){
+        $(".category_{{Cur_board|default:'1'}}").removeAttr("style");
         $(".board").click(function(){
             var bid = $(this).attr("id");
             var bname = $(this).text() + " <span class='caret'></span>";
             $("#board_id").attr("value", bid);
             $("#dropdownMenu1").html(bname);
+            $(".category").css("display", "none");
+            $(".category_"+bid).removeAttr("style");
+        });
+        $(".category").click(function(){
+            var cname = $(this).attr("id");
+            $("#category_name").attr("value",cname)
+            $("#dropdownMenu2").html(cname+'<span class="caret"></span>');
         });
     });
 </script>
@@ -37,7 +45,9 @@
         </div>
         <div class="form-group">
             <input type="hidden" class="form-control" id="board_id" name="board" value="{{ Cur_board.id|default:"1"}}">
-            <div class="dropdown">
+            <input type="hidden" class="form-control" id="category_name" name="category">
+            <ul class="nav nav-pills">
+                <li>
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     {{Cur_board.name|default:"Bamboo"}}
                     <span class="caret"></span>
@@ -47,7 +57,19 @@
                     <li><a href="#" class="board" id="{{board.id}}">{{ board.name }}</a></li>
                     {% endfor %}
                 </ul>
-            </div>
+                </li>
+                <li>
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    --------
+                    <span class="caret"></span>
+                 </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    {% for category in Categories %}
+                    <li><a href="#" class="category category_{{category.board.id}}" id="{{category.name}}" style="display: none;">{{ category.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                </li>
+            </ul>
         </div>
         <div class="form-group">
             <label>본문</label>
