@@ -87,7 +87,7 @@ function refresh_comment (grill_id) {
     });
 }
 
-function vote_up(grill_id, order) {
+function vote(grill_id, order, updown) {
     console.log("grill_id : " + grill_id + "/"+typeof(grill_id))
     console.log("order : " + order + "/"+typeof(order) )
     $.ajax({
@@ -95,7 +95,7 @@ function vote_up(grill_id, order) {
         url: '/grill/' + grill_id + '/vote_comment/',
         data: {
             grill_comment_order: order,
-            is_up: true,
+            is_up: updown,
         },
         dataType: 'json',
         success: function(json){
@@ -146,11 +146,19 @@ $(document).ready(function(){
 
             // refresh_timer = setInterval(function(){refresh_comment(grill_id);},5000);
 
-            // $(document).on('click','button.vote_up',function(){
-            //     $(this).attr('disabled',true);
-            //     vote_up(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1);
-
-            // })
+            //$(document).on('click','button.vote_up',function(){
+            //    console.log(grill_id);
+            //    console.log(true);
+            //    $(this).attr('disabled',true);
+            //    vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, true);
+//
+  //          })
+    //        $(document).on('click','button.vote_down',function(){
+      //          console.log(grill_id);
+        //        console.log(false);
+          //      $(this).attr('disabled',false);
+            //     vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, false);
+           // })
 
             $("#new_content").on('keyup',function(event){
                 $("#text_counter").text($($("#new_content")[0]).val().length);
@@ -179,7 +187,12 @@ $(document).ready(function(){
                 add_comment(grill_id, socket);
             });     
 
-
-
-
+            $(".open_comment").click(function(event){
+                console.log("open!")
+                console.log($(this).parent().children("#hate_comment_content"))
+                $(this).parent().children("#hate_comment_content").css('display', 'block');
+                $(this).parent().children("#hate_content").css('display', 'none');
+                $(this).parent().children(".open_comment").css('display', 'none');
+                event.preventDefault();
+            });
         });

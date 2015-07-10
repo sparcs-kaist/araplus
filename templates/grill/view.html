@@ -23,9 +23,12 @@
                 <textarea id="new_content" class="comment-addbox" placeholder="댓글을 입력하세요"></textarea>
             </div>
             <div id="comment_button_container" class="comment-button-container">
-                <div id="comment_length_container" class="comment-length-container">(<span id="text_counter">0</span>/140)</div>
-                <button type="submit" id="add_comment_button">댓글달기</button>
-            </div>
+                <a href="#comment_1"><button type="submit" id="first_comment_button" class="comment-button left">첫 코</button></a>
+                <div id="comment_right_container" class="comment-right-container">
+                  <div id="comment_length_container" class="comment-length-container">(<span id="text_counter">0</span>/140)</div>
+                    <button type="submit" id="add_comment_button" class="comment-button right">댓글달기</button>
+                </div>
+             </div>
         </div>
         <div id="comment_list_container" class="comment-list-container">
             <ul id='result_list'>
@@ -40,6 +43,9 @@
         </div>
     </div>
     <div id="content_container" class="content-container">
+        <div>
+            제목 : {{grill.title}}
+        </div>
         <div>
             작성자 : {{grill.author.nickname}}, 작성일 : {{grill.created_time}}, 최근댓글 : {{grill.updated_time}}
         </div>

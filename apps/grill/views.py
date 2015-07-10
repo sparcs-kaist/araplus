@@ -37,6 +37,10 @@ def view_grill(request, grill_id):
         comment.like = GrillCommentVote.objects.filter(
             grill_comment=comment,
             is_up=True).count()
+        comment.hate = GrillCommentVote.objects.filter(
+            grill_comment=comment,
+            is_up=False).count()
+        
         if user_vote.filter(grill_comment=comment):
             comment.vote_disable = True
 
@@ -135,7 +139,10 @@ def vote_comment(request, grill_id):
     #           2. 투표 처리
     post_data = request.POST
     target_order = post_data['grill_comment_order']
-    is_up = post_data['is_up']
+    if post_data['is_up'] == 'true':
+        is_up = True
+    else:
+        is_up = False
     profile = get_object_or_404(UserProfile, user=request.user)
     target_comment = get_object_or_404(GrillComment, grill__id=grill_id,
                                        order=target_order)
