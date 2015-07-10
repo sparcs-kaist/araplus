@@ -64,6 +64,7 @@ class BoardContentVote(models.Model):
                                     related_name="board_comment_vote")
     is_up = models.BooleanField(null=False)
 
+
 class BoardContentVoteAdult(models.Model):
     board_content = models.ForeignKey('BoardContent',
                                       related_name="content_vote_adult",

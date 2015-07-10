@@ -16,7 +16,7 @@ def post_write(request):
     post = {}
     post["new"] = True
     error = ""
-    
+
     if request.method == 'POST':
         _User = request.user
         _UserProfile = _User.userprofile
