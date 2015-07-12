@@ -7,5 +7,8 @@ admin.site.register(BoardPost)
 admin.site.register(BoardComment)
 admin.site.register(BoardContentVote)
 admin.site.register(Board)
+<<<<<<< HEAD
 admin.site.register(BoardReport)
+=======
 admin.site.register(BoardCategory)
+>>>>>>> 17103d9ebe65e5539b7dccfd1a0380d68709d2e7

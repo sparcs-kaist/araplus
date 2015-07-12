@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^delete/$','apps.board.views.delete'),
     url(r'^vote_adult/$', 'apps.board.views.vote_adult'),
     url(r'^vote_political/$', 'apps.board.views.vote_political'),
+    url(r'^report/$', 'apps.board.views.report'),
 ]
