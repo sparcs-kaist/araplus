@@ -110,6 +110,7 @@ def post_read(request, pid, error=''):
     post["created_time"] = _BoardContent.created_time
     post["username"] = _User.username
     post["board"] = _BoardPost.board.name
+    post["board_id"] = _BoardPost.board.id
     post["category"] = _BoardPost.board_category.name
     if _BoardContent.is_anonymous:
         post["username"] = 'anonymous'
@@ -388,7 +389,7 @@ def post_list(request, error=''):
     if adult_filter == "true":
         is_adult = True
     if board_filter:
-        _NoticeBoardPost = BoardPost.objects.filter(board=board_filter,is_notice=True).order_by('-id')
+        _NoticeBoardPost = BoardPost.objects.filter(board=board_filter, is_notice=True).order_by('-id')
         _BoardPost = BoardPost.objects.filter(board=board_filter, is_notice=False).order_by('-id')
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:

@@ -190,7 +190,7 @@
                         <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
                         {% if post.return %}			
-                        <a class="btn btn-info col-md-1" href="./modify/?board={{Cur_board.id}}">Modify</a>
+                        <a class="btn btn-info col-md-1" href="./modify/?board={{post.board_id}}">Modify</a>
                         <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
                         {% endif %}
                         {% endif %}		
