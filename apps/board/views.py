@@ -20,13 +20,13 @@ def post_write(request):
         _User = request.user
         _UserProfile = _User.userprofile
         board = request.POST.get('board', '')
-        cur_board = request.GET.get("board",'')
+        cur_board = request.GET.get("board", '')
         post["title"] = request.POST.get('title', '')
         post["content"] = request.POST.get('content', '')
         category = request.POST.get('category', '')
         anonymous = request.POST.get('anonymous', '')
         adult = request.POST.get('adult', '')
-        notice = request.POST.get('notice','')
+        notice = request.POST.get('notice', '')
         if post["title"] == '':
             error = 'title missing!'
         if post["content"] == '':
@@ -64,14 +64,13 @@ def post_write(request):
         _BoardPost.save()
         postID = str(_BoardPost.id)
         return redirect('../'+postID+'/?board='+cur_board)
-    
-    cur_board = request.GET.get("board",'')
+    cur_board = request.GET.get("board", '')
     if cur_board:
-        Cur_board = Board.objects.filter(id = cur_board)[0]
+        Cur_board = Board.objects.filter(id=cur_board)[0]
     else:
-        Cur_board = Board.objects.filter(id = 1)[0]
+        Cur_board = Board.objects.filter(id=1)[0]
     _Board = Board.objects.all()
-    #official=request.user.userprofile.is_official
+    # official=request.user.userprofile.is_official
     boards = []
     for bd in _Board:
         board = {}
@@ -95,7 +94,6 @@ def post_read(request, pid, error=''):
     else:
         error = "No post"
         return render(request, 'board/board_read.html', {'error': error})
-    
     _BoardContent = _BoardPost.board_content
     _UserProfile = _BoardPost.author
     _User = _UserProfile.user
@@ -144,8 +142,6 @@ def post_read(request, pid, error=''):
         comment["return"] = (_UserProfile.id == reading_id)
         comment["vote"] = _BoardContent.get_vote()
         comments.append(comment)
-#######################Coding of postList below###########################
-    
     adult_filter = request.GET.get('adult_filter')
     board_filter = request.GET.get('board')
     cur_board = ""
@@ -153,19 +149,19 @@ def post_read(request, pid, error=''):
     if adult_filter == "true":
         is_adult = True
     if board_filter:
-        _NoticeBoardPost = BoardPost.objects.filter(board=board_filter,is_notice=True).order_by('-id')
-        _BoardPostIn= BoardPost.objects.filter(board=board_filter,is_notice=False).order_by('-id')
+        _NoticeBoardPost = BoardPost.objects.filter(board=board_filter, is_notice=True).order_by('-id')
+        _BoardPostIn = BoardPost.objects.filter(board=board_filter, is_notice=False).order_by('-id')
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
         _BoardPostIn = BoardPost.objects.filter(is_notice=False).order_by('-id')
     _Board = Board.objects.all()
-    paginator=Paginator(_BoardPostIn,10)
+    paginator = Paginator(_BoardPostIn, 10)
     try:
-        page=int(request.GET['page'])
+        page = int(request.GET['page'])
     except:
-        page=1
-    _PageBoardPost=paginator.page(page)
+        page = 1
+    _PageBoardPost = paginator.page(page)
     posts = []
     boards = []
     for bd in _Board:
@@ -190,7 +186,7 @@ def post_read(request, pid, error=''):
         npost['is_notice'] = True
         posts.append(npost)
     for bp in _PageBoardPost:
-        postInList = {}#post for postList
+        postInList = {}  # post for postList
         if bp.board_content.is_anonymous:
             postInList['username'] = "annonymous"
         else:
@@ -209,8 +205,8 @@ def post_read(request, pid, error=''):
         if adult_filter == 'true' and bp.board_content.is_adult:
             postInList['title'] = "filterd"
         posts.append(postInList)
-    if page==1:
-        prevPage=0
+    if page == 1:
+        prevPage = 0
     else:
         prevPage = paginator.page(page).previous_page_number()
     if page == paginator.num_pages:
@@ -219,23 +215,22 @@ def post_read(request, pid, error=''):
         nextPage = paginator.page(page).next_page_number()
     return render(request,
                   'board/board_read.html',
-                  {   'error':error,#error for post
-                      'post':post,#post for post
-                      'comments':comments,#comment for post
-                      'Posts': posts, #Below,there are thing for postList.
+                  {
+                      'error': error,  # error for post
+                      'post': post,  # post for post
+                      'comments': comments,  # comment for post
+                      'Posts': posts,  # Below,there are thing for postList.
                       'Boards': boards,
                       'Cur_board': cur_board,
                       'Is_adult': is_adult,
-                      'show_paginator':paginator.num_pages>1,
-                      'has_prev':paginator.page(page).has_previous(),
-                      'has_next':paginator.page(page).has_next(),
-                      'page':page,
-                      'pages':paginator.num_pages,
-                      'next_page':nextPage,
-                      'prev_page':prevPage,
-
+                      'show_paginator': paginator.num_pages > 1,
+                      'has_prev': paginator.page(page).has_previous(),
+                      'has_next': paginator.page(page).has_next(),
+                      'page': page,
+                      'pages': paginator.num_pages,
+                      'next_page': nextPage,
+                      'prev_page': prevPage,
                   })
-       
 
 
 @login_required(login_url='/session/login')
@@ -361,18 +356,18 @@ def post_list(request, error=''):
         is_adult = True
     if board_filter:
         _NoticeBoardPost = BoardPost.objects.filter(board=board_filter,is_notice=True).order_by('-id')
-        _BoardPost= BoardPost.objects.filter(board=board_filter,is_notice=False).order_by('-id')
+        _BoardPost = BoardPost.objects.filter(board=board_filter, is_notice=False).order_by('-id')
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
         _BoardPost = BoardPost.objects.filter(is_notice=False).order_by('-id')
     _Board = Board.objects.all()
-    paginator=Paginator(_BoardPost,10)
+    paginator = Paginator(_BoardPost, 10)
     try:
-        page=int(request.GET['page'])
+        page = int(request.GET['page'])
     except:
-        page=1
-    _PageBoardPost=paginator.page(page)
+        page = 1
+    _PageBoardPost = paginator.page(page)
     posts = []
     boards = []
     for bd in _Board:
@@ -390,11 +385,11 @@ def post_list(request, error=''):
             npost['title'] = nbp.title
         npost['created_time'] = nbp.board_content.created_time
         npost['id'] = nbp.id
-        npost['board_id']=nbp.board.id
+        npost['board_id'] = nbp.board.id
         nvote = nbp.board_content.get_vote()
         npost['up'] = nvote['up']
         npost['down'] = nvote['down']
-        npost['is_notice']=True
+        npost['is_notice'] = True
         posts.append(npost)
     for bp in _PageBoardPost:
         post = {}
@@ -409,21 +404,21 @@ def post_list(request, error=''):
             post['title'] = bp.title
         post['created_time'] = bp.board_content.created_time
         post['id'] = bp.id
-        post['board_id']=bp.board.id
+        post['board_id'] = bp.board.id
         vote = bp.board_content.get_vote()
         post['up'] = vote['up']
         post['down'] = vote['down']
         if adult_filter == 'true' and bp.board_content.is_adult:
             post['title'] = "filterd"
         posts.append(post)
-    if page==1:
-        prevPage=0
+    if page == 1:
+        prevPage = 0
     else:
-        prevPage= paginator.page(page).previous_page_number()
-    if page==paginator.num_pages:
-        nextPage=page
+        prevPage = paginator.page(page).previous_page_number()
+    if page == paginator.num_pages:
+        nextPage = page
     else:
-        nextPage= paginator.page(page).next_page_number()
+        nextPage = paginator.page(page).next_page_number()
     return render(request,
                   'board/board_list.html',
                   {
@@ -431,13 +426,13 @@ def post_list(request, error=''):
                       'Boards': boards,
                       'Cur_board': cur_board,
                       'Is_adult': is_adult,
-                      'show_paginator':paginator.num_pages>1,
-                      'has_prev':paginator.page(page).has_previous(),
-                      'has_next':paginator.page(page).has_next(),
-                      'page':page,
-                      'pages':paginator.num_pages,
-                      'next_page':nextPage,
-                      'prev_page':prevPage,
+                      'show_paginator': paginator.num_pages > 1,
+                      'has_prev': paginator.page(page).has_previous(),
+                      'has_next': paginator.page(page).has_next(),
+                      'page': page,
+                      'pages': paginator.num_pages,
+                      'next_page': nextPage,
+                      'prev_page': prevPage,
 
                   })
 
@@ -576,7 +571,7 @@ def delete(request):
             return HttpResponse(message)
         if author == request.user.userprofile:
             BoardCont.is_deleted = True
-            BoardCont.boardpost.is_notice=False
+            BoardCont.boardpost.is_notice = False
             BoardCont.save()
             message = "success"
         else:
@@ -595,7 +590,7 @@ def report(request):
         if reason == '':
             message = 'no reason'
         else:
-            board_content = BoardContent.objects.filter(id = cid)
+            board_content = BoardContent.objects.filter(id=cid)
             if board_content:
                 print reason
                 print content
@@ -608,6 +603,6 @@ def report(request):
                 board_report.userprofile = request.user.userprofile
                 board_report.save()
                 message = 'success'
-            else :
+            else:
                 message = 'no content'
         return HttpResponse(message)
