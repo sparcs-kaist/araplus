@@ -20,10 +20,10 @@ def post_write(request):
         _User = request.user
         _UserProfile = _User.userprofile
         board = request.POST.get('board', '')
-        cur_board = request.GET.get("board")
-        Cur_board = Board.objects.filter(id=cur_board)[0]
+        cur_board = request.GET.get("board",'')
         post["title"] = request.POST.get('title', '')
         post["content"] = request.POST.get('content', '')
+        category = request.POST.get('category', '')
         anonymous = request.POST.get('anonymous', '')
         adult = request.POST.get('adult', '')
         notice = request.POST.get('notice','')
@@ -56,13 +56,20 @@ def post_write(request):
             _BoardPost.board = _Board[0]
         else:
             return redirect('../')
+        _Category = BoardCategory.objects.filter(name=category)
+        if _Category:
+            _BoardPost.board_category = _Category[0]
+        else:
+            return refirect('../')
         _BoardPost.save()
-        boardID = str(Cur_board.id)
         postID = str(_BoardPost.id)
-        return redirect('../'+postID+'/?board='+boardID)
+        return redirect('../'+postID+'/?board='+cur_board)
     
-    cur_board = request.GET.get("board",)
-    Cur_board= Board.objects.filter(id=cur_board)
+    cur_board = request.GET.get("board",'')
+    if cur_board:
+        Cur_board = Board.objects.filter(id = cur_board)[0]
+    else:
+        Cur_board = Board.objects.filter(id = 1)[0]
     _Board = Board.objects.all()
     #official=request.user.userprofile.is_official
     boards = []
@@ -72,9 +79,12 @@ def post_write(request):
         board['id'] = bd.id
         board['description'] = bd.description
         boards.append(board)
+    categories = BoardCategory.objects.all()
     return render(request,
                   'board/board_write.html',
-                  {"post": post, "Boards": boards, "Cur_board": Cur_board})
+                  {"post": post, "Boards": boards,
+                   "Cur_board": Cur_board,
+                   "Categories": categories})
 
 
 @login_required(login_url='/session/login')

@@ -123,7 +123,7 @@
         $('a.report').click(function() {
             $("#report_content").val("")
             $("#report_reason").attr("value", 0);
-            $("#dropdownMenu1").html("신고 이유 <span class='caret'></span>");
+            $("#report_reason_dropdown").html("신고 이유 <span class='caret'></span>");
             doOverlayOpen();
             report_uid = $(this).attr("id").slice(7)
         });
@@ -145,7 +145,7 @@
             var bid = $(this).attr("id");
             var bname = $(this).text() + " <span class='caret'></span>";
             $("#report_reason").attr("value", bid);
-            $("#dropdownMenu1").html(bname);
+            $("#report_reason_dropdown").html(bname);
         });
     });
 </script>
@@ -331,11 +331,11 @@
             <div class="form-group col-sm-3">
                 <input type="hidden" class="form-control" id="report_reason" name="report_reason" value="2">
                 <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width:250px">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="report_reason_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width:250px">
                         신고 이유
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <ul class="dropdown-menu" aria-labelledby="report_reason_dropdown">
                         <li><a href="#" class="reason" id="이유1">이유1</a></li>
                         <li><a href="#" class="reason" id="이유2">이유2</a></li>
                         <li><a href="#" class="reason" id="기타">기타</a></li>
