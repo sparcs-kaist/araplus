@@ -23,6 +23,7 @@ def post_write(request):
         board = request.POST.get('board', '')
         post["title"] = request.POST.get('title', '')
         post["content"] = request.POST.get('content', '')
+        category = request.POST.get('category', '')
         anonymous = request.POST.get('anonymous', '')
         adult = request.POST.get('adult', '')
         if post["title"] == '':
@@ -52,10 +53,17 @@ def post_write(request):
             _BoardPost.board = _Board[0]
         else:
             return redirect('../')
+        _Category = BoardCategory.objects.filter(name=category)
+        if _Category:
+            _BoardPost.board_category = _Category[0]
+        else:
+            return redirect('../')
         _BoardPost.save()
         return redirect('../%d/' % _BoardPost.id)
     cur_board = request.GET.get("board")
-    Cur_board = Board.objects.filter(id=cur_board)[0]
+    Cur_board = ""
+    if cur_board:
+        Cur_board = Board.objects.filter(id=cur_board)[0]
     _Board = Board.objects.all()
     boards = []
     for bd in _Board:
@@ -64,9 +72,12 @@ def post_write(request):
         board['id'] = bd.id
         board['description'] = bd.description
         boards.append(board)
+    categories = BoardCategory.objects.all()
     return render(request,
                   'board/board_write.html',
-                  {"post": post, "Boards": boards, "Cur_board": Cur_board})
+                  {"post": post, "Boards": boards,
+                   "Cur_board": Cur_board,
+                   "Categories": categories})
 
 
 @login_required(login_url='/session/login')
@@ -93,6 +104,7 @@ def post_read(request, pid, error=''):
     post["created_time"] = _BoardContent.created_time
     post["username"] = _User.username
     post["board"] = _BoardPost.board.name
+    post["category"] = _BoardPost.board_category.name
     if _BoardContent.is_anonymous:
         post["username"] = 'anonymous'
     writing_id = _UserProfile.id
@@ -252,19 +264,18 @@ def post_list(request, error=''):
     if adult_filter == "true":
         is_adult = True
     if board_filter:
-        _BoardPost= BoardPost.objects.filter(board=board_filter).order_by('-id')
+        _BoardPost = BoardPost.objects.filter(
+            board=board_filter).order_by('-id')
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
         _BoardPost = BoardPost.objects.all().order_by('-id')
-    
-
     _Board = Board.objects.all()
-    paginator=Paginator(_BoardPost,10)
+    paginator = Paginator(_BoardPost, 10)
     try:
-        page=int(request.GET['page'])
+        page = int(request.GET['page'])
     except:
-        page=1
-    _PageBoardPost=paginator.page(page)
+        page = 1
+    _PageBoardPost = paginator.page(page)
     posts = []
     boards = []
     for bd in _Board:
@@ -282,21 +293,21 @@ def post_list(request, error=''):
             post['title'] = bp.title
         post['created_time'] = bp.board_content.created_time
         post['id'] = bp.id
-        post['board_id']=bp.board.id
+        post['board_id'] = bp.board.id
         vote = bp.board_content.get_vote()
         post['up'] = vote['up']
         post['down'] = vote['down']
         if adult_filter == 'true' and bp.board_content.is_adult:
             post['title'] = "filterd"
         posts.append(post)
-    if page==1:
-        prevPage=0
+    if page == 1:
+        prevPage = 0
     else:
-        prevPage= paginator.page(page).previous_page_number()
-    if page==paginator.num_pages:
-        nextPage=page
+        prevPage = paginator.page(page).previous_page_number()
+    if page == paginator.num_pages:
+        nextPage = page
     else:
-        nextPage= paginator.page(page).next_page_number()
+        nextPage = paginator.page(page).next_page_number()
     return render(request,
                   'board/board_list.html',
                   {
@@ -304,13 +315,13 @@ def post_list(request, error=''):
                       'Boards': boards,
                       'Cur_board': cur_board,
                       'Is_adult': is_adult,
-                      'show_paginator':paginator.num_pages>1,
-                      'has_prev':paginator.page(page).has_previous(),
-                      'has_next':paginator.page(page).has_next(),
-                      'page':page,
-                      'pages':paginator.num_pages,
-                      'next_page':nextPage,
-                      'prev_page':prevPage,
+                      'show_paginator': paginator.num_pages > 1,
+                      'has_prev': paginator.page(page).has_previous(),
+                      'has_next': paginator.page(page).has_next(),
+                      'page': page,
+                      'pages': paginator.num_pages,
+                      'next_page': nextPage,
+                      'prev_page': prevPage,
 
                   })
 

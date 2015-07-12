@@ -2,7 +2,7 @@
 {% block js %}
 <script>
     $(document).ready(function(){
-        $(".category_{{Cur_board|default:'1'}}").removeAttr("style");
+        $(".category_{{Cur_board.id|default:'1'}}").removeAttr("style");
         $(".board").click(function(){
             var bid = $(this).attr("id");
             var bname = $(this).text() + " <span class='caret'></span>";
@@ -54,7 +54,7 @@
                  </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                     {% for board in Boards %}
-                    <li><a href="#" class="board" id="{{board.id}}">{{ board.name }}</a></li>
+                    <li><a href="javascript:;" class="board" id="{{board.id}}">{{ board.name }}</a></li>
                     {% endfor %}
                 </ul>
                 </li>
@@ -65,7 +65,7 @@
                  </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                     {% for category in Categories %}
-                    <li><a href="#" class="category category_{{category.board.id}}" id="{{category.name}}" style="display: none;">{{ category.name }}</a></li>
+                    <li><a href="javascript:;" class="category category_{{category.board.id}}" id="{{category.name}}" style="display: none;">{{ category.name }}</a></li>
                     {% endfor %}
                 </ul>
                 </li>
