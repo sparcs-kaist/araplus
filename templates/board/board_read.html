@@ -74,8 +74,7 @@
 				}
 			});
 		});	
-        $(".delete").click(
-        function delete_message(){
+        $(".delete").click(function() {
             var yes=confirm("Do yo REALLY want to delete?");
             if(yes == true){
                 var delete_uid=$(this).attr("id").slice(7);
@@ -92,6 +91,61 @@
             else{
                 return false;
             }
+        });
+        var isOpen = false;
+        var report_uid = 0;
+        function showOverlayBox() {
+            if(isOpen==false) return;
+            $(".overlayBox").css({
+                display:"block",
+                left:($(window).width()-$(".overlayBox").width())/2,
+                top:($(window).height()-$(".overlayBox").height())/2-20,
+                position:'absolute'
+            });
+            $(".bgCover").css({
+                display:"block",
+                width:$(window).width(),
+                height:$(window).height()
+            });
+        }
+        function doOverlayOpen() {
+            isOpen = true;
+            showOverlayBox();
+            $('.bgCover').css({opacity:0}).animate( {opacity:0.5, backgroundColor:'#000'} );
+            return false;
+        }
+        function doOverlayClose() {
+            isOpen = false;
+            $('.overlayBox').css( 'display', 'none' );
+            $('.bgCover').animate( {opacity:0}, null, null, function() { $(this).hide(); } );
+        }
+        $(window).bind('resize',showOverlayBox);
+        $('a.report').click(function() {
+            $("#report_content").val("")
+            $("#report_reason").attr("value", 0);
+            $("#dropdownMenu1").html("신고 이유 <span class='caret'></span>");
+            doOverlayOpen();
+            report_uid = $(this).attr("id").slice(7)
+        });
+        $("a.closeLink").click( doOverlayClose);
+        $(".report_submit").click(function() {
+            var report_reason = $("#report_reason").val()
+            var report_content = $("#report_content").val()
+            $.ajax({
+                url : "/board/report/",
+                type : "POST",
+                data : { id : report_uid, report_reason : report_reason, report_content : report_content,csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                success : function(data){
+                    alert(data);
+                }
+            });
+            doOverlayClose();
+        });
+        $(".reason").click(function(){
+            var bid = $(this).attr("id");
+            var bname = $(this).text() + " <span class='caret'></span>";
+            $("#report_reason").attr("value", bid);
+            $("#dropdownMenu1").html(bname);
         });
     });
 </script>
@@ -123,12 +177,13 @@
                         {% if not post.deleted %}
                         <div class="dropdown col-md-1">
                             <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                SingGo
+                                Report
                                 <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                    <li><a href="#" class="audlt" id="adult_{{post.content_id}}">Adult</a></li>
-                                    <li><a href="#" class="adult" id="politiclal_{{post.content_id}}">Political</a></li>
+                                    <li><a href="#" class="report" id="report_{{post.content_id}}">신고</a></li>
+                                    <li><a href="#" class="adult" id="adult_{{post.content_id}}">가버렷</a></li>
+                                    <li><a href="#" class="political" id="political_{{post.content_id}}">보내야한다</a></li>
                             </ul>
                         </div>
                         <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
@@ -158,8 +213,19 @@
                     <div id="comment{{comment.comment_id}}">{{ comment.content }}</div>
                     <div class="col-md-12">
 						<div class="row">
-						    <div class="col-md-8"></div>
+						    <div class="col-md-7"></div>
                             {% if not comment.deleted %}
+                            <div class="dropdown col-md-1">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    Report
+                                    <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                        <li><a href="#" class="report" id="report_{{comment.content_id}}">신고</a></li>
+                                        <li><a href="#" class="adult" id="adult_{{comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="political" id="political_{{comment.content_id}}">보내야한다</a></li>
+                                </ul>
+                            </div>
                             <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
                             <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
                             {% if comment.return %}			
@@ -192,5 +258,39 @@
         {% endif %}
     </div>
 </div>
+<div class="bgCover" style="background:#000; position:absolute; left:0; top:0; display:none; overflow:hidden">&nbsp;</div>
+<div class="overlayBox" style="position:absolute; display:none; width:500px; height:300px; background:#fff;">
+    <div class="overlayContent col-md-12">
+        <br />
+        <div class="row"> 
+            <div class="col-sm-3"><h4><b>신고하기</b></h4></div>
+            <div class="form-group col-sm-3">
+                <input type="hidden" class="form-control" id="report_reason" name="report_reason" value="2">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width:250px">
+                        신고 이유
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="#" class="reason" id="이유1">이유1</a></li>
+                        <li><a href="#" class="reason" id="이유2">이유2</a></li>
+                        <li><a href="#" class="reason" id="기타">기타</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-5"></div>
+            <div class="col-sm-1">
+                <h4><a href="javascript:void()" class="closeLink">X</a></h4>
+            </div>
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" rows="6" id="report_content" name="report_content"></textarea>
+        </div>
+        <div class="col-md-9"></div>
+		<button type="submit" class="btn btn-info col-md-3 report_submit" id="report_submit">Submit</button>
+          
+    </div>
+</div>
+
 {% endblock %}
 

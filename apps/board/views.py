@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
@@ -456,3 +456,30 @@ def delete(request):
     else:
         message = "no content"
     return HttpResponse(message)
+
+
+@login_required(login_url='/session/login')
+def report(request):
+    if request.method == 'POST':
+        cid = request.POST.get('id', '')
+        reason = request.POST.get('report_reason', '')
+        content = request.POST.get('report_content', '')
+        if reason == '':
+            message = 'no reason'
+        else:
+            board_content = BoardContent.objects.filter(id = cid)
+            if board_content:
+                print reason
+                print content
+                board_content = board_content[0]
+                board_report = BoardReport()
+                board_report.reason = reason
+                board_report.content = content
+                board_report.board_content = board_content
+                board_report.created_time = datetime.datetime.today()
+                board_report.userprofile = request.user.userprofile
+                board_report.save()
+                message = 'success'
+            else :
+                message = 'no content'
+        return HttpResponse(message)
