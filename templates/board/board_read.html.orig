@@ -74,54 +74,80 @@
 				}
 			});
 		});	
-    	$(".delete").click(
-<<<<<<< HEAD
-function delete_message(){
-	var yes=confirm("Do you REALLY want to delete?");
-	if(yes==true){
-		var delete_uid=$(this).attr("id").slice(7);
-		$.ajax({
-			url:'/board/delete',
-			data:{id : delete_uid},
-			success : function(data){
-                console.log(data);
-				location.reload();	
-			}	
-        }
-        );
-		return true;
-	}
-	else{
-		return false;
-}
-});
-
-});
-
-=======
-            function delete_message(){
-                var yes=confirm("Do you REALLY want to delete?");
-                if(yes==true){
-                    var delete_uid=$(this).attr("id").slice(7);
-                    $.ajax({
-                        url:'/board/delete',
-                        data:{id : delete_uid},
-                        success : function(data){
-                            console.log(data);
-                            location.reload();	
-                        }	
+        $(".delete").click(function() {
+            var yes=confirm("Do yo REALLY want to delete?");
+            if(yes == true){
+                var delete_uid=$(this).attr("id").slice(7);
+                $.ajax({
+                    url: '/board/delete',
+                    data:{id: delete_uid},
+                    success: function(data){
+                        console.log(data);
+                        location.reload();
                     }
-                    );
-                    return true;
-                }
-                else{
-                    return false;
-                }
-            } );
-
+                });
+                return true;
+            }
+            else{
+                return false;
+            }
         });
->>>>>>> b6dcaf802b026cf541c7d616cc3f49a9c883ddb0
-	
+        var isOpen = false;
+        var report_uid = 0;
+        function showOverlayBox() {
+            if(isOpen==false) return;
+            $(".overlayBox").css({
+                display:"block",
+                left:($(window).width()-$(".overlayBox").width())/2,
+                top:($(window).height()-$(".overlayBox").height())/2-20,
+                position:'absolute'
+            });
+            $(".bgCover").css({
+                display:"block",
+                width:$(window).width(),
+                height:$(window).height()
+            });
+        }
+        function doOverlayOpen() {
+            isOpen = true;
+            showOverlayBox();
+            $('.bgCover').css({opacity:0}).animate( {opacity:0.5, backgroundColor:'#000'} );
+            return false;
+        }
+        function doOverlayClose() {
+            isOpen = false;
+            $('.overlayBox').css( 'display', 'none' );
+            $('.bgCover').animate( {opacity:0}, null, null, function() { $(this).hide(); } );
+        }
+        $(window).bind('resize',showOverlayBox);
+        $('a.report').click(function() {
+            $("#report_content").val("")
+            $("#report_reason").attr("value", 0);
+            $("#report_reason_dropdown").html("신고 이유 <span class='caret'></span>");
+            doOverlayOpen();
+            report_uid = $(this).attr("id").slice(7)
+        });
+        $("a.closeLink").click( doOverlayClose);
+        $(".report_submit").click(function() {
+            var report_reason = $("#report_reason").val()
+            var report_content = $("#report_content").val()
+            $.ajax({
+                url : "/board/report/",
+                type : "POST",
+                data : { id : report_uid, report_reason : report_reason, report_content : report_content,csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                success : function(data){
+                    alert(data);
+                }
+            });
+            doOverlayClose();
+        });
+        $(".reason").click(function(){
+            var bid = $(this).attr("id");
+            var bname = $(this).text() + " <span class='caret'></span>";
+            $("#report_reason").attr("value", bid);
+            $("#report_reason_dropdown").html(bname);
+        });
+    });
 </script>
 {% endblock %}
 {% block content %}
@@ -134,9 +160,10 @@ function delete_message(){
                     {% if post.adult %}
                     <label style="color:red">+19</label>
                     {% endif %}
-                    <label> {{ post.title }} </label>
-                    <span> {{ post.username }}</span>
-                    <span> {{post.board}}</span>
+                    <label>{{ post.title }}</label>
+                    <span>{{ post.username }}</span>
+                    <span>{{post.board}}</span>
+                    <span>{{post.category}}</span>
                 </div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>
@@ -147,14 +174,28 @@ function delete_message(){
                 {{post.content}}
 				<div class="col-md-12">
 					<div class="row">
-						<div class="col-md-6"></div>
+						<div class="col-md-7"></div>
                         {% if not post.deleted %}
-                        <button class="btn btn-success col-md-1 adult" id="adult_{{post.content_id}}">Adult</button>
-                        <button class="btn btn-danger col-md-1 political" id="political_{{post.content_id}}">Political</button>
+                        <div class="dropdown col-md-1">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                Report
+                                <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+<<<<<<< HEAD
+                                    <li><a href="javascript:;" class="audlt" id="adult_{{post.content_id}}">Adult</a></li>
+                                    <li><a href="javascript:;" class="adult" id="politiclal_{{post.content_id}}">Political</a></li>
+=======
+                                    <li><a href="#" class="report" id="report_{{post.content_id}}">신고</a></li>
+                                    <li><a href="#" class="adult" id="adult_{{post.content_id}}">가버렷</a></li>
+                                    <li><a href="#" class="political" id="political_{{post.content_id}}">보내야한다</a></li>
+>>>>>>> 15a4be68e69d0b88a99a9367b37a5a51a5b96529
+                            </ul>
+                        </div>
                         <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
                         {% if post.return %}			
-                        <a class="btn btn-info col-md-1" href="./modify">Modify</a>
+						<a class="btn btn-info col-md-1" href="./modify/">Modify</a>
                         <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
                         {% endif %}
                         {% endif %}		
@@ -178,8 +219,19 @@ function delete_message(){
                     <div id="comment{{comment.comment_id}}">{{ comment.content }}</div>
                     <div class="col-md-12">
 						<div class="row">
-						    <div class="col-md-8"></div>
+						    <div class="col-md-7"></div>
                             {% if not comment.deleted %}
+                            <div class="dropdown col-md-1">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    Report
+                                    <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                        <li><a href="#" class="report" id="report_{{comment.content_id}}">신고</a></li>
+                                        <li><a href="#" class="adult" id="adult_{{comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="political" id="political_{{comment.content_id}}">보내야한다</a></li>
+                                </ul>
+                            </div>
                             <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
                             <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
                             {% if comment.return %}			
@@ -211,7 +263,104 @@ function delete_message(){
         </div>
         {% endif %}
 
+	<table style="width:100%">
+		<thead>
+			<tr>
+				<th width="150">user</th>
+                <th width="150">
+                    <div class="dropdown">                  
+                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{Cur_board.name|default:"All"}}
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a href="?">All</a></li>
+                            {% for board in Boards %}
+                            <li><a href="?board={{board.id}}">{{ board.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+				</th>
+				<th width="350">title</th>
+				<th width="100">+/-</th>
+				<th width="150">date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for post in Posts %}
+				<tr>
+					<td width="150">{{post.username}}</td>
+					<td width="150"><a href="?board={{post.board_id}}">{{post.board}}</a></td>
+					{%if post.is_notice%}
+					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}"><label style="color :black">Notice:{{post.title}}</label></a></td>
+					{%else%}
+					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}">{{post.title}}</a></td>
+					{%endif%}
+					<td width="100">+{{post.up}}/-{{post.down}}</td>
+					<td width="150">{{post.created_time}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+    </table>
+    <button class="btn btn-warn">
+        {% if Is_adult %}
+		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=false" id='2'>See Adult</a>
+        {% else %}
+		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=true" id='1'>Filter Adult Post</a>
+        {% endif %}
+    </button>
+    {% if Cur_board.id %}
+    <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
+	{% endif %}
+	{% if show_paginator %}
+		<div class="paginator">
+			{% if has_prev %}
+			<a href="../?board={{Cur_board.id}}&page={{ prev_page }}">&laquo;</a>
+			{% endif %}
+	
+			{% if has_next %}
+			<a href="../?board={{Cur_board.id}}&page={{ next_page }}">&raquo;</a>
+			{% endif %}	
+				(page {{page}} of {{pages}})
+			</div>
+	{% endif %}
+</div>   
+</div>
+
+</div>
+<div class="bgCover" style="background:#000; position:absolute; left:0; top:0; display:none; overflow:hidden">&nbsp;</div>
+<div class="overlayBox" style="position:absolute; display:none; width:500px; height:300px; background:#fff;">
+    <div class="overlayContent col-md-12">
+        <br />
+        <div class="row"> 
+            <div class="col-sm-3"><h4><b>신고하기</b></h4></div>
+            <div class="form-group col-sm-3">
+                <input type="hidden" class="form-control" id="report_reason" name="report_reason" value="2">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="report_reason_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width:250px">
+                        신고 이유
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="report_reason_dropdown">
+                        <li><a href="#" class="reason" id="이유1">이유1</a></li>
+                        <li><a href="#" class="reason" id="이유2">이유2</a></li>
+                        <li><a href="#" class="reason" id="기타">기타</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-5"></div>
+            <div class="col-sm-1">
+                <h4><a href="javascript:void()" class="closeLink">X</a></h4>
+            </div>
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" rows="6" id="report_content" name="report_content"></textarea>
+        </div>
+        <div class="col-md-9"></div>
+		<button type="submit" class="btn btn-info col-md-3 report_submit" id="report_submit">Submit</button>
+          
     </div>
 </div>
+
 {% endblock %}
+
 

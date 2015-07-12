@@ -243,7 +243,7 @@ def post_modify(request, pid):
     _BoardPost = BoardPost.objects.filter(id=pid)
     if _BoardPost:
         _BoardPost = _BoardPost[0]
-        if _BoardPost.author_id != _User.id:
+        if _BoardPost.author_id != _User.userprofile.id:
             error = "Not allowed"
     else:
         error = "No post"
@@ -251,6 +251,7 @@ def post_modify(request, pid):
     if _BoardContent.is_deleted:
         error = "Deleted"
     if error:
+        print error
         return redirect('../')
     if request.method == 'POST':
         if not request.user.is_authenticated():
@@ -258,12 +259,15 @@ def post_modify(request, pid):
         _User = request.user
         post["title"] = request.POST.get('title', '')
         post["content"] = request.POST.get('content', '')
+        post["board"] = request.POST.get('board', '')
+        post["category"] = request.POST.get('category', '')
         adult = request.POST.get('adult', '')
         if post["title"] == '':
             error = 'title missing!'
         if post["content"] == '':
             error = 'body missing!'
         if error:
+            print error
             return render(request,
                           'board/board_write.html',
                           {"error": error, "post": post})
@@ -274,10 +278,38 @@ def post_modify(request, pid):
         _BoardContent.content = post["content"]
         _BoardContent.save()
         _BoardPost.title = post["title"]
+        _Board = Board.objects.filter(id=post["board"])
+        _Category = BoardCategory.objects.filter(name=post["category"])
+        if not(_Board or _Category):
+            return redirect('../')
+        else:
+            _BoardPost.board = _Board[0]
+            _BoardPost.board_category = _Category[0]
         _BoardPost.save()
         return redirect('../')
     post["title"] = _BoardPost.title
     post["content"] = _BoardContent.content
+    cur_board = request.GET.get("board", '')
+    if cur_board:
+        Cur_board = Board.objects.filter(id=cur_board)[0]
+    else:
+        Cur_board = Board.objects.filter(id=1)[0]
+    _Board = Board.objects.all()
+    # official=request.user.userprofile.is_official
+    boards = []
+    for bd in _Board:
+        board = {}
+        board['name'] = bd.name
+        board['id'] = bd.id
+        board['description'] = bd.description
+        boards.append(board)
+    categories = BoardCategory.objects.all()
+    return render(request,
+                  'board/board_write.html',
+                  {"post": post, "Boards": boards,
+                   "Cur_board": Cur_board,
+                   "Categories": categories})
+
     return render(request,
                   'board/board_write.html',
                   {"post": post})

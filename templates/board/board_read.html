@@ -160,10 +160,10 @@
                     {% if post.adult %}
                     <label style="color:red">+19</label>
                     {% endif %}
-                    <label>{{ post.title }}</label>
-                    <span>{{ post.username }}</span>
-                    <span>{{post.board}}</span>
-                    <span>{{post.category}}</span>
+                    <label class="col-md-5">Title:{{ post.title }}</label>
+                    <span class="col-md-3">User:{{ post.username }}</span>
+                    <span class="col-md-2">Board:{{post.board}}</span>
+                    <span class="col-md-2">Category:{{post.category}}</span>
                 </div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>
@@ -182,15 +182,15 @@
                                 <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                    <li><a href="#" class="report" id="report_{{post.content_id}}">신고</a></li>
-                                    <li><a href="#" class="adult" id="adult_{{post.content_id}}">가버렷</a></li>
-                                    <li><a href="#" class="political" id="political_{{post.content_id}}">보내야한다</a></li>
+                                    <li><a href="javascript:;" class="report" id="report_{{post.content_id}}">신고</a></li>
+                                    <li><a href="javascript:;" class="adult" id="adult_{{post.content_id}}">가버렷</a></li>
+                                    <li><a href="javascript:;" class="political" id="political_{{post.content_id}}">보내야한다</a></li>
                             </ul>
                         </div>
                         <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
                         {% if post.return %}			
-						<a class="btn btn-info col-md-1" href="./modify/">Modify</a>
+                        <a class="btn btn-info col-md-1" href="./modify/?board={{Cur_board.id}}">Modify</a>
                         <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
                         {% endif %}
                         {% endif %}		
@@ -303,9 +303,7 @@
 		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=true" id='1'>Filter Adult Post</a>
         {% endif %}
     </button>
-    {% if Cur_board.id %}
     <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
-	{% endif %}
 	{% if show_paginator %}
 		<div class="paginator">
 			{% if has_prev %}
