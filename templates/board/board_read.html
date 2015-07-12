@@ -160,9 +160,10 @@
                     {% if post.adult %}
                     <label style="color:red">+19</label>
                     {% endif %}
-                    <label> {{ post.title }} </label>
-                    <span> {{ post.username }}</span>
-                    <span> {{post.board}}</span>
+                    <label>{{ post.title }}</label>
+                    <span>{{ post.username }}</span>
+                    <span>{{post.board}}</span>
+                    <span>{{post.category}}</span>
                 </div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>
@@ -189,7 +190,7 @@
                         <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
                         {% if post.return %}			
-                        <a class="btn btn-info col-md-1" href="./modify">Modify</a>
+						<a class="btn btn-info col-md-1" href="./modify/">Modify</a>
                         <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
                         {% endif %}
                         {% endif %}		
@@ -256,7 +257,70 @@
             </form>
         </div>
         {% endif %}
-    </div>
+
+	<table style="width:100%">
+		<thead>
+			<tr>
+				<th width="150">user</th>
+                <th width="150">
+                    <div class="dropdown">                  
+                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{Cur_board.name|default:"All"}}
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a href="?">All</a></li>
+                            {% for board in Boards %}
+                            <li><a href="?board={{board.id}}">{{ board.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+				</th>
+				<th width="350">title</th>
+				<th width="100">+/-</th>
+				<th width="150">date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for post in Posts %}
+				<tr>
+					<td width="150">{{post.username}}</td>
+					<td width="150"><a href="?board={{post.board_id}}">{{post.board}}</a></td>
+					{%if post.is_notice%}
+					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}"><label style="color :black">Notice:{{post.title}}</label></a></td>
+					{%else%}
+					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}">{{post.title}}</a></td>
+					{%endif%}
+					<td width="100">+{{post.up}}/-{{post.down}}</td>
+					<td width="150">{{post.created_time}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+    </table>
+    <button class="btn btn-warn">
+        {% if Is_adult %}
+		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=false" id='2'>See Adult</a>
+        {% else %}
+		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=true" id='1'>Filter Adult Post</a>
+        {% endif %}
+    </button>
+    {% if Cur_board.id %}
+    <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
+	{% endif %}
+	{% if show_paginator %}
+		<div class="paginator">
+			{% if has_prev %}
+			<a href="../?board={{Cur_board.id}}&page={{ prev_page }}">&laquo;</a>
+			{% endif %}
+	
+			{% if has_next %}
+			<a href="../?board={{Cur_board.id}}&page={{ next_page }}">&raquo;</a>
+			{% endif %}	
+				(page {{page}} of {{pages}})
+			</div>
+	{% endif %}
+</div>   
+</div>
+
 </div>
 <div class="bgCover" style="background:#000; position:absolute; left:0; top:0; display:none; overflow:hidden">&nbsp;</div>
 <div class="overlayBox" style="position:absolute; display:none; width:500px; height:300px; background:#fff;">
@@ -293,4 +357,5 @@
 </div>
 
 {% endblock %}
+
 

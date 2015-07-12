@@ -16,15 +16,17 @@ def post_write(request):
     post = {}
     post["new"] = True
     error = ""
-
     if request.method == 'POST':
         _User = request.user
         _UserProfile = _User.userprofile
         board = request.POST.get('board', '')
+        cur_board = request.GET.get("board")
+        Cur_board = Board.objects.filter(id=cur_board)[0]
         post["title"] = request.POST.get('title', '')
         post["content"] = request.POST.get('content', '')
         anonymous = request.POST.get('anonymous', '')
         adult = request.POST.get('adult', '')
+        notice = request.POST.get('notice','')
         if post["title"] == '':
             error = 'title missing!'
         if post["content"] == '':
@@ -43,6 +45,8 @@ def post_write(request):
         _BoardContent.save()
         _BoardPost = BoardPost()
         _BoardPost.title = post["title"]
+        if notice == 'on':
+            _BoardPost.is_notice = True
         _BoardPost.board_content = _BoardContent
         _BoardPost.board_content_id = _BoardContent.id
         _BoardPost.author = _UserProfile
@@ -53,10 +57,14 @@ def post_write(request):
         else:
             return redirect('../')
         _BoardPost.save()
-        return redirect('../%d/' % _BoardPost.id)
-    cur_board = request.GET.get("board")
-    Cur_board = Board.objects.filter(id=cur_board)[0]
+        boardID = str(Cur_board.id)
+        postID = str(_BoardPost.id)
+        return redirect('../'+postID+'/?board='+boardID)
+    
+    cur_board = request.GET.get("board",)
+    Cur_board= Board.objects.filter(id=cur_board)
     _Board = Board.objects.all()
+    #official=request.user.userprofile.is_official
     boards = []
     for bd in _Board:
         board = {}
@@ -77,6 +85,7 @@ def post_read(request, pid, error=''):
     else:
         error = "No post"
         return render(request, 'board/board_read.html', {'error': error})
+    
     _BoardContent = _BoardPost.board_content
     _UserProfile = _BoardPost.author
     _User = _UserProfile.user
@@ -125,9 +134,98 @@ def post_read(request, pid, error=''):
         comment["return"] = (_UserProfile.id == reading_id)
         comment["vote"] = _BoardContent.get_vote()
         comments.append(comment)
+#######################Coding of postList below###########################
+    
+    adult_filter = request.GET.get('adult_filter')
+    board_filter = request.GET.get('board')
+    cur_board = ""
+    is_adult = False
+    if adult_filter == "true":
+        is_adult = True
+    if board_filter:
+        _NoticeBoardPost = BoardPost.objects.filter(board=board_filter,is_notice=True).order_by('-id')
+        _BoardPostIn= BoardPost.objects.filter(board=board_filter,is_notice=False).order_by('-id')
+        cur_board = Board.objects.filter(id=board_filter)[0]
+    else:
+        _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
+        _BoardPostIn = BoardPost.objects.filter(is_notice=False).order_by('-id')
+    _Board = Board.objects.all()
+    paginator=Paginator(_BoardPostIn,10)
+    try:
+        page=int(request.GET['page'])
+    except:
+        page=1
+    _PageBoardPost=paginator.page(page)
+    posts = []
+    boards = []
+    for bd in _Board:
+        boards.append(bd)
+    for nbp in _NoticeBoardPost:
+        npost = {}
+        if nbp.board_content.is_anonymous:
+            npost['username'] = "annonymous"
+        else:
+            npost['username'] = nbp.author.user.username
+        npost['board'] = nbp.board.name
+        if nbp.board_content.is_deleted:
+            npost['title'] = "--Deleted--"
+        else:
+            npost['title'] = nbp.title
+        npost['created_time'] = nbp.board_content.created_time
+        npost['id'] = nbp.id
+        npost['board_id'] = nbp.board.id
+        nvote = nbp.board_content.get_vote()
+        npost['up'] = nvote['up']
+        npost['down'] = nvote['down']
+        npost['is_notice'] = True
+        posts.append(npost)
+    for bp in _PageBoardPost:
+        postInList = {}#post for postList
+        if bp.board_content.is_anonymous:
+            postInList['username'] = "annonymous"
+        else:
+            postInList['username'] = bp.author.user.username
+        postInList['board'] = bp.board.name
+        if bp.board_content.is_deleted:
+            postInList['title'] = "--Deleted--"
+        else:
+            postInList['title'] = bp.title
+        postInList['created_time'] = bp.board_content.created_time
+        postInList['id'] = bp.id
+        postInList['board_id'] = bp.board.id
+        voteIn = bp.board_content.get_vote()
+        postInList['up'] = voteIn['up']
+        postInList['down'] = voteIn['down']
+        if adult_filter == 'true' and bp.board_content.is_adult:
+            postInList['title'] = "filterd"
+        posts.append(postInList)
+    if page==1:
+        prevPage=0
+    else:
+        prevPage = paginator.page(page).previous_page_number()
+    if page == paginator.num_pages:
+        nextPage = page
+    else:
+        nextPage = paginator.page(page).next_page_number()
     return render(request,
                   'board/board_read.html',
-                  {'error': error, 'post': post, 'comments': comments})
+                  {   'error':error,#error for post
+                      'post':post,#post for post
+                      'comments':comments,#comment for post
+                      'Posts': posts, #Below,there are thing for postList.
+                      'Boards': boards,
+                      'Cur_board': cur_board,
+                      'Is_adult': is_adult,
+                      'show_paginator':paginator.num_pages>1,
+                      'has_prev':paginator.page(page).has_previous(),
+                      'has_next':paginator.page(page).has_next(),
+                      'page':page,
+                      'pages':paginator.num_pages,
+                      'next_page':nextPage,
+                      'prev_page':prevPage,
+
+                  })
+       
 
 
 @login_required(login_url='/session/login')
@@ -252,12 +350,12 @@ def post_list(request, error=''):
     if adult_filter == "true":
         is_adult = True
     if board_filter:
-        _BoardPost= BoardPost.objects.filter(board=board_filter).order_by('-id')
+        _NoticeBoardPost = BoardPost.objects.filter(board=board_filter,is_notice=True).order_by('-id')
+        _BoardPost= BoardPost.objects.filter(board=board_filter,is_notice=False).order_by('-id')
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
-        _BoardPost = BoardPost.objects.all().order_by('-id')
-    
-
+        _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
+        _BoardPost = BoardPost.objects.filter(is_notice=False).order_by('-id')
     _Board = Board.objects.all()
     paginator=Paginator(_BoardPost,10)
     try:
@@ -269,6 +367,25 @@ def post_list(request, error=''):
     boards = []
     for bd in _Board:
         boards.append(bd)
+    for nbp in _NoticeBoardPost:
+        npost = {}
+        if nbp.board_content.is_anonymous:
+            npost['username'] = "annonymous"
+        else:
+            npost['username'] = nbp.author.user.username
+        npost['board'] = nbp.board.name
+        if nbp.board_content.is_deleted:
+            npost['title'] = "--Deleted--"
+        else:
+            npost['title'] = nbp.title
+        npost['created_time'] = nbp.board_content.created_time
+        npost['id'] = nbp.id
+        npost['board_id']=nbp.board.id
+        nvote = nbp.board_content.get_vote()
+        npost['up'] = nvote['up']
+        npost['down'] = nvote['down']
+        npost['is_notice']=True
+        posts.append(npost)
     for bp in _PageBoardPost:
         post = {}
         if bp.board_content.is_anonymous:
@@ -449,6 +566,7 @@ def delete(request):
             return HttpResponse(message)
         if author == request.user.userprofile:
             BoardCont.is_deleted = True
+            BoardCont.boardpost.is_notice=False
             BoardCont.save()
             message = "success"
         else:

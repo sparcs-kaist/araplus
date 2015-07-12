@@ -16,7 +16,7 @@
                             {% endfor %}
                         </ul>
                     </div>
-                </th>
+				</th>
 				<th width="350">title</th>
 				<th width="100">+/-</th>
 				<th width="150">date</th>
@@ -27,7 +27,11 @@
 				<tr>
 					<td width="150">{{post.username}}</td>
 					<td width="150"><a href="?board={{post.board_id}}">{{post.board}}</a></td>
+					{%if post.is_notice%}
+					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}"><label style="color :black">Notice:{{post.title}}</label></a></td>
+					{%else%}
 					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}">{{post.title}}</a></td>
+					{%endif%}
 					<td width="100">+{{post.up}}/-{{post.down}}</td>
 					<td width="150">{{post.created_time}}</td>
 				</tr>
@@ -41,9 +45,7 @@
 		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=true" id='1'>Filter Adult Post</a>
         {% endif %}
     </button>
-    {% if Cur_board.id %}
     <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
-	{% endif %}
 	{% if show_paginator %}
 		<div class="paginator">
 			{% if has_prev %}
