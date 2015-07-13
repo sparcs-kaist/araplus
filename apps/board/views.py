@@ -8,7 +8,6 @@ from django.http import HttpResponse
 from apps.board.models import *
 import datetime
 import json
-# Create your views here.
 
 
 @login_required(login_url='/session/login')
@@ -31,6 +30,7 @@ def post_write(request):
         if post["content"] == '':
             error = 'content missing!'
         if error:
+            Cur_board = Board.objects.filter(id=board)[0]
             _Board = Board.objects.all()
             # official=request.user.userprofile.is_official
             boards = []
@@ -40,11 +40,11 @@ def post_write(request):
                 board['id'] = bd.id
                 board['description'] = bd.description
                 boards.append(board)
-                categories = BoardCategory.objects.all()
+            categories = BoardCategory.objects.all()
             return render(request,
                           'board/board_write.html',
                           {"post": post, "Boards": boards,
-                           "Cur_board": board ,
+                           "Cur_board": Cur_board, "error": error,
                            "Categories": categories})
         _BoardContent = BoardContent()
         _BoardContent.content = post["content"]
@@ -74,8 +74,8 @@ def post_write(request):
             return redirect('../')
         _BoardPost.save()
         postID = str(_BoardPost.id)
-        return redirect('../'+postID+'/?board='+cur_board)
-    cur_board = request.GET.get("board", '')
+        return redirect('../'+postID+'/?board='+board)
+    cur_board = request.GET.get("board")
     if cur_board:
         Cur_board = Board.objects.filter(id=cur_board)[0]
     else:
