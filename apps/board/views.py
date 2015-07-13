@@ -8,7 +8,6 @@ from django.http import HttpResponse
 from apps.board.models import *
 import datetime
 import json
-# Create your views here.
 
 ItemPerPage=15
 
@@ -21,7 +20,6 @@ def post_write(request):
         _User = request.user
         _UserProfile = _User.userprofile
         board = request.POST.get('board', '')
-        cur_board = request.GET.get("board", '')
         post["title"] = request.POST.get('title', '')
         post["content"] = request.POST.get('content', '')
         category = request.POST.get('category', '')
@@ -33,9 +31,22 @@ def post_write(request):
         if post["content"] == '':
             error = 'content missing!'
         if error:
+            Cur_board = Board.objects.filter(id=board)[0]
+            _Board = Board.objects.all()
+            # official=request.user.userprofile.is_official
+            boards = []
+            for bd in _Board:
+                board = {}
+                board['name'] = bd.name
+                board['id'] = bd.id
+                board['description'] = bd.description
+                boards.append(board)
+            categories = BoardCategory.objects.all()
             return render(request,
                           'board/board_write.html',
-                          {"error": error, "post": post})
+                          {"post": post, "Boards": boards,
+                           "Cur_board": Cur_board, "error": error,
+                           "Categories": categories})
         _BoardContent = BoardContent()
         _BoardContent.content = post["content"]
         _BoardContent.created_time = datetime.datetime.today()
@@ -64,8 +75,8 @@ def post_write(request):
             return redirect('../')
         _BoardPost.save()
         postID = str(_BoardPost.id)
-        return redirect('../'+postID+'/?board='+cur_board)
-    cur_board = request.GET.get("board", '')
+        return redirect('../'+postID+'/?board='+board)
+    cur_board = request.GET.get("board")
     if cur_board:
         Cur_board = Board.objects.filter(id=cur_board)[0]
     else:
@@ -105,7 +116,11 @@ def post_read(request, pid, error=''):
         post["deleted"] = True
     else:
         post["title"] = _BoardPost.title
-        post["content"] = _BoardContent.content
+        content = _BoardContent.content
+        content = content.replace('<', '&lt')
+        content = content.replace('>', '&gt')
+        content = content.replace('\n', '<br />')
+        post["content"] = content
         post["deleted"] = False
     post["content_id"] = _BoardContent.id
     post["created_time"] = _BoardContent.created_time
@@ -133,7 +148,11 @@ def post_read(request, pid, error=''):
             comment["deleted"] = True
         else:
             comment["title"] = _BoardPost.title
-            comment["content"] = _BoardContent.content
+            content = _BoardContent.content
+            content = content.replace('<', '&lt')
+            content = content.replace('>', '&gt')
+            content = content.replace('\n', '<br />')
+            comment["content"] = content
             comment["deleted"] = False
         comment["comment_id"] = cm.id
         comment["content_id"] = _BoardContent.id
@@ -400,7 +419,7 @@ def post_list(request, error=''):
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
-        _BoardPost = BoardPost.objects.filter(is_notice=False).order_by('-id')
+        _BoardPost = BoardPost.objects.all().order_by('-id')
     _Board = Board.objects.all()
     paginator = Paginator(_BoardPost, ItemPerPage)
     try:

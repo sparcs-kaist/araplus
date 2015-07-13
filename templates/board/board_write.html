@@ -8,6 +8,8 @@
             var bname = $(this).text() + " <span class='caret'></span>";
             $("#board_id").attr("value", bid);
             $("#dropdownMenu1").html(bname);
+            $("#dropdownMenu2").html("Plz Select Category<div class='caret'></div>");
+            $("#cateogry_name").attr("value","");
             $(".category").css("display", "none");
             $(".category_"+bid).removeAttr("style");
         });
@@ -66,7 +68,7 @@
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Plz select Category
                     <span class="caret"></span>
                  </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                     {% for category in Categories %}
                     <li><a href="javascript:;" class="category category_{{category.board.id}}" id="{{category.name}}" style="display: none;">{{ category.name }}</a></li>
                     {% endfor %}
