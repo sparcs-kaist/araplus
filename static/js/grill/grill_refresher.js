@@ -133,7 +133,7 @@ $(document).ready(function(){
             })   
 
             // websocket Initialize
-            var socket = io.connect('http://localhost:9779');
+            var socket = io.connect('http://bit.sparcs.org:9779');
 
             socket.emit('adduser',grill_id);
             
