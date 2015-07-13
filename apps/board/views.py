@@ -292,7 +292,9 @@ def post_modify(request, pid):
         _BoardPost.title = post["title"]
         _Board = Board.objects.filter(id=post["board"])
         _Category = BoardCategory.objects.filter(name=post["category"])
-        if not(_Board or _Category):
+        if not _Board:
+            return redirect('../')
+        elif not _Category:
             return redirect('../')
         else:
             _BoardPost.board = _Board[0]
