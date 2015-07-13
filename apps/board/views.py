@@ -10,6 +10,7 @@ import datetime
 import json
 # Create your views here.
 
+ItemPerPage=15
 
 @login_required(login_url='/session/login')
 def post_write(request):
@@ -85,7 +86,7 @@ def post_write(request):
                    "Cur_board": Cur_board,
                    "Categories": categories})
 
-
+            
 @login_required(login_url='/session/login')
 def post_read(request, pid, error=''):
     _BoardPost = BoardPost.objects.filter(id=pid)
@@ -158,7 +159,7 @@ def post_read(request, pid, error=''):
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
         _BoardPostIn = BoardPost.objects.filter(is_notice=False).order_by('-id')
     _Board = Board.objects.all()
-    paginator = Paginator(_BoardPostIn, 10)
+    paginator = Paginator(_BoardPostIn, ItemPerPage)
     try:
         page = int(request.GET['page'])
     except:
@@ -401,12 +402,16 @@ def post_list(request, error=''):
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
         _BoardPost = BoardPost.objects.filter(is_notice=False).order_by('-id')
     _Board = Board.objects.all()
-    paginator = Paginator(_BoardPost, 10)
+    paginator = Paginator(_BoardPost, ItemPerPage)
     try:
         page = int(request.GET['page'])
     except:
         page = 1
+    
     _PageBoardPost = paginator.page(page)
+    PageBoardPost=[]
+    for i in range((page-1)*ItemPerPage,page*ItemPerPage):
+        PageBoardPost.append(_BoardPost[i])
     posts = []
     boards = []
     for bd in _Board:
@@ -432,7 +437,7 @@ def post_list(request, error=''):
         npost['down'] = nvote['down']
         npost['is_notice'] = True
         posts.append(npost)
-    for bp in _PageBoardPost:
+    for bp in PageBoardPost:
         post = {}
         if bp.board_content.is_anonymous:
             post['username'] = "annonymous"
