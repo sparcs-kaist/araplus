@@ -115,7 +115,11 @@ def post_read(request, pid, error=''):
         post["deleted"] = True
     else:
         post["title"] = _BoardPost.title
-        post["content"] = _BoardContent.content
+        content = _BoardContent.content
+        content = content.replace('<', '&lt')
+        content = content.replace('>', '&gt')
+        content = content.replace('\n', '<br />')
+        post["content"] = content
         post["deleted"] = False
     post["content_id"] = _BoardContent.id
     post["created_time"] = _BoardContent.created_time
@@ -143,7 +147,11 @@ def post_read(request, pid, error=''):
             comment["deleted"] = True
         else:
             comment["title"] = _BoardPost.title
-            comment["content"] = _BoardContent.content
+            content = _BoardContent.content
+            content = content.replace('<', '&lt')
+            content = content.replace('>', '&gt')
+            content = content.replace('\n', '<br />')
+            comment["content"] = content
             comment["deleted"] = False
         comment["comment_id"] = cm.id
         comment["content_id"] = _BoardContent.id
@@ -410,7 +418,7 @@ def post_list(request, error=''):
         cur_board = Board.objects.filter(id=board_filter)[0]
     else:
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
-        _BoardPost = BoardPost.objects.filter(is_notice=False).order_by('-id')
+        _BoardPost = BoardPost.objects.all().order_by('-id')
     _Board = Board.objects.all()
     paginator = Paginator(_BoardPost, 10)
     try:
