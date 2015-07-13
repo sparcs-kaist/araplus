@@ -180,6 +180,9 @@ def post_read(request, pid, error=''):
     for bd in _Board:
         boards.append(bd)
     for nbp in _NoticeBoardPost:
+        if nbp.board_content.is_deleted:
+            continue
+        npost = {}
         npost = {}
         if nbp.board_content.is_anonymous:
             npost['username'] = "annonymous"
@@ -255,7 +258,7 @@ def post_modify(request, pid):
     _BoardPost = BoardPost.objects.filter(id=pid)
     if _BoardPost:
         _BoardPost = _BoardPost[0]
-        if _BoardPost.author_id != _User.userprofile.id:
+        if _BoardPost.author != _User.userprofile:
             error = "Not allowed"
     else:
         error = "No post"
@@ -292,7 +295,9 @@ def post_modify(request, pid):
         _BoardPost.title = post["title"]
         _Board = Board.objects.filter(id=post["board"])
         _Category = BoardCategory.objects.filter(name=post["category"])
-        if not(_Board or _Category):
+        if not _Board:
+            return redirect('../')
+        elif not _Category:
             return redirect('../')
         else:
             _BoardPost.board = _Board[0]
@@ -372,7 +377,7 @@ def comment_modify(request, error=''):
         _BoardComment = BoardComment.objects.filter(id=cid)
         if _BoardComment:
             _BoardComment = _BoardComment[0]
-            if _BoardComment.author_id != _User.id:
+            if _BoardComment.author != _User.userprofile:
                 error = "Not allowd"
         else:
             error = "No Comment"
@@ -418,6 +423,8 @@ def post_list(request, error=''):
     for bd in _Board:
         boards.append(bd)
     for nbp in _NoticeBoardPost:
+        if nbp.board_content.is_deleted:
+            continue
         npost = {}
         if nbp.board_content.is_anonymous:
             npost['username'] = "annonymous"
@@ -616,7 +623,6 @@ def delete(request):
             return HttpResponse(message)
         if author == request.user.userprofile:
             BoardCont.is_deleted = True
-            BoardCont.boardpost.is_notice = False
             BoardCont.save()
             message = "success"
         else:
