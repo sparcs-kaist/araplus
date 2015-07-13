@@ -157,10 +157,12 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 <div>
-                    {% if post.adult %}
-                    <label style="color:red">+19</label>
-                    {% endif %}
-                    <label class="col-md-5">Title:{{ post.title }}</label>
+                    <label class="col-md-5">
+                        {% if post.adult %}
+                        <label style="color:red">+19</label>
+                        {% endif %}
+                        Title:{{ post.title }}
+                    </label>
                     <span class="col-md-3">User:{{ post.username }}</span>
                     <span class="col-md-2">Board:{{post.board}}</span>
                     <span class="col-md-2">Category:{{post.category}}</span>
@@ -171,7 +173,7 @@
                 </div>
             </div>
             <div class="panel-body">
-                {{post.content}}
+                {{post.content|safe}}
 				<div class="col-md-12">
 					<div class="row">
 						<div class="col-md-7"></div>
@@ -211,7 +213,7 @@
             </div>
             <div class="panel-body">
                 <div id="comment_content{{ comment.comment_id }}">
-                    <div id="comment{{comment.comment_id}}">{{ comment.content }}</div>
+                    <div id="comment{{comment.comment_id}}">{{ comment.content|safe }}</div>
                     <div class="col-md-12">
 						<div class="row">
 						    <div class="col-md-7"></div>
