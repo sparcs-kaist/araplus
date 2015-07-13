@@ -274,7 +274,6 @@ def post_modify(request, pid):
     if _BoardContent.is_deleted:
         error = "Deleted"
     if error:
-        print error
         return redirect('../')
     if request.method == 'POST':
         if not request.user.is_authenticated():
@@ -290,7 +289,6 @@ def post_modify(request, pid):
         if post["content"] == '':
             error = 'body missing!'
         if error:
-            print error
             return render(request,
                           'board/board_write.html',
                           {"error": error, "post": post})
@@ -646,13 +644,11 @@ def report(request):
         cid = request.POST.get('id', '')
         reason = request.POST.get('report_reason', '')
         content = request.POST.get('report_content', '')
-        if reason == '':
+        if reason == '' or reason == '0':
             message = 'no reason'
         else:
             board_content = BoardContent.objects.filter(id=cid)
             if board_content:
-                print reason
-                print content
                 board_content = board_content[0]
                 board_report = BoardReport()
                 board_report.reason = reason
