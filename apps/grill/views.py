@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 import json
 import datetime
 
+
 @login_required(login_url='/session/login/')
 def home(request):
     grills = Grill.objects.all().order_by('created_time')  # 나중에 업데이트 순서로 바꾸기?
@@ -18,12 +19,14 @@ def home(request):
                       'grills': grills,
                   })
 
+
 @login_required(login_url='/session/login/')
 def view_grill(request, grill_id):
     grill = get_object_or_404(Grill, pk=grill_id)
     edit_form = CommentAddForm()
     comments = GrillComment.objects.filter(
-        grill=grill_id).order_by('created_time').reverse()
+        grill=grill_id
+    ).order_by('created_time').reverse()
     profile = get_object_or_404(UserProfile, user=request.user)
     user_vote = GrillCommentVote.objects.filter(userprofile=profile)
     for comment in comments:
@@ -31,10 +34,12 @@ def view_grill(request, grill_id):
         comment.content = comment.replace_tags()
         comment.like = GrillCommentVote.objects.filter(
             grill_comment=comment,
-            is_up=True).count()
+            is_up=True
+        ).count()
         comment.hate = GrillCommentVote.objects.filter(
             grill_comment=comment,
-            is_up=False).count()
+            is_up=False
+        ).count()
 
         if user_vote.filter(grill_comment=comment):
             comment.vote_disable = True
@@ -47,6 +52,7 @@ def view_grill(request, grill_id):
                       'comments': comments,
                       'grill': grill,
                   })
+
 
 @login_required(login_url='/session/login/')
 def add_grill(request):
@@ -115,7 +121,8 @@ def refresh_comment(request, grill_id):
     last_update = request.POST['last_update']
     votes = GrillCommentVote.objects.filter(
         grill_comment__grill=grill,
-        created_time__gte=last_update).values('grill_comment')
+        created_time__gte=last_update
+    ).values('grill_comment')
     last_update = datetime.datetime.now()
     votes = votes.annotate(new_count=Count('is_up'))
     # XXX: 어떻게 grill_comment가 알아서 order가 되지?
@@ -137,7 +144,8 @@ def vote_comment(request, grill_id):
     else:
         is_up = False
     profile = get_object_or_404(UserProfile, user=request.user)
-    target_comment = get_object_or_404(GrillComment, grill__id=grill_id,
+    target_comment = get_object_or_404(GrillComment,
+                                       grill__id=grill_id,
                                        order=target_order)
     if GrillCommentVote.objects.filter(grill_comment=target_comment,
                                        userprofile=profile).count():
