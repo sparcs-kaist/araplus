@@ -54,7 +54,11 @@ def send_message(request):
         return render(request, 'session/write_message.html')
     sender = request.user.userprofile
     content = request.POST['content']
-    receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
+    try:
+        receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
+    except UserProfile.DoesNotExist:
+        return render(request, 'session/message_fail.html',
+                      {'error': "The user doesn't exist"})
     Message.objects.create(content=content,
                            sender=sender,
                            receiver=receiver,
@@ -87,12 +91,16 @@ def block(request):
     if request.method != "POST":
         return render(request, 'session/block.html')
     receiver = request.user.userprofile
-    sender = UserProfile.objects.get(nickname=request.POST['nickname'])
-    if sender==receiver:
+    try:
+        sender = UserProfile.objects.get(nickname=request.POST['nickname'])
+    except UserProfile.DoesNotExist:
         return render(request, 'session/block_fail.html',
-                      {'error':"You can't block yourself"})
+                      {'error': "The user doesn't exist"})
+    if sender == receiver:
+        return render(request, 'session/block_fail.html',
+                      {'error': "You can't block yourself"})
     if len(Block.objects.filter(sender=sender, receiver=receiver)) != 0:
         return render(request, 'session/block_fail.html',
-                {'error':"You already blocked the user"})
+                      {'error': "You already blocked the user"})
     Block.objects.create(sender=sender, receiver=receiver)
     return render(request, 'session/block_success.html')
