@@ -104,3 +104,9 @@ def block(request):
                       {'error': "You already blocked the user"})
     Block.objects.create(sender=sender, receiver=receiver)
     return render(request, 'session/block_success.html')
+
+
+@login_required(login_url='/session/login')
+def show_block_list(request):
+    blocks = Block.objects.filter(receiver=request.user.userprofile)
+    return render(request, 'session/block_list.html', {'blocks': blocks})
