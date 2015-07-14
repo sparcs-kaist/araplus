@@ -108,8 +108,8 @@ class BoardCategory(models.Model):
 
 class BoardPost(models.Model):
     title = models.CharField(max_length=45, null=False)
-    is_notice = models.BooleanField(default=False, null=False)
-    board = models.ForeignKey('Board', related_name='board', null=False)
+    is_notice = models.BooleanField(default=False, null=False, db_index=True)
+    board = models.ForeignKey('Board', related_name='board', null=False, db_index=True)
     author = models.ForeignKey('session.UserProfile',
                                related_name='board_post')
     board_content = models.OneToOneField('BoardContent', null=False)
