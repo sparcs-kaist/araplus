@@ -413,27 +413,33 @@ def post_list(request, error=''):
         is_adult = True
     if board_filter:
         _NoticeBoardPost = BoardPost.objects.filter(board=board_filter, is_notice=True).order_by('-id')
-        _BoardPost = BoardPost.objects.filter(board=board_filter, is_notice=False).order_by('-id')
+        _BoardPost = BoardPost.objects.filter(board=board_filter).order_by('-id')
         cur_board = Board.objects.filter(id=board_filter)[0]
+        post_count = cur_board.post_count
     else:
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
         _BoardPost = BoardPost.objects.all().order_by('-id')
+        post_count = _BoardPost[0].id
+    if post_count < 0:
+        post_count = 1
     _Board = Board.objects.all()
-    paginator = Paginator(_BoardPost, ItemPerPage)
+    #  paginator = Paginator(_BoardPost, ItemPerPage)
     try:
         page = int(request.GET['page'])
     except:
         page = 1
-    
-    _PageBoardPost = paginator.page(page)
-    PageBoardPost=[]
-    for i in range((page-1)*ItemPerPage,page*ItemPerPage):
-        PageBoardPost.append(_BoardPost[i])
+    if page < 1:
+        page = 1
+    if page > (post_count-1)/ItemPerPage+1:
+        page = (post_count-1)/ItemPerPage+1
+    _NoticeBoardPost = _NoticeBoardPost[:5]
+    _PageBoardPost = _BoardPost[page*ItemPerPage-ItemPerPage:page*ItemPerPage]
+    # _PageBoardPost = paginator.page(page)
     posts = []
     boards = []
-    for bd in _Board:
+    for bd in _Board[:]:
         boards.append(bd)
-    for nbp in _NoticeBoardPost:
+    for nbp in _NoticeBoardPost.iterator():
         if nbp.board_content.is_deleted:
             continue
         npost = {}
@@ -442,10 +448,7 @@ def post_list(request, error=''):
         else:
             npost['username'] = nbp.author.user.username
         npost['board'] = nbp.board.name
-        if nbp.board_content.is_deleted:
-            npost['title'] = "--Deleted--"
-        else:
-            npost['title'] = nbp.title
+        npost['title'] = nbp.title
         npost['created_time'] = nbp.board_content.created_time
         npost['id'] = nbp.id
         npost['board_id'] = nbp.board.id
@@ -454,7 +457,7 @@ def post_list(request, error=''):
         npost['down'] = nvote['down']
         npost['is_notice'] = True
         posts.append(npost)
-    for bp in PageBoardPost:
+    for bp in _PageBoardPost.iterator():
         post = {}
         if bp.board_content.is_anonymous:
             post['username'] = "annonymous"
@@ -475,13 +478,15 @@ def post_list(request, error=''):
             post['title'] = "filterd"
         posts.append(post)
     if page == 1:
-        prevPage = 0
+        prevPage = page
     else:
-        prevPage = paginator.page(page).previous_page_number()
-    if page == paginator.num_pages:
+        #  prevPage = paginator.page(page).previous_page_number()
+        prevPage = page-1
+    if page == (post_count-1)/ItemPerPage+1:
         nextPage = page
     else:
-        nextPage = paginator.page(page).next_page_number()
+        #  nextPage = paginator.page(page).next_page_number()
+        nextPage = page+1
     return render(request,
                   'board/board_list.html',
                   {
@@ -489,11 +494,11 @@ def post_list(request, error=''):
                       'Boards': boards,
                       'Cur_board': cur_board,
                       'Is_adult': is_adult,
-                      'show_paginator': paginator.num_pages > 1,
-                      'has_prev': paginator.page(page).has_previous(),
-                      'has_next': paginator.page(page).has_next(),
+                      'show_paginator': ((post_count-1)/ItemPerPage > 1),
+                      'has_prev': (prevPage != page),
+                      'has_next': (nextPage != page),
                       'page': page,
-                      'pages': paginator.num_pages,
+                      'pages': (post_count-1)/ItemPerPage+1,
                       'next_page': nextPage,
                       'prev_page': prevPage,
 

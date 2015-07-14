@@ -95,6 +95,7 @@ class BoardReport(models.Model):
 class Board(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=100, null=False)
+    post_count = models.IntegerField(default=0)
 
     def __str__(self):
         return "board %s" % self.name
