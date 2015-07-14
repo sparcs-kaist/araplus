@@ -88,7 +88,11 @@ def block(request):
         return render(request, 'session/block.html')
     receiver = request.user.userprofile
     sender = UserProfile.objects.get(nickname=request.POST['nickname'])
+    if sender==receiver:
+        return render(request, 'session/block_fail.html',
+                      {'error':"You can't block yourself"})
     if len(Block.objects.filter(sender=sender, receiver=receiver)) != 0:
-        return render(request, 'session/block_fail.html')
+        return render(request, 'session/block_fail.html',
+                {'error':"You already blocked the user"})
     Block.objects.create(sender=sender, receiver=receiver)
     return render(request, 'session/block_success.html')
