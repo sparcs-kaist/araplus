@@ -74,6 +74,8 @@ def post_write(request):
         else:
             return redirect('../')
         _BoardPost.save()
+        _Board[0].post_count += 1
+        _Board[0].save()
         postID = str(_BoardPost.id)
         return redirect('../'+postID+'/?board='+board)
     cur_board = request.GET.get("board")
@@ -419,8 +421,11 @@ def post_list(request, error=''):
     else:
         _NoticeBoardPost = BoardPost.objects.filter(is_notice=True).order_by('-id')
         _BoardPost = BoardPost.objects.all().order_by('-id')
-        post_count = _BoardPost[0].id
-    if post_count < 0:
+        if _BoardPost:
+            post_count = _BoardPost[0].id
+        else:
+            post_count = 0
+    if post_count < 1:
         post_count = 1
     _Board = Board.objects.all()
     #  paginator = Paginator(_BoardPost, ItemPerPage)
