@@ -23,6 +23,6 @@ urlpatterns = [
     url(r'^message/', 'apps.session.views.send_message'),
     url(r'^checkmessage/', 'apps.session.views.check_message'),
     url(r'^checksentmessage/', 'apps.session.views.check_sent_message'),
-    url(r'^block/', 'apps.session.views.block'),
-    url(r'^blocklist/', 'apps.session.views.show_block_list'),
+    url(r'^messageblock/', 'apps.session.views.block'),
+    url(r'^messageblocklist/', 'apps.session.views.show_block_list'),
 ]

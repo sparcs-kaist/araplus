@@ -119,11 +119,8 @@ def show_block_list(request):
     except UserProfile.DoesNotExist:
         return render(request, 'session/block_list.html', {'error': "There are no user with the given nickname"})
     block = Block.objects.get(sender=blocked_userprofile, receiver=request.user.userprofile)
-    print "block is "
-    print block
     block.delete()
-    print "unblock complete"
-    return redirect('/session/blocklist') 
+    return redirect('/session/messageblocklist') 
 
 
 
