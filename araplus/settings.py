@@ -40,7 +40,7 @@ INSTALLED_APPS = (
     'apps.board',
     'apps.grill',
     'apps.session',
-    'apps.main',
+    # 'apps.main',
 )
 
 MIDDLEWARE_CLASSES = (
