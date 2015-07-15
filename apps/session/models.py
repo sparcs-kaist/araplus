@@ -31,11 +31,12 @@ class Message(models.Model):
 """
 class GroupMessage(models.Model):
     content = models.TextField()
-    sender = models.ForeignKey('UserProfile', related_name='group_message_sent')
+    sender = models.ForeignKey('UserProfile',
+                               related_name='group_message_sent')
     receivers = models.ForeignKey('Group',
-                                 related_name='group_message_received')
+                                  related_name='group_message_received')
     created_time = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return "Group Message from %s to %s at %s" % \
                 (self.sender, self.receivers, self.created_time)
@@ -55,11 +56,10 @@ class Block(models.Model):
 """
 class Group(models.Model):
     members = models.ManyToManyField(UserProfile)
-     
+
     def add_member(self, userprofile):
         self.members.add(userprofile)
-    
+
     def remove_member(self, userprofile):
         self.members.remove(userprofile)
 """
-
