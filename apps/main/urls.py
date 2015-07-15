@@ -18,5 +18,6 @@ from django.contrib import admin
 
 
 urlpatterns = [
-    url(r'^$', 'apps.main.views.home')
+    url(r'^$', 'apps.main.views.home'),
+    url(r'^credit/', 'apps.main.views.credit'),
 ]
