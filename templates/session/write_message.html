@@ -3,6 +3,8 @@
 <div class="container">
     <a href="/session/checkmessage/" class="btn btn-default"> Check received message </a>
     <a href="/session/checksentmessage/" class="btn btn-default"> Check sent message </a>
+    <a href="/session/messageblock/" class="btn btn-default"> Block message </a>
+    <a href="/session/messageblocklist/" class="btn btn-default"> See block lists </a>
 </div>
 <div class="container">
     <form method="POST">
@@ -18,5 +20,6 @@
         <button type="submit" class="btn btn-default">Send Message</button>
     </form>
     {{ error }}
+    {{ success }}
 </div>
 {% endblock %}

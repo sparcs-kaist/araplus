@@ -57,13 +57,14 @@ def send_message(request):
     try:
         receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
     except UserProfile.DoesNotExist:
-        return render(request, 'session/message_fail.html',
+        return render(request, 'session/write_message.html',
                       {'error': "The user doesn't exist"})
     Message.objects.create(content=content,
                            sender=sender,
                            receiver=receiver,
                            is_read=False)
-    return render(request, 'session/message_success.html')
+    success = "Successfully sent message"
+    return render(request, 'session/write_message.html', {'success': success})
 
 
 @login_required(login_url='/session/login/')
@@ -103,7 +104,8 @@ def block(request):
         return render(request, 'session/block.html',
                       {'error': "You already blocked the user"})
     Block.objects.create(sender=sender, receiver=receiver)
-    return render(request, 'session/block.html')
+    success = "block successful"
+    return render(request, 'session/block.html', {'success': success})
 
 
 @login_required(login_url='/session/login')
