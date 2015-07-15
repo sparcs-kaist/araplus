@@ -11,14 +11,47 @@
         {% block js %}{% endblock %}
     </head>
     <body>
-        {% if user.is_authenticated %}
-        <li>Hello, {{ user }}</span></li>
-        <li><a href="/session/logout/" class="btn btn-default">Logout</a></li>
-        {% else %}
-        <li><a href="/session/login/" class="btn btn-primary">Login</a></li>
-        <li><a href="/session/register/" class="btn btn-default">Join Araplus!</a></li>
-        {% endif %}
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">Ara Plus</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/board/">Board</a></li>
+                        <li><a href="/grill/">Grill</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_authenticated %}
+                        <li><p class="navbar-text">Hello, {{ user }}!</p></li>
+                        <li><a href="/session/">Account</a></li>
+                        <li>
+                            <p class="navbar-btn">
+                                <a href="/session/logout/" class="btn btn-default">Logout</a>
+                            </p>
+                        </li>
+                        {% else %}
+                        <li>
+                            <p class="navbar-btn">
+                                <a href="/session/login/" class="btn btn-primary">Login</a>
+                                <a href="/session/register/" class="btn btn-default">Join Ara Plus</a>
+                            </p>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
         {% block content %}
         {% endblock %}
+        <div id="footer" class="text-center">
+            <p>
+                <a href="/main/credit/">Credit</a>
+                <a href="#">Contact Us</a>
+            </p>
+            <p>
+                <span>Copyright &copy; 2015 <a href="http://sparcs.org/">SPARCS</a>. All rights reserved.</span>
+            </p>
+        </div>
     </body>
 </html>
