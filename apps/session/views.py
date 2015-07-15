@@ -94,19 +94,38 @@ def block(request):
     try:
         sender = UserProfile.objects.get(nickname=request.POST['nickname'])
     except UserProfile.DoesNotExist:
-        return render(request, 'session/block_fail.html',
+        return render(request, 'session/block.html',
                       {'error': "The user doesn't exist"})
     if sender == receiver:
-        return render(request, 'session/block_fail.html',
+        return render(request, 'session/block.html',
                       {'error': "You can't block yourself"})
     if len(Block.objects.filter(sender=sender, receiver=receiver)) != 0:
-        return render(request, 'session/block_fail.html',
+        return render(request, 'session/block.html',
                       {'error': "You already blocked the user"})
     Block.objects.create(sender=sender, receiver=receiver)
-    return render(request, 'session/block_success.html')
+    return render(request, 'session/block.html')
 
 
 @login_required(login_url='/session/login')
 def show_block_list(request):
-    blocks = Block.objects.filter(receiver=request.user.userprofile)
-    return render(request, 'session/block_list.html', {'blocks': blocks})
+    if request.method != "POST":
+        blocks = Block.objects.filter(receiver=request.user.userprofile)
+        return render(request, 'session/block_list.html', {'blocks': blocks})
+
+    ## The rest is unblock
+    try:
+        blocked_userprofile = UserProfile.objects.get(nickname=request.POST['nickname'])
+        print blocked_userprofile
+    except UserProfile.DoesNotExist:
+        return render(request, 'session/block_list.html', {'error': "There are no user with the given nickname"})
+    block = Block.objects.get(sender=blocked_userprofile, receiver=request.user.userprofile)
+    print "block is "
+    print block
+    block.delete()
+    print "unblock complete"
+    return redirect('/session/blocklist') 
+
+
+
+
+

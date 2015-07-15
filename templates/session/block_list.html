@@ -4,6 +4,11 @@
     <ul>
     {% for block in blocks %}
         <li>{{ block.sender.nickname }}</li>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name='nickname' value={{ block.sender.nickname }} >
+            <button type='submit'> Unblock {{ block.sender.nickname }} </button>
+        </form>
     {% endfor %}
     </ul>
 </div>

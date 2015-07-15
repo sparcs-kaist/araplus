@@ -28,7 +28,7 @@ class Message(models.Model):
         self.is_read = True
         self.save()
 
-
+"""
 class GroupMessage(models.Model):
     content = models.TextField()
     sender = models.ForeignKey('UserProfile', related_name='group_message_sent')
@@ -39,7 +39,7 @@ class GroupMessage(models.Model):
     def __str__(self):
         return "Group Message from %s to %s at %s" % \
                 (self.sender, self.receivers, self.created_time)
-
+"""
 
 
 class Block(models.Model):
@@ -52,6 +52,7 @@ class Block(models.Model):
         return "%s blocked message from %s" % (self.receiver, self.sender)
 
 
+"""
 class Group(models.Model):
     members = models.ManyToManyField(UserProfile)
      
@@ -60,5 +61,5 @@ class Group(models.Model):
     
     def remove_member(self, userprofile):
         self.members.remove(userprofile)
-    
+"""
 
