@@ -7,8 +7,12 @@ from django.contrib.auth.decorators import login_required
 
 def user_login(request):
     if request.method != 'POST':
+        if request.user.is_authenticated():
+            return render(request, 'session/login.html',
+                          {'next': request.GET.get('next', '/session/login'),
+                           'alreadyloggedin': True})
         return render(request, 'session/login.html',
-                      {'next': request.GET.get('next', '/')})
+                      {'next': request.GET.get('next', '/session/login')})
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(username=username, password=password)

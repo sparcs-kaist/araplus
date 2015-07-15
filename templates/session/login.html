@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
+    {% if alreadyloggedin %}
+        You are currently logged in
+    {% else %} 
     <form method="POST">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
@@ -14,6 +17,7 @@
         </div>
         <button type="submit" class="btn btn-default">Login</button>
     </form>
+    {% endif %}
     {{ error }}
 </div>
 {% endblock %}
