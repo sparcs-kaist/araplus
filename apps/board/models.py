@@ -22,7 +22,7 @@ class BoardContent(models.Model):
     def get_vote(self):
         up = 0
         down = 0
-        for content_vote in self.content_vote.all():
+        for content_vote in self.board_content_vote.all():
             if content_vote.is_up:
                 up = up+1
             else:
@@ -83,7 +83,7 @@ class BoardContentVotePolitical(models.Model):
 
 class BoardReport(models.Model):
     reason = models.TextField(null=False)
-    content = models.TextField()
+    content = models.TextField(default='Write something')
     created_time = models.DateTimeField(null=False)
     board_content = models.ForeignKey('BoardContent',
                                       related_name="board_report",
