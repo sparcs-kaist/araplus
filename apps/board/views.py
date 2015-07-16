@@ -194,8 +194,9 @@ def comment_modify(request, error=''):
 
 @login_required(login_url='/session/login')
 def post_list(request, error=''):
-    post_list = _get_post_list(request)[0]
-    paginator = _get_post_list(request)[1]
+    get_post_list = _get_post_list(request)
+    post_list = get_post_list[0]
+    paginator = get_post_list[1]
     board_list = _get_board_list()
     querystring = _get_querystring(request)
     #  board = _get_board_current(request)
