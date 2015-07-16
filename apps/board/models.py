@@ -22,7 +22,7 @@ class BoardContent(models.Model):
     def get_vote(self):
         up = 0
         down = 0
-        for content_vote in self.content_vote.all():
+        for content_vote in self.board_content_vote.all():
             if content_vote.is_up:
                 up = up+1
             else:
