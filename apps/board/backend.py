@@ -158,6 +158,7 @@ def _get_post(request, board_content, is_comment=False):
         board_post = board_content.board_comment
     else:
         board_post = board_content.boardpost
+        post['id'] = board_post.id
         post['title'] = board_post.title
         post['board'] = board_post.board.name
         post['board_id'] = board_post.board.id
@@ -185,8 +186,8 @@ def _write_post(request, is_post_or_comment):
     is_anonymous = request.POST.get('anonymous', False)
     is_adult = request.POST.get('adult', False)
     board_content = BoardContent()
-    if content:
-        return -1
+    if not content:
+        return
     board_content.content = content
     board_content.is_anonymous = bool(is_anonymous)
     board_content.is_adult = bool(is_adult)
@@ -196,37 +197,31 @@ def _write_post(request, is_post_or_comment):
         is_notice = request.POST.get('notice', False)
         category = request.POST.get('category', 0)
         title = request.POST.get('title', '')
-        if not(board and title):
-            return -1
-        if not (category in board.board_category):
-            return -1
-        board_content.save()
         board_post = BoardPost()
-        board_post.board = Board.objects.filter(id=board)[0]
+        try:
+            board_post.board = Board.objects.filter(id=board)[0]
+            board_post.board_category = BoardCategory.objects.filter(name=category, board=board_post.board)[0]
+        except IndexError:
+            return
+        board_content.save()
+        board_post.board_content = board_content
         board_post.is_notice = bool(is_notice)
         board_post.author = user_profile
-        board_post.board_cateogry= BoardCategory.objects.filter(id=category)[0]
-        board_post.board_content = board_content
         board_post.title = title
         board_post.save()
         return board_post.id
     elif is_post_or_comment == 'Comment':
         board_post_id = request.POST.get('board_post_id', 0)
-        if not board_post_id:
-            return -1
-        else:
-            board_post = BoardPost.objects.filter(id=board_post_id)[0]
-        board_content.save()
+        print board_post_id
         board_comment = BoardComment()
+        try:
+            board_comment.board_post = BoardPost.objects.filter(id=board_post_id)[0]
+        except IndexError:
+            return
         board_comment.author = user_profile
+        board_content.save()
         board_comment.board_content = board_content
-        board_commnet.board_post = board_post
         board_comment.save()
         return board_comment.board_post.id
     else:
-        return -1
-
-
-=======
->>>>>>> a009ab646e2ae1dba5a6843546fc140d1e926e0c
-
+        return

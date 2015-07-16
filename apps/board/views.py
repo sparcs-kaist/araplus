@@ -6,7 +6,9 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from apps.board.models import *
-from apps.board.backend import _get_post_list, _get_board_list, _get_querystring, _get_content
+from apps.board.backend import _get_post_list, _get_board_list
+from apps.board.backend import _get_querystring, _get_content
+from apps.board.backend import _write_post
 import datetime
 import json
 
@@ -15,79 +17,22 @@ ItemPerPage=15
 @login_required(login_url='/session/login')
 def post_write(request):
     post = {}
-    post["new"] = True
-    error = ""
+    post['new'] = True
     if request.method == 'POST':
-        _User = request.user
-        _UserProfile = _User.userprofile
-        board = request.POST.get('board', '')
-        post["title"] = request.POST.get('title', '')
-        post["content"] = request.POST.get('content', '')
-        category = request.POST.get('category', '')
-        anonymous = request.POST.get('anonymous', '')
-        adult = request.POST.get('adult', '')
-        notice = request.POST.get('notice', '')
-        if post["title"] == '':
-            error = 'title missing!'
-        if post["content"] == '':
-            error = 'content missing!'
-        if error:
-            Cur_board = Board.objects.filter(id=board)[0]
-            _Board = Board.objects.all()
-            # official=request.user.userprofile.is_official
-            boards = []
-            for bd in _Board:
-                board = {}
-                board['name'] = bd.name
-                board['id'] = bd.id
-                board['description'] = bd.description
-                boards.append(board)
-            categories = BoardCategory.objects.all()
-            return render(request,
-                          'board/board_write.html',
-                          {"post": post, "Boards": boards,
-                           "Cur_board": Cur_board, "error": error,
-                           "Categories": categories})
-        _BoardContent = BoardContent()
-        _BoardContent.content = post["content"]
-        _BoardContent.created_time = datetime.datetime.today()
-        if anonymous == 'on':
-            _BoardContent.is_anonymous = True
-        if adult == 'on':
-            _BoardContent.is_adult = True
-        _BoardContent.save()
-        _BoardPost = BoardPost()
-        _BoardPost.title = post["title"]
-        if notice == 'on':
-            _BoardPost.is_notice = True
-        _BoardPost.board_content = _BoardContent
-        _BoardPost.board_content_id = _BoardContent.id
-        _BoardPost.author = _UserProfile
-        _BoardPost.author_id = _UserProfile.id
-        _Board = Board.objects.filter(id=board)
-        if _Board:
-            _BoardPost.board = _Board[0]
+        post_id = _write_post(request,'Post')
+        if post_id:
+            board_id = BoardPost.objects.filter(id=post_id)[0].board.id
+            return redirect('../' + str(post_id) + '/?board=' + str(board_id))
         else:
-            return redirect('../')
-        _Category = BoardCategory.objects.filter(name=category)
-        if _Category:
-            _BoardPost.board_category = _Category[0]
-        else:
-            return redirect('../')
-        _BoardPost.save()
-        _Board[0].post_count += 1
-        _Board[0].save()
-        postID = str(_BoardPost.id)
-        return redirect('../'+postID+'/?board='+board)
-    cur_board = request.GET.get("board")
-    if cur_board:
-        Cur_board = Board.objects.filter(id=cur_board)[0]
+            return redircet('../')
+    board_current_id = request.GET.get("board")
+    if board_current_id:
+        board_current = Board.objects.filter(id=board_cuttent_id)[0]
     else:
-        Cur_board = Board.objects.filter(id=1)[0]
-    _Board = Board.objects.all()
+        board_current = Board.objects.filter(id=1)[0]
     # official=request.user.userprofile.is_official
     boards = []
-    for bd in _Board:
+    for bd in Board.objects.all():
         board = {}
         board['name'] = bd.name
         board['id'] = bd.id
@@ -97,10 +42,10 @@ def post_write(request):
     return render(request,
                   'board/board_write.html',
                   {"post": post, "Boards": boards,
-                   "Cur_board": Cur_board,
+                   "Cur_board": board_current,
                    "Categories": categories})
 
-            
+
 @login_required(login_url='/session/login')
 def post_read(request, post_id, error=''):
     get_post_list = _get_post_list(request)
@@ -116,7 +61,6 @@ def post_read(request, post_id, error=''):
     get_content = _get_content(request, post_id)
     post  = get_content[0]
     comment_list = get_content[1]
- 
     return render(request,
                   'board/board_read.html',
                   {
@@ -214,43 +158,14 @@ def post_modify(request, pid):
 
 
 @login_required(login_url='/session/login')
-def comment_write(request, pid, error=''):
-    _User = request.user
-    _BoardPost = BoardPost.objects.filter(id=pid)
-    if _BoardPost:
-        _BoardPost = _BoardPost[0]
+def comment_write(request):
+    post_id = _write_post(request, 'Comment')
+    if post_id:
+        return redirect('../')
     else:
-        error = "No post"
-    if error:
         return redirect('../')
-    if request.method == 'POST':
-        if not request.user.is_authenticated():
-            return redirect('session/login')
-        _User = request.user
-        _UserProfile = _User.userprofile
-
-        content = request.POST.get('content', '')
-        anonymous = request.POST.get('anonymous', '')
-        if content == '':
-            error = 'content missing!'
-        if error:
-            return redirect('../')
-        _BoardContent = BoardContent()
-        _BoardContent.content = content
-        _BoardContent.created_time = datetime.datetime.today()
-        if anonymous == 'on':
-            _BoardContent.is_anonymous = True
-        _BoardContent.save()
-        _BoardComment = BoardComment()
-        _BoardComment.board_content = _BoardContent
-        _BoardComment.board_post = _BoardPost
-        _BoardComment.author = _UserProfile
-        _BoardComment.save()
-        return redirect('../')
-    return redirect('../')
 
 
-@login_required(login_url='/session/login')
 def comment_modify(request, error=''):
     if request.method == "POST":
         _User = request.user

@@ -114,8 +114,7 @@ class BoardPost(models.Model):
                                related_name='board_post')
     board_content = models.OneToOneField('BoardContent', null=False)
     board_category = models.ForeignKey('BoardCategory',
-                                       related_name='board_post',
-                                       null=False)
+                                       related_name='board_post')
 
     def __str__(self):
         title = self.title

@@ -245,7 +245,7 @@
         <div>
             <form action="./comment/" method="POST">
                 {%csrf_token%}
-                <input type="hidden" name="next" value="{{ next }}">
+                <input type="hidden" name="board_post_id" value="{{ post.id }}">
                 <div class="form-group">
                     <label>Anonymous</label>
                     <input type="checkbox" name="anonymous">
