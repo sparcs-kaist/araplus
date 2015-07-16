@@ -83,7 +83,7 @@ class BoardContentVotePolitical(models.Model):
 
 class BoardReport(models.Model):
     reason = models.TextField(null=False)
-    content = models.TextField()
+    content = models.TextField(default='Write something')
     created_time = models.DateTimeField(null=False)
     board_content = models.ForeignKey('BoardContent',
                                       related_name="report",

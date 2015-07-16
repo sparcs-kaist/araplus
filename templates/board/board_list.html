@@ -6,13 +6,13 @@
 				<th width="150">user</th>
                 <th width="150">
                     <div class="dropdown">                  
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{Cur_board.name|default:"All"}}
+                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{board.board_name|default:"All"}}
                           <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                             <li><a href="?">All</a></li>
-                            {% for board in Boards %}
-                            <li><a href="?board={{board.id}}">{{ board.name }}</a></li>
+                            {% for bd in board_list %}
+                            <li><a href="?board={{bd.id}}">{{ bd.name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -23,40 +23,34 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for post in Posts %}
+			{% for pst in post_list %}
 				<tr>
-					<td width="150">{{post.username}}</td>
-					<td width="150"><a href="?board={{post.board_id}}">{{post.board}}</a></td>
-					{%if post.is_notice%}
-					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}"><label style="color :black">Notice:{{post.title}}</label></a></td>
+					<td width="150">{{pst.username}}</td>
+					<td width="150"><a href="?board={{pst.board_id}}">{{pst.board}}</a></td>
+					{%if pst.is_notice%}
+					<td width="350"><a href="/board/{{pst.id}}/?{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
 					{%else%}
-					<td width="350"><a href="/board/{{post.id}}/?board={{Cur_board.id}}&page={{page}}">{{post.title}}</a></td>
+					<td width="350"><a href="/board/{{pst.id}}/?{{querystring}}">{{pst.title}}</a></td>
 					{%endif%}
-					<td width="100">+{{post.up}}/-{{post.down}}</td>
-					<td width="150">{{post.created_time}}</td>
+					<td width="100">+{{pst.up}}/-{{pst.down}}</td>
+					<td width="150">{{pst.created_time}}</td>
 				</tr>
 			{% endfor %}
 		</tbody>
     </table>
     <button class="btn btn-warn">
-        {% if Is_adult %}
-		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=false" id='2'>See Adult</a>
+        {% if is_adult %}
+		<a href="/board/?{{querystring}}&adult_filter=false" id='2'>See Adult</a>
         {% else %}
-		<a href="/board/?board={{Cur_board.id}}&page={{page}}&adult_filter=true" id='1'>Filter Adult Post</a>
+		<a href="/board/?{{querystirng}}&adult_filter=true" id='1'>Filter Adult Post</a>
         {% endif %}
     </button>
-    <button class="btn btn-normal"><a href="/board/post/?board={{Cur_board.id}}">Write</a></button>
-	{% if show_paginator %}
+    <button class="btn btn-normal"><a href="/board/post/?{{board.querystring}}">Write</a></button>
 		<div class="paginator">
-			{% if has_prev %}
-			<a href="?board={{Cur_board.id}}&page={{ prev_page }}">&laquo;</a>
-			{% endif %}
-	
-			{% if has_next %}
-			<a href="?board={{Cur_board.id}}&page={{ next_page }}">&raquo;</a>
-			{% endif %}	
-				(page {{page}} of {{pages}})
-			</div>
+			{%for page in paginator%}
+				<a href="/board/?{{page.querystring}}">{{page.page_number}} </a>
+			{%endfor%}
+		</div>
 	{% endif %}
 {% endblock %}
 
