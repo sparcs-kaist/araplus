@@ -125,5 +125,52 @@ def get_content(request, post_id):
 def get_post(request, content_id):
 
 
-def _write_post(request,  ):
+def _write_content(request, is_post_or_comment):
+    user_profile = request.user.userprofile
+    content = request.POST.get('content', '')
+    is_anonymous = request.POST.get('anonymous', False)
+    is_adult = request.POST.get('adult', False)
+    board_content = BoardContent()
+    if content:
+        return -1
+    board_content.content = content
+    board_content.is_anonymous = bool(is_anonymous)
+    board_content.is_adult = bool(is_adult)
+    board_content.created_time = datetime.datetime.today()
+    if is_post_or_comment == 'Post':
+        board = request.POST.get('board', 0)
+        is_notice = request.POST.get('notice', False)
+        category = request.POST.get('category', 0)
+        title = request.POST.get('title', '')
+        if not(board and title):
+            return -1
+        if not (category in board.board_category):
+            return -1
+        board_content.save()
+        board_post = BoardPost()
+        board_post.board = Board.objects.filter(id=board)[0]
+        board_post.is_notice = bool(is_notice)
+        board_post.author = user_profile
+        board_post.board_cateogry= BoardCategory.objects.filter(id=category)[0]
+        board_post.board_content = board_content
+        board_post.title = title
+        board_post.save()
+        return board_post.id
+    elif is_post_or_comment == 'Comment':
+        board_post_id = request.POST.get('board_post_id', 0)
+        if not board_post_id:
+            return -1
+        else:
+            board_post = BoardPost.objects.filter(id=board_post_id)[0]
+        board_content.save()
+        board_comment = BoardComment()
+        board_comment.author = user_profile
+        board_comment.board_content = board_content
+        board_commnet.board_post = board_post
+        board_comment.save()
+        return board_comment.board_post.id
+    else:
+        return -1
+
+
 
