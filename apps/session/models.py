@@ -17,7 +17,7 @@ class Message(models.Model):
     sender = models.ForeignKey('UserProfile', related_name='message_sent')
     receiver = models.ForeignKey('UserProfile',
                                  related_name='message_received')
-    created_time = models.DateTimeField(auto_now=True)
+    created_time = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField()
 
     def __str__(self):

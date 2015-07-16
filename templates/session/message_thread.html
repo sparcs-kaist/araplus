@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    Message thread between {{ sender.nickname }} and {{ receiver.nickname }}
+    
+    {% for message in messages %}
+    <li>({{ message.created_time }}){{ message.sender.nickname }} : {{ message.content }}</li>
+    {% endfor %}
+    
+</ul>
+</div>    
+{% endblock %}

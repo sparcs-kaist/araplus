@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from apps.session.models import UserProfile, Message, Block
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 
 def user_login(request):
@@ -82,6 +83,21 @@ def check_message(request):
         message.read()
     return render(request,
                   'session/check_message.html', {'messages': messages})
+
+
+@login_required(login_url='/session/login/')
+def check_thread(request, nickname):
+    receiver = request.user.userprofile
+    sender = UserProfile.objects.get(nickname=nickname)
+    messages = Message.objects.filter(Q(sender=sender, receiver=receiver) |
+                                      Q(receiver=sender, sender=receiver))
+    messages = messages.order_by('created_time')
+    for message in messages:
+        message.read()
+    return render(request,
+                  'session/message_thread.html', {'sender': sender,
+                                                  'receiver': receiver,
+                                                  'messages': messages})
 
 
 @login_required(login_url='/session/login/')
