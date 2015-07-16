@@ -125,6 +125,18 @@ def _get_board_list():
     return board_list
 
 
+def _get_current_board(request):
+    board = {}
+    try:
+        board_model = Board.objects.filter(request.GET.get('board'))[0]
+        board['board_id'] = board_model.id
+        board['board_name'] = board_model.name
+    except:
+        board['board_id'] = 0
+        board['board_name'] = 'All'
+    return board
+
+
 def _get_querystring(request):
     querystring = ''
     board_filter = request.GET.get('board')

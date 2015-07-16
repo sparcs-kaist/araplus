@@ -264,13 +264,13 @@
 				<th width="150">user</th>
                 <th width="150">
                     <div class="dropdown">                  
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{board.board_name|default:"All"}}
+                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{current_board.board_name|default:"All"}}
                           <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                             <li><a href="?">All</a></li>
                             {% for bd in board_list %}
-                            <li><a href="?board={{bd.id}}">{{ bd.name }}</a></li>
+                            <li><a href="?board={{bd.board_id}}">{{ bd.board_name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>

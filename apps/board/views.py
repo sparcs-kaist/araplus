@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from apps.board.models import *
 from apps.board.backend import _get_post_list, _get_board_list
 from apps.board.backend import _get_querystring, _get_content
-from apps.board.backend import _write_post
+from apps.board.backend import _write_post, _get_current_board
 import datetime
 import json
 
@@ -26,18 +26,14 @@ def post_write(request):
             return redirect('../' + str(post_id) + querystring)
         else:
             return redirect('../')
-    board_current_id = request.GET.get("board")
-    if board_current_id:
-        board_current = Board.objects.filter(id=board_current_id)[0]
-    else:
-        board_current = Board.objects.filter(id=1)[0]
+    current_board = _get_current_board(request)
     # official=request.user.userprofile.is_official
     board_list = _get_board_list
     categories = BoardCategory.objects.all()
     return render(request,
                   'board/board_write.html',
                   {"post": post, "board_list": board_list,
-                   "Cur_board": board_current,
+                   "current_board": current_board,
                    "Categories": categories})
 
 
@@ -48,7 +44,7 @@ def post_read(request, post_id, error=''):
     paginator = get_post_list[1]
     board_list = _get_board_list()
     querystring = _get_querystring(request)
-    #  board = _get_board_current(request)
+    current_board = _get_current_board(request)
     adult_filter = request.GET.get('adult_filter')
     is_adult = False
     if adult_filter == "true":
@@ -65,7 +61,7 @@ def post_read(request, post_id, error=''):
                       # Below,there are thing for postList.
                       'post_list' : post_list,
                       'board_list': board_list,
-                      #  'board' : board,
+                      'current_board' : current_board,
                       'is_adult' : is_adult,
                       'paginator' : paginator, 
                   })
@@ -192,7 +188,7 @@ def post_list(request, error=''):
     paginator = get_post_list[1]
     board_list = _get_board_list()
     querystring = _get_querystring(request)
-    #  board = _get_board_current(request)
+    current_board = _get_current_board(request)
     adult_filter = request.GET.get('adult_filter')
     is_adult = False
     if adult_filter == "true":
@@ -202,7 +198,7 @@ def post_list(request, error=''):
                   {
                       'post_list' : post_list,
                       'board_list' : board_list,
-                      #  'board' : board,
+                      'current_board' : current_board,
                       'is_adult' : is_adult,
                       'querystring' : querystring,
                       'paginator' : paginator,

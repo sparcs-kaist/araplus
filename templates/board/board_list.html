@@ -6,7 +6,7 @@
 				<th width="150">user</th>
                 <th width="150">
                     <div class="dropdown">                  
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{board.board_name|default:"All"}}
+                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{current_board.board_name|default:"All"}}
                           <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -45,7 +45,7 @@
 		<a href="/board/?{{querystirng}}&adult_filter=true" id='1'>Filter Adult Post</a>
         {% endif %}
     </button>
-    <button class="btn btn-normal"><a href="/board/post/?{{board.querystring}}">Write</a></button>
+    <button class="btn btn-normal"><a href="/board/post/?{{current_board.querystring}}">Write</a></button>
 		<div class="paginator">
 			{%for page in paginator%}
 				<a href="/board/{{page.querystring}}">{{page.page}} </a>
