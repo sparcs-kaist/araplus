@@ -120,6 +120,7 @@ def _get_board_list():
         board = {}
         board['board_name'] = board_model.name
         board['querystring'] = '?board='+str(board_model.id)
+        board['board_id'] = board_model.id
         board_list.append(board)
     return board_list
 
@@ -175,6 +176,8 @@ def _get_post(request, board_content, is_comment=False):
     post['content_id'] = board_content.id
     post['created_time'] = board_content.created_time
     post['username'] = user.username
+    if board_content.is_anonymous:
+        post['username'] = 'anonymous'
     post['return'] = (user.id == request.user.id)
     post['vote'] = board_content.get_vote()
     post['adult'] = board_content.is_adult

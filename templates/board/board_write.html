@@ -59,8 +59,8 @@
                     <span class="caret"></span>
                  </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    {% for board in Boards %}
-                    <li><a href="javascript:;" class="board" id="{{board.id}}">{{ board.name }}</a></li>
+                    {% for board in board_list %}
+                    <li><a href="javascript:;" class="board" id="{{board.board_id}}">{{ board.board_name }}</a></li>
                     {% endfor %}
                 </ul>
                 </li>

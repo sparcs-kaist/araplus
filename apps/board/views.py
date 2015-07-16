@@ -21,27 +21,22 @@ def post_write(request):
     if request.method == 'POST':
         post_id = _write_post(request,'Post')
         if post_id:
-            board_id = BoardPost.objects.filter(id=post_id)[0].board.id
-            return redirect('../' + str(post_id) + '/?board=' + str(board_id))
+            querystring = _get_querystring(request)
+            #  board_id = BoardPost.objects.filter(id=post_id)[0].board.id
+            return redirect('../' + str(post_id) + querystring)
         else:
-            return redircet('../')
+            return redirect('../')
     board_current_id = request.GET.get("board")
     if board_current_id:
-        board_current = Board.objects.filter(id=board_cuttent_id)[0]
+        board_current = Board.objects.filter(id=board_current_id)[0]
     else:
         board_current = Board.objects.filter(id=1)[0]
     # official=request.user.userprofile.is_official
-    boards = []
-    for bd in Board.objects.all():
-        board = {}
-        board['name'] = bd.name
-        board['id'] = bd.id
-        board['description'] = bd.description
-        boards.append(board)
+    board_list = _get_board_list
     categories = BoardCategory.objects.all()
     return render(request,
                   'board/board_write.html',
-                  {"post": post, "Boards": boards,
+                  {"post": post, "board_list": board_list,
                    "Cur_board": board_current,
                    "Categories": categories})
 
@@ -159,11 +154,9 @@ def post_modify(request, pid):
 
 @login_required(login_url='/session/login')
 def comment_write(request):
-    post_id = _write_post(request, 'Comment')
-    if post_id:
-        return redirect('../')
-    else:
-        return redirect('../')
+    if request.method == 'POST':
+        post_id = _write_post(request, 'Comment')
+    return redirect('../')
 
 
 def comment_modify(request, error=''):
