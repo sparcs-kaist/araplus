@@ -6,6 +6,7 @@ import datetime
 
 
 def _get_post_list(request, item_per_page=15):
+    t = datetime.datetime.today()
     adult_filter = request.GET.get('adult_filter')
     board_filter = request.GET.get('board')
     try:
@@ -25,14 +26,14 @@ def _get_post_list(request, item_per_page=15):
         is_adult = True
     post_count = 0
     if board_filter:
-        board_post_notice = BoardPost.objects.filter(board=board_filter, is_notice=True).order_by('-id')
+        board_post_notice = BoardPost.objects.filter(is_notice=True, board=board_filter).order_by('-id')
         board_post = BoardPost.objects.filter(board=board_filter).order_by('-id')
         post_count = board.post_count
     else:
         board_post_notice = BoardPost.objects.filter(is_notice=True).order_by('-id')
-        board_post = BoardPost.objects.all().order_by('-id')
-        if board_post:
-            post_count = board_post[0].id
+        board_post = BoardPost.objects.filter(is_notice=False).order_by('-id')
+        for board in Board.objects.all():
+            post_count += board.post_count
     if post_count == 0:
         post_count = 1
     last_page = (post_count-1)/item_per_page+1
@@ -41,7 +42,7 @@ def _get_post_list(request, item_per_page=15):
     elif page > last_page:
         page = last_page
     board_post_notice = board_post_notice[:5]
-    board_post_all = board_post[page*item_per_page-item_per_page:page*item_per_page]
+    board_post_all = board_post[(page*item_per_page-item_per_page):(page*item_per_page)]
     post_list = []
     for board_post in board_post_notice:
         post = {}
@@ -125,7 +126,7 @@ def _get_board_list():
 
 def _get_querystring(request):
     querystring = ''
-    board_filter = request.GET.get('board_filter')
+    board_filter = request.GET.get('board')
     page = request.GET.get('page')
     if board_filter or page:
         querystring = '?'
