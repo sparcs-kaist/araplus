@@ -123,6 +123,7 @@ def _get_content(request, post_id):
     return (post, comment_list)
 
 
+<<<<<<< HEAD
 def _get_post(request, board_content, is_comment=False):
     post = {}
     if is_comment:
@@ -149,7 +150,9 @@ def _get_post(request, board_content, is_comment=False):
     post['adult'] = board_content.is_adult
     return post
 =======
+def get_post(request, content_id):
 
 
 def _write_post(request,  ):
 
+>>>>>>> fef25f108f381d2aecbd42d48bca56096361fb93
