@@ -286,9 +286,9 @@
 					<td width="150">{{pst.username}}</td>
                     <td width="150"><a href="{{pst.board.querystring}}">{{pst.board.board_name}}</a></td>
 					{%if pst.is_notice%}
-					<td width="350"><a href="/board/{{pst.id}}/?{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
+					<td width="350"><a href="/board/{{pst.post_id}}/{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
 					{%else%}
-					<td width="350"><a href="/board/{{pst.id}}/?{{querystring}}">{{pst.title}}</a></td>
+					<td width="350"><a href="/board/{{pst.post_id}}/{{querystring}}">{{pst.title}}</a></td>
 					{%endif%}
 					<td width="100">+{{pst.vote.up}}/-{{pst.vote.down}}</td>
 					<td width="150">{{pst.created_time}}</td>
@@ -303,7 +303,7 @@
 		<a href="/board/?{{querystring}}&adult_filter=true" id='1'>Filter Adult Post</a>
         {% endif %}
     </button>
-	<button class="btn btn-normal"><a href="/board/post/?{{querystring}}">Write</a></button>
+	<button class="btn btn-normal"><a href="/board/post/{{querystring}}">Write</a></button>
 		<div class="paginator">
 			{%for page in paginator%}
 			<a href="/board/{{page.querystring}}">{{page.page}}</a>
