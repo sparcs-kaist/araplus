@@ -92,7 +92,7 @@ def _get_post_list(request, item_per_page=15):
         else:
             paging['querystring'] = '?page='+str((page-page%10))
         paginator.append(paging)
-    for i in range(page-page%10+1,page-page%10+11):
+    for i in range(page-(page-1)%10,page-(page-1)%10+10):
         if i > last_page:
             break
         paging = {}
@@ -102,13 +102,13 @@ def _get_post_list(request, item_per_page=15):
         else:
             paging['querystring'] = '?page='+str(i)
         paginator.append(paging)
-    if page <= last_page-last_page%10:
+    if page < last_page-(last_page-1)%10:
         paging = {}
         paging['page'] = 'next'
         if board_querystring:
-            paging['querystring'] = '?'+board_querystring+'&page='+str((page-page%10+11))
+            paging['querystring'] = '?'+board_querystring+'&page='+str((page-(page-1)%10+10))
         else:
-            paging['querystring'] = '?page='+str((page-page%10+11))
+            paging['querystring'] = '?page='+str((page-(page-1)%10+10))
         paginator.append(paging)
     return (post_list, paginator)
 
