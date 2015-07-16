@@ -123,4 +123,7 @@ def get_content(request, post_id):
 
 
 def get_post(request, content_id):
-    
+
+
+def _write_post(request,  ):
+

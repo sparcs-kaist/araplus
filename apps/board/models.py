@@ -42,10 +42,10 @@ class Attachment(models.Model):
 
 class BoardComment(models.Model):
     board_content = models.OneToOneField('BoardContent',
-                                         related_name="comment",
+                                         related_name="board_comment",
                                          null=False)
     board_post = models.ForeignKey('BoardPost',
-                                   related_name="comment",
+                                   related_name="board_comment",
                                    null=False)
     author = models.ForeignKey('session.UserProfile',
                                related_name="board_comment")
@@ -58,27 +58,27 @@ class BoardComment(models.Model):
 
 class BoardContentVote(models.Model):
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="content_vote",
+                                      related_name="board_content_vote",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name="board_comment_vote")
+                                    related_name="board_content_vote")
     is_up = models.BooleanField(null=False)
 
 
 class BoardContentVoteAdult(models.Model):
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="content_vote_adult",
+                                      related_name="board_content_vote_adult",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name="board_comment_vote_adult")
+                                    related_name="board_content_vote_adult")
 
 
 class BoardContentVotePolitical(models.Model):
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="content_vote_political",
+                                      related_name="board_content_vote_political",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name="board_comment_vote_political")
+                                    related_name="board_content_vote_political")
 
 
 class BoardReport(models.Model):
@@ -86,7 +86,7 @@ class BoardReport(models.Model):
     content = models.TextField()
     created_time = models.DateTimeField(null=False)
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="report",
+                                      related_name="board_report",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="board_report")
@@ -103,7 +103,7 @@ class Board(models.Model):
 
 class BoardCategory(models.Model):
     name = models.CharField(max_length=10, null=False)
-    board = models.ForeignKey('Board', related_name='category', null=False)
+    board = models.ForeignKey('Board', related_name='board_category', null=False)
 
 
 class BoardPost(models.Model):
@@ -114,7 +114,7 @@ class BoardPost(models.Model):
                                related_name='board_post')
     board_content = models.OneToOneField('BoardContent', null=False)
     board_category = models.ForeignKey('BoardCategory',
-                                       related_name='category',
+                                       related_name='board_post',
                                        null=False)
 
     def __str__(self):
