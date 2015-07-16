@@ -74,6 +74,8 @@ def post_write(request):
         else:
             return redirect('../')
         _BoardPost.save()
+        _Board[0].post_count += 1
+        _Board[0].save()
         postID = str(_BoardPost.id)
         return redirect('../'+postID+'/?board='+board)
     cur_board = request.GET.get("board")
@@ -283,7 +285,6 @@ def post_list(request, error=''):
     is_adult = False
     if adult_filter == "true":
         is_adult = True
-
     return render(request,
                   'board/board_list.html',
                   {
