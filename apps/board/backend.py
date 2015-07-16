@@ -125,7 +125,7 @@ def get_content(request, post_id):
 def get_post(request, content_id):
 
 
-def _write_content(request, is_post_or_comment):
+def _write_post(request, is_post_or_comment):
     user_profile = request.user.userprofile
     content = request.POST.get('content', '')
     is_anonymous = request.POST.get('anonymous', False)
