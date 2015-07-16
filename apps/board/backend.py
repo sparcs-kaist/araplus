@@ -83,7 +83,7 @@ def _get_post_list(request, item_per_post=15):
     return (post_list, paginator)
 
 
-def get_board_list():
+def _get_board_list():
     board_model_list = Board.objects.all()
     board_list = []
     for board_model in board_model_list:
@@ -94,7 +94,7 @@ def get_board_list():
     return board_list
 
 
-def get_querystring(request):
+def _get_querystring(request):
     querystring = ''
     board_filter = request.GET.get('board_filter')
     page = request.GET.get('page')
@@ -109,18 +109,42 @@ def get_querystring(request):
     return querystring
 
 
-def get_content(request, post_id):
+def _get_content(request, post_id):
     board_post = BoardPost.objects.filter(id=post_id)
     if board_post:
         board_post = board_post[0]
     else:
         return (get_post(request, 0), [])
-    post = get_post(board_post.board_content.id)
+    post = get_post(board_post.board_content)
     comment_list = []
     for board_comment in board_post.board_comment.all():
-        comment_list.append(get_post(request, board_comment.board_content.id))
+        comment = get_post(request, board_comment.board_content, True)
+        comment_list.append(comment)
     return (post, comment_list)
 
 
-def get_post(request, content_id):
-    
+def _get_post(request, board_content, is_comment=False):
+    post = {}
+    if is_comment:
+        board_post = board_content.board_comment
+    else:
+        board_post = board_content.board_post
+        post['title'] = board_post.title
+        post['board'] = board_post.board.name
+        post['board_id'] = board_post.board.id
+        post['category' = board_post.board_category.name
+    userprofile = board_post.author
+    user = userprofile.user
+    if board_content.is_deleted:
+        post['title'] = '--Deleted--'
+        post['content'] = '--Deleted--'
+    else:
+        post['content'] = board_content.content
+    post['deleted'] = board_content.is_deleted
+    post['content_id'] = board_content.id
+    post['created_time'] = board_content.created_time
+    post['username'] = user.username
+    post['return'] = (user.id == request.user.id)
+    post['vote'] = board_content.get_vote()
+    post['adult'] = board_content.is_adult
+    return post
