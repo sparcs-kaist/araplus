@@ -50,12 +50,12 @@
             <input type="text" class="form-control" name="title" value="{{post.title}}" placeholder="title">
         </div>
         <div class="form-group">
-            <input type="hidden" class="form-control" id="board_id" name="board" value="{{ current_board.board_id}}">
+            <input type="hidden" class="form-control" id="board_id" name="board" value="{{ current_board.board_id|default:board_list.0.board_id}}">
             <input type="hidden" class="form-control" id="category_name" name="category">
             <ul class="nav nav-pills">
                 <li>
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{current_board.board_name}}
+                    {{current_board.board_name|default:board_list.0.board_name}}
                     <span class="caret"></span>
                  </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">

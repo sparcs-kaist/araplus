@@ -6,7 +6,6 @@ import datetime
 
 
 def _get_post_list(request, item_per_page=15):
-    t = datetime.datetime.today()
     adult_filter = request.GET.get('adult_filter')
     board_filter = request.GET.get('board')
     try:
@@ -128,12 +127,12 @@ def _get_board_list():
 def _get_current_board(request):
     board = {}
     try:
-        board_model = Board.objects.filter(request.GET.get('board'))[0]
+        board_model = Board.objects.filter(id=request.GET.get('board'))[0]
         board['board_id'] = board_model.id
         board['board_name'] = board_model.name
     except:
-        board['board_id'] = 0
-        board['board_name'] = 'All'
+        board['board_id'] = None
+        board['board_name'] = None
     return board
 
 
@@ -225,6 +224,8 @@ def _write_post(request, is_post_or_comment):
         board_post.author = user_profile
         board_post.title = title
         board_post.save()
+        board_post.board.post_count += 1
+        board_post.board.save()
         return board_post.id
     elif is_post_or_comment == 'Comment':
         board_post_id = request.POST.get('board_post_id', 0)
