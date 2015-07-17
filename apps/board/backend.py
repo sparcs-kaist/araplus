@@ -195,7 +195,7 @@ def _get_post(request, board_content, is_comment=False):
     return post
 
 
-def _write_post(request, is_post_or_comment):
+def _write_post(request, is_post_or_comment, check=0):
     user_profile = request.user.userprofile
     content = request.POST.get('content', '')
     is_anonymous = request.POST.get('anonymous', False)
@@ -229,7 +229,9 @@ def _write_post(request, is_post_or_comment):
         return board_post.id
     elif is_post_or_comment == 'Comment':
         board_post_id = request.POST.get('board_post_id', 0)
-        print board_post_id
+        if not check == board_post_id:
+            print 'not allowed'
+            return
         board_comment = BoardComment()
         try:
             board_comment.board_post = BoardPost.objects.filter(id=board_post_id)[0]

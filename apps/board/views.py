@@ -63,7 +63,7 @@ def post_read(request, post_id, error=''):
                       'board_list': board_list,
                       'current_board' : current_board,
                       'is_adult' : is_adult,
-                      'paginator' : paginator, 
+                      'paginator' : paginator,
                   })
 
 
@@ -149,9 +149,9 @@ def post_modify(request, pid):
 
 
 @login_required(login_url='/session/login')
-def comment_write(request):
+def comment_write(request, post_id_check):
     if request.method == 'POST':
-        post_id = _write_post(request, 'Comment')
+        post_id = _write_post(request, 'Comment', post_id_check)
     return redirect('../')
 
 
@@ -202,7 +202,6 @@ def post_list(request, error=''):
                       'is_adult' : is_adult,
                       'querystring' : querystring,
                       'paginator' : paginator,
-
                   })
 
 
