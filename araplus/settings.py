@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'apps.board',
     'apps.grill',
     'apps.session',
+    'apps.channel',
 )
 
 MIDDLEWARE_CLASSES = (
