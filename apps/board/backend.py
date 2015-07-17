@@ -130,6 +130,7 @@ def _get_current_board(request):
         board_model = Board.objects.filter(id=request.GET.get('board'))[0]
         board['board_id'] = board_model.id
         board['board_name'] = board_model.name
+        board['querystring'] = '?board='+str(board_model.id)
     except:
         board['board_id'] = None
         board['board_name'] = None
