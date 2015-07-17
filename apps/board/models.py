@@ -112,7 +112,8 @@ class BoardPost(models.Model):
     board = models.ForeignKey('Board', related_name='board', null=False, db_index=True)
     author = models.ForeignKey('session.UserProfile',
                                related_name='board_post')
-    board_content = models.OneToOneField('BoardContent', null=False)
+    board_content = models.OneToOneField('BoardContent', null=False,
+                                         related_name='board_post')
     board_category = models.ForeignKey('BoardCategory',
                                        related_name='board_post')
 

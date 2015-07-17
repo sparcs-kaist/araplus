@@ -52,6 +52,9 @@
         <div class="form-group">
             <input type="hidden" class="form-control" id="board_id" name="board" value="{{ current_board.board_id|default:board_list.0.board_id}}">
             <input type="hidden" class="form-control" id="category_name" name="category">
+            {% if not post.new %}
+            <input type="hidden" class="form-control" id="board_post_id" name="board_post_id" value={{ post.id }}>
+            {% endif %}
             <ul class="nav nav-pills">
                 <li>
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

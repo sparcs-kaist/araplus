@@ -68,84 +68,30 @@ def post_read(request, post_id, error=''):
 
 
 @login_required(login_url='/session/login')
-def post_modify(request, pid):
-    post = {}
-    post["new"] = False
-    error = ""
-    _User = request.user
-    _BoardPost = BoardPost.objects.filter(id=pid)
-    if _BoardPost:
-        _BoardPost = _BoardPost[0]
-        if _BoardPost.author != _User.userprofile:
-            error = "Not allowed"
-    else:
-        error = "No post"
-    _BoardContent = _BoardPost.board_content
-    if _BoardContent.is_deleted:
-        error = "Deleted"
-    if error:
-        return redirect('../')
+def post_modify(request, post_id):
+    try:
+        board_post = BoardPost.objects.filter(id=post_id)[0]
+        if request.user.userprofile != board_post.author:
+            return
+    except:
+        return
     if request.method == 'POST':
-        if not request.user.is_authenticated():
-            return redirect('session/login')
-        _User = request.user
-        post["title"] = request.POST.get('title', '')
-        post["content"] = request.POST.get('content', '')
-        post["board"] = request.POST.get('board', '')
-        post["category"] = request.POST.get('category', '')
-        adult = request.POST.get('adult', '')
-        if post["title"] == '':
-            error = 'title missing!'
-        if post["content"] == '':
-            error = 'body missing!'
-        if error:
-            return render(request,
-                          'board/board_write.html',
-                          {"error": error, "post": post})
-        if adult:
-            _BoardContent.is_adult = True
-        else:
-            _BoardContent.is_adult = False
-        _BoardContent.content = post["content"]
-        _BoardContent.save()
-        _BoardPost.title = post["title"]
-        _Board = Board.objects.filter(id=post["board"])
-        _Category = BoardCategory.objects.filter(name=post["category"])
-        if not _Board:
-            return redirect('../')
-        elif not _Category:
-            return redirect('../')
-        else:
-            _BoardPost.board = _Board[0]
-            _BoardPost.board_category = _Category[0]
-        _BoardPost.save()
+        post_id = _write_post(request, 'Post', modify=True)
+        if post_id:
+            querystring = _get_querystring(request)
+            return redirect('../'+querystring)
         return redirect('../')
-    post["title"] = _BoardPost.title
-    post["content"] = _BoardContent.content
-    cur_board = request.GET.get("board", '')
-    if cur_board:
-        Cur_board = Board.objects.filter(id=cur_board)[0]
-    else:
-        Cur_board = Board.objects.filter(id=1)[0]
-    _Board = Board.objects.all()
+    post = _get_content(request, post_id)[0]
+    post['new'] = False
+    current_board = _get_current_board(request)
+    board_list = _get_board_list()
     # official=request.user.userprofile.is_official
-    boards = []
-    for bd in _Board:
-        board = {}
-        board['name'] = bd.name
-        board['id'] = bd.id
-        board['description'] = bd.description
-        boards.append(board)
     categories = BoardCategory.objects.all()
     return render(request,
                   'board/board_write.html',
-                  {"post": post, "Boards": boards,
-                   "Cur_board": Cur_board,
+                  {"post": post, "board_list": board_list,
+                   "current_board": current_board,
                    "Categories": categories})
-
-    return render(request,
-                  'board/board_write.html',
-                  {"post": post})
 
 
 @login_required(login_url='/session/login')
@@ -155,29 +101,10 @@ def comment_write(request, post_id_check):
     return redirect('../')
 
 
-def comment_modify(request, error=''):
-    if request.method == "POST":
-        _User = request.user
-        cid = request.POST.get('cid', '')
-        _BoardComment = BoardComment.objects.filter(id=cid)
-        if _BoardComment:
-            _BoardComment = _BoardComment[0]
-            if _BoardComment.author != _User.userprofile:
-                error = "Not allowd"
-        else:
-            error = "No Comment"
-        if error:
-            return redirect('../')
-        _BoardContent = _BoardComment.board_content
-        content = request.POST.get('content', '')
-        if content == '':
-            error = 'No comment content'
-        if error:
-            return redirect('../')
-        _BoardContent.content = content
-        _BoardContent.save()
-        return redirect('../')
-    error = "Invalid access"
+@login_required(login_url='/session/login')
+def comment_modify(request, post_id_check):
+    if request.method == 'POST':
+        post_id = _write_post(request, 'Comment', post_id_check, True)
     return redirect('../')
 
 

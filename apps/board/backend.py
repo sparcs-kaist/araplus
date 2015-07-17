@@ -170,8 +170,7 @@ def _get_post(request, board_content, is_comment=False):
     if is_comment:
         board_post = board_content.board_comment
     else:
-        board_post = board_content.boardpost
-        post['id'] = board_post.id
+        board_post = board_content.board_post
         post['title'] = board_post.title
         post['board'] = board_post.board.name
         post['board_id'] = board_post.board.id
@@ -183,6 +182,7 @@ def _get_post(request, board_content, is_comment=False):
         post['content'] = '--Deleted--'
     else:
         post['content'] = board_content.content
+    post['id'] = board_post.id
     post['deleted'] = board_content.is_deleted
     post['content_id'] = board_content.id
     post['created_time'] = board_content.created_time
@@ -195,24 +195,49 @@ def _get_post(request, board_content, is_comment=False):
     return post
 
 
-def _write_post(request, is_post_or_comment, check=0):
+def _write_post(request, is_post_or_comment, check=0, modify=False):
     user_profile = request.user.userprofile
     content = request.POST.get('content', '')
     is_anonymous = request.POST.get('anonymous', False)
     is_adult = request.POST.get('adult', False)
-    board_content = BoardContent()
+    if modify:
+        try:
+            if is_post_or_comment == 'Post':
+                board_post_id = int(request.POST.get('board_post_id', 0))
+                board_post = BoardPost.objects.filter(id=board_post_id)[0]
+                board_content = board_post.board_content
+                author = board_post.author
+            elif is_post_or_comment == 'Comment':
+                board_comment_id = int(request.POST.get('board_comment_id', 0))
+                board_comment = BoardComment.objects.filter(id=board_comment_id)[0]
+                board_content = board_comment.board_content
+                author = board_comment.author
+            else:
+                return
+        except:
+            return
+        if author != user_profile:
+            return
+        if board_content.is_deleted:
+            return
+    else:
+        board_content = BoardContent()
     if not content:
         return
     board_content.content = content
-    board_content.is_anonymous = bool(is_anonymous)
     board_content.is_adult = bool(is_adult)
-    board_content.created_time = datetime.datetime.today()
+    if not modify:
+        board_content.is_anonymous = bool(is_anonymous)
+        board_content.created_time = datetime.datetime.today()
     if is_post_or_comment == 'Post':
         board = request.POST.get('board', 0)
         is_notice = request.POST.get('notice', False)
         category = request.POST.get('category', 0)
         title = request.POST.get('title', '')
-        board_post = BoardPost()
+        if modify:
+            board_post = board_content.board_post
+        else:
+            board_post = BoardPost()
         try:
             board_post.board = Board.objects.filter(id=board)[0]
             board_post.board_category = BoardCategory.objects.filter(name=category, board=board_post.board)[0]
@@ -224,19 +249,27 @@ def _write_post(request, is_post_or_comment, check=0):
         board_post.author = user_profile
         board_post.title = title
         board_post.save()
-        board_post.board.post_count += 1
-        board_post.board.save()
+        if not modify:
+            board_post.board.post_count += 1
+            board_post.board.save()
         return board_post.id
     elif is_post_or_comment == 'Comment':
         board_post_id = request.POST.get('board_post_id', 0)
         if not check == board_post_id:
             print 'not allowed'
             return
-        board_comment = BoardComment()
-        try:
-            board_comment.board_post = BoardPost.objects.filter(id=board_post_id)[0]
-        except IndexError:
-            return
+        if modify:
+            try:
+                board_comment_id = request.POST.get('board_comment_id', 0)
+                board_comment = BoardComment.objects.filter(id=board_comment_id)[0]
+            except:
+                return
+        else:
+            board_comment = BoardComment()
+            try:
+                board_comment.board_post = BoardPost.objects.filter(id=board_post_id)[0]
+            except IndexError:
+                return
         board_comment.author = user_profile
         board_content.save()
         board_comment.board_content = board_content

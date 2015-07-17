@@ -4,12 +4,13 @@
 <script>
     $(document).ready(function(){
         $(".comment").click(function(){
-            var cid=$(this).attr("id").slice(3);
+            var board_comment_id=$(this).attr("id").slice(3);
 	   
-            var content = $("#comment"+cid).text();
+            var content = $("#comment"+board_comment_id).text();
             var mod_comment = "<form action='./comment_mod/' method='POST'>"+
                 "{% csrf_token %}"+
-                "<input type='hidden' name='cid' value=" + cid + ">"+ 
+                "<input type='hidden' name='board_comment_id' value=" + board_comment_id + ">"+ 
+                "<input type='hidden' name='board_post_id' value={{post.id}}>"+
                 "<div class='form-group'>"+
                     "<textarea class='form-control' rows='2' name='content'>"+
                         content+
@@ -18,7 +19,7 @@
                                 "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
                                     "완료"+
                                     "</button></div></div></form>"
-            $(mod_comment).replaceAll("#comment_content"+cid);
+            $(mod_comment).replaceAll("#comment_content"+board_comment_id);
         });
 		$(".vote").click(function() {
 			var vote_uid;
@@ -211,8 +212,8 @@
                 </div>
             </div>
             <div class="panel-body">
-                <div id="comment_content{{ comment.comment_id }}">
-                    <div id="comment{{comment.comment_id}}">{{ comment.content|safe }}</div>
+                <div id="comment_content{{ comment.id }}">
+                    <div id="comment{{comment.id}}">{{ comment.content|safe }}</div>
                     <div class="col-md-12">
 						<div class="row">
 						    <div class="col-md-7"></div>
@@ -231,7 +232,7 @@
                             <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
                             <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
                             {% if comment.return %}			
-							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.comment_id}}">Modify</button>
+							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
                             <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
                             {% endif %}
                             {% endif %}		
