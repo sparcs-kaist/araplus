@@ -50,7 +50,7 @@
             <a href="{{post_list_url}}{{querystirng}}&adult_filter=true" id='1'>Filter Adult Post</a>
             {% endif %}
         </button>
-        <button class="btn btn-normal"><a href="{{post_list_url}}post/{{current_board.querystring}}">Write</a></button>
+        <a class="btn btn-info" href="{{post_list_url}}post/{{current_board.querystring}}">Write</a>
         <div class="paginator">
             {%for page in paginator%}
                 <a href="{{post_list_url}}{{page.querystring}}">{{page.page}} </a>

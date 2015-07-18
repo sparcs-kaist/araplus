@@ -1,6 +1,4 @@
 # -*- coding: utf-8
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from apps.board.models import *
 import datetime
 
@@ -20,9 +18,6 @@ def _get_post_list(request, item_per_page=15):
         else:
             return ([], [])
         board_querystring = 'board='+str(board.id)
-    is_adult = False
-    if adult_filter == 'true':
-        is_adult = True
     post_count = 0
     if board_filter:
         board_post_notice = BoardPost.objects.filter(is_notice=True, board=board_filter).order_by('-id')
@@ -87,11 +82,11 @@ def _get_post_list(request, item_per_page=15):
         paging = {}
         paging['page'] = 'prev'
         if board_querystring:
-            paging['querystring'] = '?'+board_querystring+'&page='+str((page-page%10))
+            paging['querystring'] = '?'+board_querystring+'&page='+str((page-page % 10))
         else:
-            paging['querystring'] = '?page='+str((page-page%10))
+            paging['querystring'] = '?page='+str((page-page % 10))
         paginator.append(paging)
-    for i in range(page-(page-1)%10,page-(page-1)%10+10):
+    for i in range(page-(page-1) % 10, page-(page-1) % 10+10):
         if i > last_page:
             break
         paging = {}
@@ -101,13 +96,13 @@ def _get_post_list(request, item_per_page=15):
         else:
             paging['querystring'] = '?page='+str(i)
         paginator.append(paging)
-    if page < last_page-(last_page-1)%10:
+    if page < last_page-(last_page-1) % 10:
         paging = {}
         paging['page'] = 'next'
         if board_querystring:
-            paging['querystring'] = '?'+board_querystring+'&page='+str((page-(page-1)%10+10))
+            paging['querystring'] = '?'+board_querystring+'&page='+str((page-(page-1) % 10+10))
         else:
-            paging['querystring'] = '?page='+str((page-(page-1)%10+10))
+            paging['querystring'] = '?page='+str((page-(page-1) % 10+10))
         paginator.append(paging)
     return (post_list, paginator)
 

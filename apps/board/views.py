@@ -1,9 +1,6 @@
 # -*- coding: utf-8
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from django.http import HttpResponse
 from apps.board.models import *
 from apps.board.backend import _get_post_list, _get_board_list
@@ -12,14 +9,13 @@ from apps.board.backend import _write_post, _get_current_board
 import datetime
 import json
 
-ItemPerPage=15
 
 @login_required(login_url='/session/login')
 def post_write(request):
     post = {}
     post['new'] = True
     if request.method == 'POST':
-        post_id = _write_post(request,'Post')
+        post_id = _write_post(request, 'Post')
         if post_id:
             querystring = _get_querystring(request)
             #  board_id = BoardPost.objects.filter(id=post_id)[0].board.id
@@ -38,32 +34,27 @@ def post_write(request):
 
 
 @login_required(login_url='/session/login')
-def post_read(request, post_id, error=''):
+def post_read(request, post_id):
     get_post_list = _get_post_list(request)
     post_list = get_post_list[0]
     paginator = get_post_list[1]
     board_list = _get_board_list()
     querystring = _get_querystring(request)
     current_board = _get_current_board(request)
-    adult_filter = request.GET.get('adult_filter')
-    is_adult = False
-    if adult_filter == "true":
-        is_adult = True
     get_content = _get_content(request, post_id)
-    post  = get_content[0]
+    post = get_content[0]
     comment_list = get_content[1]
     return render(request,
                   'board/board_read.html',
                   {
-                      'querystring' : querystring,
-                      'post' : post,  # post for post
-                      'comment_list' : comment_list,  # comment for post  
+                      'querystring': querystring,
+                      'post': post,  # post for post
+                      'comment_list': comment_list,  # comment for post
                       # Below,there are thing for postList.
-                      'post_list' : post_list,
+                      'post_list': post_list,
                       'board_list': board_list,
-                      'current_board' : current_board,
-                      'is_adult' : is_adult,
-                      'paginator' : paginator,
+                      'current_board': current_board,
+                      'paginator': paginator,
                   })
 
 
@@ -109,7 +100,7 @@ def comment_modify(request, post_id_check):
 
 
 @login_required(login_url='/session/login')
-def post_list(request, error=''):
+def post_list(request):
     get_post_list = _get_post_list(request)
     post_list = get_post_list[0]
     paginator = get_post_list[1]
@@ -123,12 +114,12 @@ def post_list(request, error=''):
     return render(request,
                   'board/board_list.html',
                   {
-                      'post_list' : post_list,
-                      'board_list' : board_list,
-                      'current_board' : current_board,
-                      'is_adult' : is_adult,
-                      'querystring' : querystring,
-                      'paginator' : paginator,
+                      'post_list': post_list,
+                      'board_list': board_list,
+                      'current_board': current_board,
+                      'is_adult': is_adult,
+                      'querystring': querystring,
+                      'paginator': paginator,
                   })
 
 
