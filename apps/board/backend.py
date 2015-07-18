@@ -1,5 +1,6 @@
 # -*- coding: utf-8
 from apps.board.models import *
+from django.core.exceptions import ObjectDoesNotExist
 import datetime
 
 
@@ -12,10 +13,9 @@ def _get_post_list(request, item_per_page=15):
         page = 1
     board_querystring = ''
     if board_filter:
-        board = Board.objects.filter(id=board_filter)
-        if board:
-            board = board[0]
-        else:
+        try:
+            board = Board.objects.get(id=board_filter)
+        except:
             return ([], [])
         board_querystring = 'board='+str(board.id)
     post_count = 0
@@ -122,7 +122,7 @@ def _get_board_list():
 def _get_current_board(request):
     board = {}
     try:
-        board_model = Board.objects.filter(id=request.GET.get('board'))[0]
+        board_model = Board.objects.get(id=request.GET.get('board'))
         board['board_id'] = board_model.id
         board['board_name'] = board_model.name
         board['querystring'] = '?board='+str(board_model.id)
@@ -148,11 +148,10 @@ def _get_querystring(request):
 
 
 def _get_content(request, post_id):
-    board_post = BoardPost.objects.filter(id=post_id)
-    if board_post:
-        board_post = board_post[0]
-    else:
-        return (_get_post(request, 0), [])
+    try:
+        board_post = BoardPost.objects.get(id=post_id)
+    except ObjectDoesNotExist:
+        return ({}, [])
     post = _get_post(request, board_post.board_content)
     comment_list = []
     for board_comment in board_post.board_comment.all():
@@ -200,12 +199,12 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         try:
             if is_post_or_comment == 'Post':
                 board_post_id = int(request.POST.get('board_post_id', 0))
-                board_post = BoardPost.objects.filter(id=board_post_id)[0]
+                board_post = BoardPost.objects.get(id=board_post_id)
                 board_content = board_post.board_content
                 author = board_post.author
             elif is_post_or_comment == 'Comment':
                 board_comment_id = int(request.POST.get('board_comment_id', 0))
-                board_comment = BoardComment.objects.filter(id=board_comment_id)[0]
+                board_comment = BoardComment.objects.get(id=board_comment_id)
                 board_content = board_comment.board_content
                 author = board_comment.author
             else:
@@ -235,9 +234,9 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_post = BoardPost()
         try:
-            board_post.board = Board.objects.filter(id=board)[0]
-            board_post.board_category = BoardCategory.objects.filter(name=category, board=board_post.board)[0]
-        except IndexError:
+            board_post.board = Board.objects.get(id=board)
+            board_post.board_category = BoardCategory.objects.get(name=category, board=board_post.board)
+        except ObjectDoesNotExist:
             return
         board_content.save()
         board_post.board_content = board_content
@@ -257,14 +256,14 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         if modify:
             try:
                 board_comment_id = request.POST.get('board_comment_id', 0)
-                board_comment = BoardComment.objects.filter(id=board_comment_id)[0]
-            except:
+                board_comment = BoardComment.objects.get(id=board_comment_id)
+            except ObjectDoesNotExist:
                 return
         else:
             board_comment = BoardComment()
             try:
-                board_comment.board_post = BoardPost.objects.filter(id=board_post_id)[0]
-            except IndexError:
+                board_comment.board_post = BoardPost.objects.get(id=board_post_id)
+            except ObjectDoesNotExist:
                 return
         board_comment.author = user_profile
         board_content.save()
