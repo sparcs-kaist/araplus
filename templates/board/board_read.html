@@ -1,5 +1,5 @@
 
-{% extends "base.html" %}
+{% extends "board/board_list.html" %}
 {% block js %}
 <script>
     $(document).ready(function(){
@@ -151,7 +151,7 @@
     });
 </script>
 {% endblock %}
-{% block content %}
+{% block board_read %}
 <div class="container">
     <div class="col-md-12">
         <div class="panel panel-success">
@@ -259,58 +259,7 @@
         </div>
         {% endif %}
 
-	<table style="width:100%">
-		<thead>
-			<tr>
-				<th width="150">user</th>
-                <th width="150">
-                    <div class="dropdown">                  
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">{{current_board.board_name|default:"All"}}
-                          <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                            <li><a href="./">All</a></li>
-                            {% for bd in board_list %}
-                            <li><a href="{{bd.querystring}}">{{ bd.board_name }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-				</th>
-				<th width="350">title</th>
-				<th width="100">+/-</th>
-				<th width="150">date</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for pst in post_list %}
-				<tr>
-					<td width="150">{{pst.username}}</td>
-                    <td width="150"><a href="../{{pst.board.querystring}}">{{pst.board.board_name}}</a></td>
-					{%if pst.is_notice%}
-					<td width="350"><a href="/board/{{pst.post_id}}/{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
-					{%else%}
-					<td width="350"><a href="/board/{{pst.post_id}}/{{querystring}}">{{pst.title}}</a></td>
-					{%endif%}
-					<td width="100">+{{pst.vote.up}}/-{{pst.vote.down}}</td>
-					<td width="150">{{pst.created_time}}</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-    </table>
-    <button class="btn btn-warn">
-        {% if is_adult %}
-		<a href="/board/{{querystring}}&adult_filter=false" id='2'>See Adult</a>
-        {% else %}
-		<a href="/board/{{querystring}}&adult_filter=true" id='1'>Filter Adult Post</a>
-        {% endif %}
-    </button>
-	<button class="btn btn-normal"><a href="/board/post/{{current_board.querystring}}">Write</a></button>
-		<div class="paginator">
-			{%for page in paginator%}
-			<a href="/board/{{page.querystring}}">{{page.page}}</a>
-			{%endfor%}
-		</div>
-</div>   
+    </div>   
 </div>
 
 </div>

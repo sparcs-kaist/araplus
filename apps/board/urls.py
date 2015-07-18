@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 
 urlpatterns = [
-    url(r'^$', 'apps.board.views.post_list'),
+    url(r'^$', 'apps.board.views.post_list', name='post_list'),
     url(r'^post/$', 'apps.board.views.post_write'),
     url(r'^([1-9][0-9]*)/$', 'apps.board.views.post_read'),
     url(r'^([1-9][0-9]*)/modify/$', 'apps.board.views.post_modify'),
