@@ -7,7 +7,7 @@
             var board_comment_id=$(this).attr("id").slice(3);
 	   
             var content = $("#comment"+board_comment_id).text();
-            var mod_comment = "<form action='./comment_mod/' method='POST'>"+
+            var mod_comment = "<form action='./comment_mod/{{querystring}}' method='POST'>"+
                 "{% csrf_token %}"+
                 "<input type='hidden' name='board_comment_id' value=" + board_comment_id + ">"+ 
                 "<input type='hidden' name='board_post_id' value={{post.id}}>"+
@@ -23,7 +23,7 @@
         });
         $(".re_comment").click(function(){
             var board_comment_id=$(this).attr("id").slice(11);
-            var write_comment = "<form action='./re_comment/' method='POST'>"+
+            var write_comment = "<form action='./re_comment/{{querystring}}' method='POST'>"+
                 "{%csrf_token%}"+
                 "<input type='hidden' name='board_comment_id' value="+board_comment_id+">"+
                 "<div class='form-group'>"+
@@ -314,7 +314,7 @@
         {% endfor %}
         {% if not post.deleted %}
         <div>
-            <form action="./comment/" method="POST">
+            <form action="./comment/{{querystring}}" method="POST">
                 {%csrf_token%}
                 <input type="hidden" name="board_post_id" value="{{ post.id }}">
                 <div class="form-group">

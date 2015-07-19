@@ -89,21 +89,24 @@ def post_modify(request, post_id):
 def comment_write(request, post_id_check):
     if request.method == 'POST':
         post_id = _write_post(request, 'Comment', post_id_check)
-    return redirect('../')
+    querystring = _get_querystring(request)
+    return redirect('../'+querystring)
 
 
 @login_required(login_url='/session/login')
 def comment_modify(request, post_id_check):
     if request.method == 'POST':
         post_id = _write_post(request, 'Comment', post_id_check, True)
-    return redirect('../')
+    querystring = _get_querystring(request)
+    return redirect('../'+querystring)
 
 
 @login_required(login_url='/session/login')
 def re_comment_write(request):
     if request.method == 'POST':
         post_id = _write_post(request, 'Re-Comment')
-    return redirect('../')
+    querystring = _get_querystring(request)
+    return redirect('../'+querystring)
 
 
 @login_required(login_url='/session/login')
