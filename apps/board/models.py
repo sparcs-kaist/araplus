@@ -46,9 +46,12 @@ class BoardComment(models.Model):
                                          null=False)
     board_post = models.ForeignKey('BoardPost',
                                    related_name="board_comment",
-                                   null=False)
+                                   null=True)
     author = models.ForeignKey('session.UserProfile',
                                related_name="board_comment")
+    original_comment = models.ForeignKey('BoardComment',
+                                         related_name='re_comment',
+                                         null=True)
 
     def __str__(self):
         created_time = self.board_content.created_time

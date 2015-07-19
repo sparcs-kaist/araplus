@@ -100,6 +100,13 @@ def comment_modify(request, post_id_check):
 
 
 @login_required(login_url='/session/login')
+def re_comment_write(request):
+    if request.method == 'POST':
+        post_id = _write_post(request, 'Re-Comment')
+    return redirect('../')
+
+
+@login_required(login_url='/session/login')
 def post_list(request):
     get_post_list = _get_post_list(request)
     post_list = get_post_list[0]

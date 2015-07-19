@@ -21,6 +21,22 @@
                                     "</button></div></div></form>"
             $(mod_comment).replaceAll("#comment_content"+board_comment_id);
         });
+        $(".re_comment").click(function(){
+            var board_comment_id=$(this).attr("id").slice(11);
+            var write_comment = "<form action='./re_comment/' method='POST'>"+
+                "{%csrf_token%}"+
+                "<input type='hidden' name='board_comment_id' value="+board_comment_id+">"+
+                "<div class='form-group'>"+
+                "    <label>Anonymous</label>"+
+                "    <input type='checkbox' name='anonymous'>"+
+                "</div>"+
+                "<div class='form-group'>"+
+                "    <textarea class='form-control' rows='3' name='content'></textarea>"+
+                "</div>"+
+                "<button type='submit' class='btn btn-normal col-md-1 col-md-offset-11'>Submit</button>"+
+                "</form>";
+            $("#re_comment_write"+board_comment_id).html(write_comment);
+        });
 		$(".vote").click(function() {
 			var vote_uid;
 			var vote_url;
@@ -220,7 +236,7 @@
                     <div id="comment{{comment.id}}">{{ comment.content|safe }}</div>
                     <div class="col-md-12">
 						<div class="row">
-						    <div class="col-md-7"></div>
+						    <div class="col-md-6"></div>
                             {% if not comment.deleted %}
                             <div class="dropdown col-md-1">
                                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -238,12 +254,62 @@
                             {% if comment.return %}			
 							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
                             <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
+                            {% else %}
+                            <div class="col-md-2"></div>
+                            {% endif %}
+                            <button class="btn btn-info col-md-1 re_comment" id="re_comment_{{comment.id}}">Re-comment</button>
+                            {% endif %}		
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% for re_comment in comment.re_comment_list %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div>
+                    <span> {{ re_comment.username }}</span>
+                </div>
+                <div> 
+                    <span class="col-md-10">{{re_comment.created_time}}</span>
+                    <span id="vote_{{re_comment.content_id}}">추천 +{{re_comment.vote.up}}/-{{re_comment.vote.down}}</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="comment_content{{ re_comment.id }}">
+                    <div id="comment{{re_comment.id}}">{{ re_comment.content|safe }}</div>
+                    <div class="col-md-12">
+						<div class="row">
+						    <div class="col-md-6"></div>
+                            {% if not re_comment.deleted %}
+                            <div class="dropdown col-md-1">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    Report
+                                    <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                        <li><a href="#" class="report" id="report_{{re_comment.content_id}}">신고</a></li>
+                                        <li><a href="#" class="adult" id="adult_{{re_comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="political" id="political_{{re_comment.content_id}}">보내야한다</a></li>
+                                </ul>
+                            </div>
+                            <button class="btn btn-success col-md-1 vote up" id="up_{{re_comment.content_id}}">Up</button>
+                            <button class="btn btn-danger col-md-1 vote down" id="down_{{re_comment.content_id}}">Down</button>
+                            {% if re_comment.return %}			
+							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{re_comment.id}}">Modify</button>
+                            <button class="btn btn-normal col-md-1 delete" id="delete_{{re_comment.content_id}}">Delete</button>
+                            {% else %}
+                            <div class="col-md-2"></div>
                             {% endif %}
                             {% endif %}		
 						</div>
                     </div>
                 </div>
             </div>
+        </div>
+        {% endfor %}
+
+        <div id="re_comment_write{{comment.id}}">
         </div>
         {% endfor %}
         {% if not post.deleted %}

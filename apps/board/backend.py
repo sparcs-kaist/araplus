@@ -152,10 +152,15 @@ def _get_content(request, post_id):
         board_post = BoardPost.objects.get(id=post_id)
     except ObjectDoesNotExist:
         return ({}, [])
-    post = _get_post(request, board_post.board_content)
+    post = _get_post(request, board_post, 'Post')
     comment_list = []
     for board_comment in board_post.board_comment.all():
-        comment = _get_post(request, board_comment.board_content, True)
+        comment = _get_post(request, board_comment, 'Comment')
+        re_comment_list = []
+        for board_re_comment in board_comment.re_comment.all():
+            re_comment = _get_post(request, board_re_comment, 'Re-Comment')
+            re_comment_list.append(re_comment)
+        comment['re_comment_list'] = re_comment_list
         comment_list.append(comment)
     best_comment = {}
     best_vote = 0
@@ -169,18 +174,20 @@ def _get_content(request, post_id):
     return (post, comment_list)
 
 
-def _get_post(request, board_content, is_comment=False):
+def _get_post(request, board_post, type):
     post = {}
-    if is_comment:
-        board_post = board_content.board_comment
-    else:
-        board_post = board_content.board_post
+    if type == 'Comment' or type == 'Re-Comment':
+        pass
+    elif type == 'Post':
         post['title'] = board_post.title
         post['board'] = board_post.board.name
         post['board_id'] = board_post.board.id
         post['category'] = board_post.board_category.name
+    else:
+        return post
     userprofile = board_post.author
     user = userprofile.user
+    board_content = board_post.board_content
     if board_content.is_deleted:
         post['title'] = '--Deleted--'
         post['content'] = '--Deleted--'
@@ -200,6 +207,7 @@ def _get_post(request, board_content, is_comment=False):
 
 
 def _write_post(request, is_post_or_comment, check=0, modify=False):
+    print is_post_or_comment
     user_profile = request.user.userprofile
     content = request.POST.get('content', '')
     is_anonymous = request.POST.get('anonymous', False)
@@ -211,7 +219,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
                 board_post = BoardPost.objects.get(id=board_post_id)
                 board_content = board_post.board_content
                 author = board_post.author
-            elif is_post_or_comment == 'Comment':
+            elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':
                 board_comment_id = int(request.POST.get('board_comment_id', 0))
                 board_comment = BoardComment.objects.get(id=board_comment_id)
                 board_content = board_comment.board_content
@@ -257,11 +265,14 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
             board_post.board.post_count += 1
             board_post.board.save()
         return board_post.id
-    elif is_post_or_comment == 'Comment':
-        board_post_id = request.POST.get('board_post_id', 0)
-        if not check == board_post_id:
-            print 'not allowed'
-            return
+    elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':
+        if is_post_or_comment == 'Comment':
+            board_post_id = request.POST.get('board_post_id', 0)
+            if not check == board_post_id:
+                print 'not allowed'
+                return
+        else:
+            board_post_id = request.POST.get('board_comment_id', 0)
         if modify:
             try:
                 board_comment_id = request.POST.get('board_comment_id', 0)
@@ -271,13 +282,16 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_comment = BoardComment()
             try:
-                board_comment.board_post = BoardPost.objects.get(id=board_post_id)
+                if is_post_or_comment == 'Comment':
+                    board_comment.board_post = BoardPost.objects.get(id=board_post_id)
+                else:
+                    board_comment.original_comment = BoardComment.objects.get(id=board_post_id)
             except ObjectDoesNotExist:
                 return
         board_comment.author = user_profile
         board_content.save()
         board_comment.board_content = board_content
         board_comment.save()
-        return board_comment.board_post.id
+        return 0
     else:
         return
