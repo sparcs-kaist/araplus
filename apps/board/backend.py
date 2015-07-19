@@ -157,6 +157,15 @@ def _get_content(request, post_id):
     for board_comment in board_post.board_comment.all():
         comment = _get_post(request, board_comment.board_content, True)
         comment_list.append(comment)
+    best_comment = {}
+    best_vote = 0
+    for comment in comment_list:
+        if comment['vote']['up'] > 5 and comment['vote']['up'] > best_vote:
+            best_vote = comment['vote']['up']
+            best_comment = comment
+    if best_comment:
+        best_comment['best_comment'] = True
+        comment_list.insert(0, best_comment)
     return (post, comment_list)
 
 

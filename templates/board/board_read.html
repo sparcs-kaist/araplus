@@ -201,7 +201,11 @@
             </div>
         </div>
         {% for comment in comment_list %}
+        {% if comment.best_comment %}
+        <div class="panel panel-danger">
+        {% else %}
         <div class="panel panel-success">
+        {% endif %}
             <div class="panel-heading">
                 <div>
                     <span> {{ comment.username }}</span>
