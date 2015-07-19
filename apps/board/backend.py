@@ -294,3 +294,23 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         return 0
     else:
         return
+
+
+def _delete_post(request):
+    message = ''
+    board_content_id = request.GET.get('id', 0)
+    try:
+        board_content = BoardContent.objects.get(id=board_content_id)
+    except ObjectDoesNotExist:
+        return 'no post or comment'
+    if hasattr(board_content, 'board_post'):
+        author = board_content.board_post.author
+    elif hasattr(board_content, 'board_comment'):
+        author = board_content.board_comment.author
+    else:
+        return 'invalid content'
+    if author != request.user.userprofile:
+        return 'not allowed'
+    board_content.is_deleted = True
+    board_content.save()
+    return 'success'

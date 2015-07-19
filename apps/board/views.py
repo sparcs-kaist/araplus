@@ -6,6 +6,7 @@ from apps.board.models import *
 from apps.board.backend import _get_post_list, _get_board_list
 from apps.board.backend import _get_querystring, _get_content
 from apps.board.backend import _write_post, _get_current_board
+from apps.board.backend import _delete_post
 from django.utils import timezone
 import json
 
@@ -253,26 +254,7 @@ def vote_political(request):
 
 @login_required(login_url='/session/login')
 def delete(request):
-    message = ""
-    cid = request.GET.get('id')
-    _BoardContents = BoardContent.objects.filter(id=cid)
-    if _BoardContents:
-        BoardCont = _BoardContents[0]
-        if hasattr(BoardCont, 'boardpost'):
-            author = BoardCont.boardpost.author
-        elif hasattr(BoardCont, 'comment'):
-            author = BoardCont.comment.author
-        else:
-            message = "no post or comment"
-            return HttpResponse(message)
-        if author == request.user.userprofile:
-            BoardCont.is_deleted = True
-            BoardCont.save()
-            message = "success"
-        else:
-            message = "not allowed"
-    else:
-        message = "no content"
+    message = _delete_post(request)
     return HttpResponse(message)
 
 
