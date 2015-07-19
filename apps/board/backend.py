@@ -1,7 +1,7 @@
 # -*- coding: utf-8
 from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
-import datetime
+from django.utils import timezone
 
 
 def _get_post_list(request, item_per_page=15):
@@ -207,7 +207,6 @@ def _get_post(request, board_post, type):
 
 
 def _write_post(request, is_post_or_comment, check=0, modify=False):
-    print is_post_or_comment
     user_profile = request.user.userprofile
     content = request.POST.get('content', '')
     is_anonymous = request.POST.get('anonymous', False)
@@ -240,7 +239,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
     board_content.is_adult = bool(is_adult)
     if not modify:
         board_content.is_anonymous = bool(is_anonymous)
-        board_content.created_time = datetime.datetime.today()
+        board_content.created_time = timezone.now()
     if is_post_or_comment == 'Post':
         board = request.POST.get('board', 0)
         is_notice = request.POST.get('notice', False)

@@ -264,6 +264,8 @@
                 </div>
             </div>
         </div>
+        <div id="re_comment_write{{comment.id}}">
+        </div>
         {% for re_comment in comment.re_comment_list %}
         <div class="panel panel-info">
             <div class="panel-heading">
@@ -309,8 +311,6 @@
         </div>
         {% endfor %}
 
-        <div id="re_comment_write{{comment.id}}">
-        </div>
         {% endfor %}
         {% if not post.deleted %}
         <div>

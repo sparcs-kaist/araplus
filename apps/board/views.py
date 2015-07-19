@@ -6,7 +6,7 @@ from apps.board.models import *
 from apps.board.backend import _get_post_list, _get_board_list
 from apps.board.backend import _get_querystring, _get_content
 from apps.board.backend import _write_post, _get_current_board
-import datetime
+from django.utils import timezone
 import json
 
 
@@ -289,7 +289,7 @@ def report(request):
                 board_report.reason = reason
                 board_report.content = content
                 board_report.board_content = board_content
-                board_report.created_time = datetime.datetime.today()
+                board_report.created_time = timezone.now()
                 board_report.userprofile = request.user.userprofile
                 board_report.save()
                 message = 'success'
