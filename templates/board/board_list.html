@@ -8,6 +8,7 @@
         <table style="width:100%">
             <thead>
                 <tr>
+                    <th width="20"></th>
                     <th width="150">user</th>
                     <th width="150">
                         <div class="dropdown">                  
@@ -30,6 +31,7 @@
             <tbody>
                 {% for pst in post_list %}
                     <tr>
+                        <td width="20">{{pst.is_read}}</td>
                         <td width="150">{{pst.username}}</td>
                         <td width="150"><a href="{{post_list_url}}{{pst.board.querystring}}">{{pst.board.board_name}}</a></td>
                         {%if pst.is_notice%}

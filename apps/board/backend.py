@@ -58,6 +58,11 @@ def _get_post_list(request, item_per_page=15):
         post['vote'] = board_post.board_content.get_vote()
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
+        if BoardPostIs_read.objects.filter(board_post=board_post,
+                               userprofile=request.user.userprofile).exists():
+            post['is_read'] = ' '
+        else:
+            post['is_read'] = 'N'
         post_list.append(post)
     for board_post in board_post_all:
         post = {}
@@ -76,6 +81,11 @@ def _get_post_list(request, item_per_page=15):
         post['vote'] = board_post.board_content.get_vote()
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
+        if BoardPostIs_read.objects.filter(board_post=board_post,
+                               userprofile=request.user.userprofile).exists():
+            post['is_read'] = ' '
+        else:
+            post['is_read'] = 'N'
         post_list.append(post)
     paginator = []
     if page > 10:
@@ -152,6 +162,15 @@ def _get_content(request, post_id):
         board_post = BoardPost.objects.get(id=post_id)
     except ObjectDoesNotExist:
         return ({}, [])
+    try:
+        board_post_is_read = BoardPostIs_read.objects.get(board_post=board_post,
+                                          userprofile = request.user.userprofile)
+    except ObjectDoesNotExist:
+        board_post_is_read = BoardPostIs_read()
+        board_post_is_read.board_post = board_post
+        board_post_is_read.userprofile = request.user.userprofile
+    board_post_is_read.last_read = timezone.now()
+    board_post_is_read.save()
     post = _get_post(request, board_post, 'Post')
     comment_list = []
     for board_comment in board_post.board_comment.all():

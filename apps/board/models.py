@@ -127,3 +127,13 @@ class BoardPost(models.Model):
         return "title: %s created in %s, authored by %s" % (title,
                                                             created_time,
                                                             author)
+
+
+class BoardPostIs_read(models.Model):
+    userprofile = models.ForeignKey('session.UserProfile',
+                                    related_name='board_post_is_read')
+    board_post = models.ForeignKey('BoardPost',
+                                   related_name='board_post_is_read')
+    last_read = models.DateTimeField(null=False)
+    class Meta:
+        unique_together = ('userprofile', 'board_post',)

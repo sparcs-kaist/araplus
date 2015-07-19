@@ -36,15 +36,15 @@ def post_write(request):
 
 @login_required(login_url='/session/login')
 def post_read(request, post_id):
+    get_content = _get_content(request, post_id)
+    post = get_content[0]
+    comment_list = get_content[1]
     get_post_list = _get_post_list(request)
     post_list = get_post_list[0]
     paginator = get_post_list[1]
     board_list = _get_board_list()
     querystring = _get_querystring(request)
     current_board = _get_current_board(request)
-    get_content = _get_content(request, post_id)
-    post = get_content[0]
-    comment_list = get_content[1]
     return render(request,
                   'board/board_read.html',
                   {
