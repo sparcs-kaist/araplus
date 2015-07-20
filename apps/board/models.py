@@ -51,7 +51,8 @@ class BoardComment(models.Model):
                                related_name="board_comment")
     original_comment = models.ForeignKey('BoardComment',
                                          related_name='re_comment',
-                                         null=True)
+                                         null=True,
+                                         blank=True)
 
     def __str__(self):
         created_time = self.board_content.created_time
@@ -106,19 +107,25 @@ class Board(models.Model):
 
 class BoardCategory(models.Model):
     name = models.CharField(max_length=10, null=False)
-    board = models.ForeignKey('Board', related_name='board_category', null=False)
+    board = models.ForeignKey('Board',
+                              related_name='board_category',
+                              null=False)
 
 
 class BoardPost(models.Model):
     title = models.CharField(max_length=45, null=False)
     is_notice = models.BooleanField(default=False, null=False, db_index=True)
-    board = models.ForeignKey('Board', related_name='board', null=False, db_index=True)
+    board = models.ForeignKey('Board',
+                              related_name='board',
+                              null=False,
+                              db_index=True)
     author = models.ForeignKey('session.UserProfile',
                                related_name='board_post')
     board_content = models.OneToOneField('BoardContent', null=False,
                                          related_name='board_post')
     board_category = models.ForeignKey('BoardCategory',
-                                       related_name='board_post')
+                                       related_name='board_post',
+                                       null=True)
 
     def __str__(self):
         title = self.title
@@ -135,5 +142,6 @@ class BoardPostIs_read(models.Model):
     board_post = models.ForeignKey('BoardPost',
                                    related_name='board_post_is_read')
     last_read = models.DateTimeField(null=False)
+
     class Meta:
         unique_together = ('userprofile', 'board_post',)

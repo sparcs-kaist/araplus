@@ -8,7 +8,7 @@
             var bname = $(this).text() + " <span class='caret'></span>";
             $("#board_id").attr("value", bid);
             $("#dropdownMenu1").html(bname);
-            $("#dropdownMenu2").html("Plz Select Category<div class='caret'></div>");
+            $("#dropdownMenu2").html("------<div class='caret'></div>");
             $("#cateogry_name").attr("value","");
             $(".category").css("display", "none");
             $(".category_"+bid).removeAttr("style");
@@ -68,7 +68,7 @@
                 </ul>
                 </li>
                 <li>
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Plz select Category
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">------
                     <span class="caret"></span>
                  </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
