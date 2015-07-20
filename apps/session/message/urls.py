@@ -1,17 +1,14 @@
-from django.conf.urls import url
 from apps.session.urls import url
-from .. import views
 
 
-# This url is under "message/"
+# This url is under "session/message/"
 urlpatterns = [
-    url(r'^$', 'apps.session.views.send_message'),
-    url(r'check/', 'apps.session.views.send_message'),
-    url(r'thread/individual/(?P<nickname>[a-z A-Z 0-9]+)/',
-        'apps.session.views.check_thread'),
-    url(r'sent/', 'apps.session.views.check_sent_message'),
-    url(r'block/', 'apps.session.views.block'),
-    url(r'blocklist/', 'apps.session.views.show_block_list'),
+    url(r'^$', 'apps.session.message.views.check_message'),
+    url(r'^send/', 'apps.session.message.views.send_message'),
+    url(r'^thread/individual/(?P<nickname>[a-z A-Z 0-9]+)/',
+        'apps.session.message.views.check_thread'),
+    # ex) session/message/thread/individual/tonykim
+    url(r'^sent/', 'apps.session.message.views.check_sent_message'),
+    url(r'^block/', 'apps.session.message.views.block'),
+    url(r'^blocklist/', 'apps.session.message.views.show_block_list'),
 ]
-
-

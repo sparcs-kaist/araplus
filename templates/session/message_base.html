@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<a href="/session/message/" class="btn btn-default"> Send message </a>
-<a href="/session/checkmessage/" class="btn btn-default"> Check received message </a>
-<a href="/session/checksentmessage/" class="btn btn-default"> Check sent message </a></br>
-<a href="/session/messageblock/" class="btn btn-default"> Block message </a>
-<a href="/session/messageblocklist/" class="btn btn-default"> See block lists </a>
+<div class="container">
+<a href="/session/message/send" class="btn btn-default"> Send message </a>
+<a href="/session/message/" class="btn btn-default"> Check received message </a>
+<a href="/session/message/sent/" class="btn btn-default"> Check sent message </a></br>
+<a href="/session/message/block/" class="btn btn-default"> Block message </a>
+<a href="/session/message/blocklist/" class="btn btn-default"> See block lists </a>
 {% block message_content%}
 {% endblock %}
 </div>
