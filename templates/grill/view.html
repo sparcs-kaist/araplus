@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ARA Grill</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+    </script>
+    <script src="http://bit.sparcs.org:9779/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
+    <link rel="stylesheet" href="/media/css/grill/grill.css">
+    <script>
+
+
+        
+                                              
+    </script>
+</head>
+
+<body>
+    <div id="comment_container" class="comment-container">
+        <div id="comment_form_container comment_form" class="comment-form-container" method="POST">
+            <div id="comment_add_container" class="comment-add-container">
+                <textarea id="new_content" class="comment-addbox" placeholder="댓글을 입력하세요"></textarea>
+            </div>
+            <div id="comment_button_container" class="comment-button-container">
+                <a href="#comment_1"><button type="submit" id="first_comment_button" class="comment-button left">첫 코</button></a>
+                <div id="comment_right_container" class="comment-right-container">
+                  <div id="comment_length_container" class="comment-length-container">(<span id="text_counter">0</span>/140)</div>
+                    <button type="submit" id="add_comment_button" class="comment-button right">댓글달기</button>
+                </div>
+             </div>
+        </div>
+        <div id="comment_list_container" class="comment-list-container">
+            <ul id='result_list'>
+             {% if comments|length %}
+                 {% for comment in comments %}
+                    {% include 'grill/comments.html' %}
+                {% endfor %}
+             {% else %}
+            글이 없습니다.
+             {% endif %}
+            </ul>
+        </div>
+    </div>
+    <div id="content_container" class="content-container">
+        <div>
+            제목 : {{grill.title}}
+        </div>
+        <div>
+            작성자 : {{grill.author.nickname}}, 작성일 : {{grill.created_time}}, 최근댓글 : {{grill.updated_time}}
+        </div>
+        <div> Content : {{grill.content}} </div>
+    </div>
+</body>
+
+</html>

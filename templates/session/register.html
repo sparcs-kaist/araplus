@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Username</label>
+            <input type="username" class="form-control" name="username" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <label>Nickname</label>
+            <input type="text" class="form-control" name="nickname" placeholder="Nickname">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label>Confirm your password</label>
+            <input type="password" class="form-control" name="password_confirmation" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" name="email" placeholder="Password">
+        </div>      
+        <div class="form-group">
+            <label>First name</label>
+            <input type="text" class="form-control" name="first_name" placeholder="first name">
+        </div>
+        <div class="form-group">
+            <label>Last name</label>
+            <input type="text" class="form-control" name="last_name" placeholder="last name">
+        </div>
+        <button type="submit" class="btn btn-default">Create an account</button>
+    </form>
+    {{ error }}
+</div>
+{% endblock %}
+
+    
