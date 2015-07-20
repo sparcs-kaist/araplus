@@ -104,7 +104,7 @@ def check_thread(request, nickname):
 def check_sent_message(request):
     messages = Message.objects.filter(sender=request.user.userprofile)
     return render(request,
-                  'session/check_message.html', {'messages': messages})
+                  'session/check_sent_message.html', {'messages': messages})
 
 
 @login_required(login_url='/session/login')

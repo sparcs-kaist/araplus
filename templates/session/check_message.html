@@ -1,10 +1,14 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "session/message_base.html" %}
+{% block message_content %}
+<div class="container">
     <ul>
     {% for message in messages %}
-        <li> Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </li>
-        <li> Content : {{ message.content }} </li>
+        <li>
+            Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </br>
+            Content : {{ message.content }}
+        </li>
     {% endfor %}
     </ul>
+</div>
 {% endblock %}
 
