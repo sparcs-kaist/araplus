@@ -1,5 +1,5 @@
 from django.db import models
-# import apps.session.models
+import apps.session.models
 
 # Create your models here.
 
