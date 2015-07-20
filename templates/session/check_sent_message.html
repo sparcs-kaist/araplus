@@ -1,14 +1,18 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "session/message_base.html" %}
+{% block message_content %}
+<div class="container">
     <ul>
     {% for message in messages %}
-        <li> Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </li>
-        <li> Content : {{ message.content }} </li>
-        {% if message.is_read %}
-            <li> message is read by {{ message.receiver.nickname }} </li>
-        {% else %}
-            <li> message is not yet read </li>
-        {% endif %}
+        <li>
+            Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </br>
+            Content : {{ message.content }} </br>
+            {% if message.is_read %}
+                message is read by {{ message.receiver.nickname }} </br>
+            {% else %}
+                message is not yet read </br>
+            {% endif %}
+        </li>
     {% endfor %}
     </ul>
+</div>
 {% endblock %}

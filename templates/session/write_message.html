@@ -1,11 +1,5 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="container">
-    <a href="/session/checkmessage/" class="btn btn-default"> Check received message </a>
-    <a href="/session/checksentmessage/" class="btn btn-default"> Check sent message </a>
-    <a href="/session/messageblock/" class="btn btn-default"> Block message </a>
-    <a href="/session/messageblocklist/" class="btn btn-default"> See block lists </a>
-</div>
+{% extends "session/message_base.html" %}
+{% block message_content %}
 <div class="container">
     <form method="POST">
         {% csrf_token %}

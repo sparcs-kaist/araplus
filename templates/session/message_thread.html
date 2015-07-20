@@ -1,10 +1,10 @@
-{% extends "base.html" %}
-{% block content %}
-<div>
+{% extends "session/message_base.html" %}
+{% block message_content %}
+<div class="container">
     Message thread between {{ sender.nickname }} and {{ receiver.nickname }}
     
     {% for message in messages %}
-    <li>({{ message.created_time }}){{ message.sender.nickname }} : {{ message.content }}</li>
+    <li>{{ message.sender.nickname }} : {{ message.content }} ({{message.created_time}})</li>
     {% endfor %}
     
 </ul>
