@@ -13,19 +13,12 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import url
-
+from django.conf.urls import include, url
 
 urlpatterns = [
     url(r'^$', 'apps.session.views.main'),
     url(r'^login/', 'apps.session.views.user_login'),
     url(r'^logout/', 'apps.session.views.user_logout'),
     url(r'^register/', 'apps.session.views.user_register'),
-    url(r'^message/', 'apps.session.views.send_message'),
-    url(r'^checkmessage/', 'apps.session.views.check_message'),
-    url(r'^messagethread/individual/(?P<nickname>[a-z A-Z 0-9]+)',
-        'apps.session.views.check_thread'),
-    url(r'^checksentmessage/', 'apps.session.views.check_sent_message'),
-    url(r'^messageblock/', 'apps.session.views.block'),
-    url(r'^messageblocklist/', 'apps.session.views.show_block_list'),
+    url(r'^message/', include('apps.session.message.urls')),
 ]
