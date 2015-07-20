@@ -57,6 +57,7 @@ def _get_post_list(request, item_per_page=15):
         post['created_time'] = board_post.board_content.created_time
         post['post_id'] = board_post.id
         post['vote'] = board_post.board_content.get_vote()
+        post['comment_count'] = board_post.comment_count
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
         if BoardPostIs_read.objects.filter(board_post=board_post,
@@ -81,6 +82,7 @@ def _get_post_list(request, item_per_page=15):
         post['created_time'] = board_post.board_content.created_time
         post['post_id'] = board_post.id
         post['vote'] = board_post.board_content.get_vote()
+        post['comment_count'] = board_post.comment_count
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
         if BoardPostIs_read.objects.filter(board_post=board_post,
@@ -309,10 +311,14 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_comment = BoardComment()
             try:
+                
                 if is_post_or_comment == 'Comment':
                     board_comment.board_post = BoardPost.objects.get(id=board_post_id)
                 else:
                     board_comment.original_comment = BoardComment.objects.get(id=board_post_id)
+                board_comment.board_post.comment_count += 1
+                print board_comment.board_post.comment_count
+                board_comment.board_post.save()
             except ObjectDoesNotExist:
                 return
         board_comment.author = user_profile

@@ -124,8 +124,8 @@ class BoardPost(models.Model):
     board_content = models.OneToOneField('BoardContent', null=False,
                                          related_name='board_post')
     board_category = models.ForeignKey('BoardCategory',
-                                       related_name='board_post',
-                                       null=True)
+                                       related_name='board_post')
+    comment_count = models.IntegerField(default=0)
 
     def __str__(self):
         title = self.title

@@ -37,7 +37,7 @@
                         {%if pst.is_notice%}
                         <td width="350"><a href="{{post_list_url}}{{pst.post_id}}/{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
                         {%else%}
-                        <td width="350"><a href="{{post_list_url}}{{pst.post_id}}/{{querystring}}">{{pst.title}}</a></td>
+                        <td width="350"><a href="{{post_list_url}}{{pst.post_id}}/{{querystring}}">{{pst.title}} [{{pst.comment_count}}]</a></td>
                         {%endif%}
                         <td width="100">+{{pst.vote.up}}/-{{pst.vote.down}}</td>
                         <td width="150">{{pst.created_time}}</td>
