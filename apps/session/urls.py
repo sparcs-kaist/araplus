@@ -17,6 +17,7 @@ from django.conf.urls import url
 
 
 urlpatterns = [
+    url(r'^$', 'apps.session.views.main'),
     url(r'^login/', 'apps.session.views.user_login'),
     url(r'^logout/', 'apps.session.views.user_logout'),
     url(r'^register/', 'apps.session.views.user_register'),

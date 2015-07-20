@@ -144,3 +144,7 @@ def show_block_list(request):
                               receiver=request.user.userprofile)
     block.delete()
     return redirect('/session/messageblocklist')
+
+
+def main(request):
+    return render(request, 'session/main.html')
