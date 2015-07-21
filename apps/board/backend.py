@@ -348,3 +348,23 @@ def _delete_post(request):
     board_content.is_deleted = True
     board_content.save()
     return 'success'
+
+
+def _report(request):
+    content_id = request.POST.get('id', 0)
+    report_reason = request.POST.get('report_reason', '')
+    report_content = request.POST.get('report_content', '')
+    if report_reason == '' or report_reason == '0':
+        return 'no reason'
+    try:
+        board_content = BoardContent.objects.get(id=content_id)
+    except ObjectDoesNotExist:
+        return 'no content'
+    board_report = BoardReport()
+    board_report.reason = report_reason
+    board_report.content = report_content
+    board_report.board_content = board_content
+    board_report.created_time = timezone.now()
+    board_report.userprofile = request.user.userprofile
+    board_report.save()
+    return 'success'
