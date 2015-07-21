@@ -1,5 +1,5 @@
 from django.db import models
-import apps.session.models
+from apps.session.models import UserProfile
 
 # Create your models here.
 
@@ -48,7 +48,7 @@ class ChannelComment(models.Model):
     channel_post = models.ForeignKey('ChannelPost',
                                      related_name="channel_comment",
                                      null=False)
-    author = models.ForeignKey('session.UserProfile',
+    author = models.ForeignKey(UserProfile,
                                related_name="channel_comment")
 
     def __str__(self):
@@ -61,7 +61,7 @@ class ChannelContentVote(models.Model):
     channel_content = models.ForeignKey('ChannelContent',
                                         related_name="channel_content_vote",
                                         null=False)
-    userprofile = models.ForeignKey('session.UserProfile',
+    userprofile = models.ForeignKey(UserProfile,
                                     related_name="channel_content_vote")
     is_up = models.BooleanField(null=False)
 
@@ -73,14 +73,14 @@ class ChannelReport(models.Model):
     channel_content = models.ForeignKey('ChannelContent',
                                         related_name="channel_report",
                                         null=False)
-    userprofile = models.ForeignKey('session.UserProfile',
+    userprofile = models.ForeignKey(UserProfile,
                                     related_name="channel_report")
 
 
 class Channel(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=100, null=False)
-    author = models.ForeignKey('session.UserProfile', related_name="channel")
+    author = models.ForeignKey(UserProfile, related_name="channel")
     thumbnail = models.FileField(null=False)
     post_count = models.IntegerField(default=0)
 
@@ -109,7 +109,7 @@ class ChannelFavorite(models.Model):
     channel = models.ForeignKey('Channel',
                                 related_name="channel_favorite",
                                 null=False)
-    userprofile = models.ForeignKey('session.UserProfile',
+    userprofile = models.ForeignKey(UserProfile,
                                     related_name="channel_favorite")
 
 
@@ -117,6 +117,6 @@ class ChannelPostScrap(models.Model):
     channel_post = models.ForeignKey('ChannelPost',
                                      related_name="channel_post_scrap",
                                      null=False)
-    userprofile = models.ForeignKey('session.UserProfile',
+    userprofile = models.ForeignKey(UserProfile,
                                     related_name="channel_post_scrap",
                                     null=False)
