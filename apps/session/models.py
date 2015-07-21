@@ -53,13 +53,17 @@ class Block(models.Model):
         return "%s blocked message from %s" % (self.receiver, self.sender)
 
 
-"""
-class Group(models.Model):
-    members = models.ManyToManyField(UserProfile)
 
+class Group(models.Model):
+    members = models.ManyToManyField(UserProfile, related_name="groups")
+    name = models.CharField(max_length=30)
+
+    # second argument(userprofile) can be one object or list of objects
     def add_member(self, userprofile):
         self.members.add(userprofile)
+        self.save()
 
     def remove_member(self, userprofile):
         self.members.remove(userprofile)
-"""
+        self.save()
+

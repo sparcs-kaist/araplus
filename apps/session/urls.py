@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^logout/', 'apps.session.views.user_logout'),
     url(r'^register/', 'apps.session.views.user_register'),
     url(r'^message/', include('apps.session.message.urls')),
+    url(r'^group/', include('apps.session.group.urls')),
 ]
