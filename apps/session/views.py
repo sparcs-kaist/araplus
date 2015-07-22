@@ -50,6 +50,7 @@ def user_register(request):
     UserProfile.objects.create(user=new_user, nickname=nickname)
     return render(request, 'session/register_complete.html')
 
+
 # Session main page
 def main(request):
     return render(request, 'session/main.html')

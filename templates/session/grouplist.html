@@ -6,6 +6,11 @@
         <li>
         {{ group.name }}
         </li>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name='groupname' value={{ group.name }}>
+            <button type='submit'> Check message </button>
+        </form>
     {% endfor %}
     </ul>
 </div>

@@ -55,6 +55,7 @@ class Block(models.Model):
 class Group(models.Model):
     members = models.ManyToManyField(UserProfile, related_name="groups")
     name = models.CharField(max_length=30)
+
     # second argument(userprofile) can be one object or list of objects
     def add_member(self, userprofile):
         self.members.add(userprofile)
