@@ -22,11 +22,14 @@ def _get_post_list(request, item_per_page=15):
     if board_filter:
         board_post_notice = BoardPost.objects.filter(
             is_notice=True, board=board_filter).order_by('-id')
-        board_post = BoardPost.objects.filter(board=board_filter).order_by('-id')
+        board_post = BoardPost.objects.filter(
+            board=board_filter).order_by('-id')
         post_count = board.post_count
     else:
-        board_post_notice = BoardPost.objects.filter(is_notice=True).order_by('-id')
-        board_post = BoardPost.objects.filter(is_notice=False).order_by('-id')
+        board_post_notice = BoardPost.objects.filter(
+            is_notice=True).order_by('-id')
+        board_post = BoardPost.objects.filter(
+            is_notice=False).order_by('-id')
         for board in Board.objects.all():
             post_count += board.post_count
     if post_count == 0:
@@ -37,7 +40,8 @@ def _get_post_list(request, item_per_page=15):
     elif page > last_page:
         page = last_page
     board_post_notice = board_post_notice[:5]
-    board_post_all = board_post[(page*item_per_page-item_per_page):(page*item_per_page)]
+    board_post_all = board_post[
+        (page*item_per_page-item_per_page):(page*item_per_page)]
     post_list = []
     for board_post in board_post_notice:
         post = {}
@@ -168,8 +172,9 @@ def _get_content(request, post_id):
     except ObjectDoesNotExist:
         return ({}, [])
     try:
-        board_post_is_read = BoardPostIs_read.objects.get(board_post=board_post,
-                                          userprofile=request.user.userprofile)
+        board_post_is_read = BoardPostIs_read.objects.get(
+            board_post=board_post,
+            userprofile=request.user.userprofile)
     except ObjectDoesNotExist:
         board_post_is_read = BoardPostIs_read()
         board_post_is_read.board_post = board_post
@@ -245,7 +250,8 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
                 board_post = BoardPost.objects.get(id=board_post_id)
                 board_content = board_post.board_content
                 author = board_post.author
-            elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':
+            elif (is_post_or_comment == 'Comment'
+                    or is_post_or_comment == 'Re-Comment'):
                 board_comment_id = int(request.POST.get('board_comment_id', 0))
                 board_comment = BoardComment.objects.get(id=board_comment_id)
                 board_content = board_comment.board_content
@@ -281,7 +287,9 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         except ObjectDoesNotExist:
             return
         try:
-            board_post.board_category = BoardCategory.objects.get(name=category, board=board_post.board)
+            board_post.board_category = BoardCategory.objects.get(
+                name=category,
+                board=board_post.board)
         except ObjectDoesNotExist:
             pass
         board_content.save()
@@ -311,11 +319,12 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_comment = BoardComment()
             try:
-                
                 if is_post_or_comment == 'Comment':
-                    board_comment.board_post = BoardPost.objects.get(id=board_post_id)
+                    board_comment.board_post = BoardPost.objects.get(
+                        id=board_post_id)
                 else:
-                    board_comment.original_comment = BoardComment.objects.get(id=board_post_id)
+                    board_comment.original_comment = BoardComment.objects.get(
+                        id=board_post_id)
                 board_comment.board_post.comment_count += 1
                 print board_comment.board_post.comment_count
                 board_comment.board_post.save()
@@ -368,3 +377,47 @@ def _report(request):
     board_report.userprofile = request.user.userprofile
     board_report.save()
     return 'success'
+
+
+def _vote(request, vote_type, content_id):
+    user_profile = request.user.userprofile
+    try:
+        board_content = BoardContent.objects.get(id=content_id)
+        if vote_type == 'up' or vote_type == 'down':
+            is_up_or_down = (False, True)[vote_type == 'up']
+            try:
+                content_vote = BoardContentVote.objects.get(
+                    board_content=board_content,
+                    userprofile=user_profile)
+                if content_vote.is_up == is_up_or_down:
+                    content_vote.delete()
+                    return {'success': vote_type + ' canceled'}
+                else:
+                    content_vote.is_up = is_up_or_down
+                    content_vote.save()
+                    return {'success': 'changed to ' + vote_type}
+            except:
+                vote = BoardContentVote()
+                vote.is_up = is_up_or_down
+        elif vote_type == 'adult':
+            if BoardContentVoteAdult.objects.filter(
+                    board_content=board_content,
+                    userprofile=user_profile):
+                return {'success': 'Already voted' + vote_type}
+            else:
+                vote = BoardContentVoteAdult()
+        elif vote_type == 'political':
+            if BoardContentVotePolitical.objects.filter(
+                    board_content=board_content,
+                    userprofile=user_profile):
+                return {'success': 'Already voted ' + vote_type}
+            else:
+                vote = BoardContentVotePolitical()
+        else:
+            return {'fail': 'Wrong request'}
+        vote.board_content = board_content
+        vote.userprofile = user_profile
+        vote.save()
+        return {'success': 'vote ' + vote_type}
+    except ObjectDoesNotExist:
+        return {'fail': 'Unvalid ontent id'}

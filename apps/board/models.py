@@ -129,7 +129,7 @@ class BoardPost(models.Model):
                                        blank=True)
     comment_count = models.IntegerField(default=0)
 
-    def __str__(self):
+    def __unicode__(self):
         title = self.title
         created_time = self.board_content.created_time
         author = self.author.user
