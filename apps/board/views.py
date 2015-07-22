@@ -6,7 +6,7 @@ from apps.board.models import *
 from apps.board.backend import _get_post_list, _get_board_list
 from apps.board.backend import _get_querystring, _get_content
 from apps.board.backend import _write_post, _get_current_board
-from apps.board.backend import _delete_post, _report
+from apps.board.backend import _delete_post, _report, _vote
 from django.utils import timezone
 import json
 
@@ -135,120 +135,14 @@ def post_list(request):
 
 
 @login_required(login_url='/session/login')
-def up(request):
-    message = ""
-    id = request.GET.get('id')
-    _BoardContent = BoardContent.objects.filter(id=id)
-    if _BoardContent:
-        _BoardContent = _BoardContent[0]
-        _BoardContentVote = BoardContentVote.objects.filter(
-            board_content=_BoardContent,
-            userprofile=request.user.userprofile)
-        if _BoardContentVote:
-            vote = _BoardContentVote[0]
-            if vote.is_up:
-                vote.delete()
-                message = "success_up_cancle"
-            else:
-                vote.is_up = True
-                vote.save()
-                message = "success_up"
-        else:
-            vote = BoardContentVote()
-            vote.is_up = True
-            vote.userprofile = request.user.userprofile
-            vote.board_content = _BoardContent
-            vote.save()
-            message = "success_up"
-    else:
-        message = "fail"
+def content_vote(request, vote_type='', content_id=0):
     result = {}
-    result['message'] = message
-    result['vote'] = _BoardContent.get_vote()
-    return HttpResponse(json.dumps(result), content_type="application/json")
-
-
-@login_required(login_url='/session/login')
-def down(request):
-    message = ""
-    id = request.GET.get('id')
-    _BoardContent = BoardContent.objects.filter(id=id)
-    if _BoardContent:
-        _BoardContent = _BoardContent[0]
-        _BoardContentVote = BoardContentVote.objects.filter(
-            board_content=_BoardContent,
-            userprofile=request.user.userprofile)
-        if _BoardContentVote:
-            vote = _BoardContentVote[0]
-            if not vote.is_up:
-                vote.delete()
-                message = "success_down_cancle"
-            else:
-                vote.is_up = False
-                vote.save()
-                message = "success_down"
-        else:
-            vote = BoardContentVote()
-            vote.is_up = False
-            vote.userprofile = request.user.userprofile
-            vote.board_content = _BoardContent
-            vote.save()
-            message = "success_down"
-    else:
-        message = "fail"
-    result = {}
-    result['message'] = message
-    result['vote'] = _BoardContent.get_vote()
-    return HttpResponse(json.dumps(result), content_type="application/json")
-
-
-@login_required(login_url='/session/login')
-def vote_adult(request):
-    message = ""
-    id = request.GET.get('id')
-    _BoardContent = BoardContent.objects.filter(id=id)
-    if _BoardContent:
-        _BoardContent = _BoardContent[0]
-        _BoardContentVoteAdult = BoardContentVoteAdult.objects.filter(
-            board_content=_BoardContent,
-            userprofile=request.user.userprofile)
-        if _BoardContentVoteAdult:
-            message = "already voted_adult"
-        else:
-            vote = BoardContentVoteAdult()
-            vote.userprofile = request.user.userprofile
-            vote.board_content = _BoardContent
-            vote.save()
-            message = "success"
-    else:
-        message = "content not exist"
-    result = {}
-    result['message'] = message
-    return HttpResponse(json.dumps(result), content_type="application/json")
-
-
-@login_required(login_url='/session/login')
-def vote_political(request):
-    message = ""
-    id = request.GET.get('id')
-    _BoardContent = BoardContent.objects.filter(id=id)
-    if _BoardContent:
-        _BoardContent = _BoardContent[0]
-        _BoardContentVotePolitical = BoardContentVotePolitical.objects.filter(
-            board_content=_BoardContent,
-            userprofile=request.user.userprofile)
-        if _BoardContentVotePolitical:
-            message = "already voted_political"
-        else:
-            vote = BoardContentVotePolitical()
-            vote.userprofile = request.user.userprofile
-            vote.board_content = _BoardContent
-            vote.save()
-            message = "success"
-    else:
-        message = "content not exist"
-    result = {}
-    result['message'] = message
+    result['response'] = 'fail'
+    vote_result = _vote(request, vote_type, content_id)
+    if 'success' in vote_result:
+        result['response'] = 'success'
+        result['message'] = vote_result['success']
+        result['vote'] = BoardContent.objects.get(id=content_id).get_vote()
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 
