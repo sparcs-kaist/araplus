@@ -127,7 +127,7 @@ class BoardPost(models.Model):
                                        related_name='board_post',
                                        null=True,
                                        blank=True)
-    comment_count = models.IntegerField(default=0)
+
 
     def __unicode__(self):
         title = self.title
