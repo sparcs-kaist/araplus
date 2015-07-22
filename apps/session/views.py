@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from apps.session.models import UserProfile, Message, Block
+from apps.session.models import UserProfile, Message, Block, Group
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
@@ -144,3 +144,28 @@ def show_block_list(request):
                               receiver=request.user.userprofile)
     block.delete()
     return redirect('/session/messageblocklist')
+
+
+@login_required(login_url='/session/login')
+def show_group_list(request):
+    if request.method != "POST":
+        groups = Group.objects.filter(members=request.user.userprofile)
+        return render(request, 'session/group_list.html', {'groups':groups})
+
+    return redirect('/session/group/'+request.POST['checkname'])
+
+
+@login_required(login_url='/session/login')
+def make_group(request):
+    if request.method != "POST":
+        return render(request, 'session/make_group.html')
+
+    name = request.POST['name']
+    try:
+        tempgroup = Group.objects.get(name=name)
+    except Group.DoesNotExist:
+        newgroup=Group.objects.create(name=name)
+        newgroup.add_member(request.user.userprofile)
+        return redirect('/session/group/'+name+'/manage')
+    return render(request, 'session/make_group.html',
+                  {'error':'The name is already being used by other group'})

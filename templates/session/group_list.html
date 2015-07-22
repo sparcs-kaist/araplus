@@ -2,12 +2,12 @@
 {% block message_content %}
 <div class="container">
     <ul>
-    {% for block in blocks %}
-        <li>{{ block.sender.nickname }}</li>
+    {% for group in groups %}
+        <li>{{ group.name }}</li>
         <form method="POST">
             {% csrf_token %}
-            <input type="hidden" name='nickname' value={{ block.sender.nickname }} >
-            <button type='submit'> Unblock {{ block.sender.nickname }} </button>
+            <input type="hidden" name='checkname' value={{ group.name }} >
+            <button type='submit'> Check message </button>
         </form>
     {% endfor %}
     </ul>

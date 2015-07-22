@@ -27,4 +27,6 @@ urlpatterns = [
     url(r'^checksentmessage/', 'apps.session.views.check_sent_message'),
     url(r'^messageblock/', 'apps.session.views.block'),
     url(r'^messageblocklist/', 'apps.session.views.show_block_list'),
+    url(r'^grouplist/', 'apps.session.views.show_group_list'),
+    url(r'^makegroup/', 'apps.session.views.make_group'),
 ]
