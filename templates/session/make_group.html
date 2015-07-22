@@ -1,14 +1,13 @@
-{% extends "session/message_base.html" %}
-{% block message_content %}
-<div class="content">
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
     <form method="POST">
         {% csrf_token %}
         <div class="form-group">
-            <label>name</label>
-            <input type="text" class="form-control" name="name" placeholder="name">
+            <label> group name </label>
+            <input type="text" class="form-control" name="groupname" >
         </div>
-        <button type="submit" class="btn btn-default">Make</button>
+        <button type="submit" class="btn btn-default"> make group </button>
     </form>
-    {{ error }}
 </div>
 {% endblock %}

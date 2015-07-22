@@ -53,11 +53,13 @@ class Block(models.Model):
 
 
 class Group(models.Model):
-    name = models.TextField(max_length=24)
-    members = models.ManyToManyField(UserProfile)
-
+    members = models.ManyToManyField(UserProfile, related_name="groups")
+    name = models.CharField(max_length=30)
+    # second argument(userprofile) can be one object or list of objects
     def add_member(self, userprofile):
         self.members.add(userprofile)
+        self.save()
 
     def remove_member(self, userprofile):
         self.members.remove(userprofile)
+        self.save()
