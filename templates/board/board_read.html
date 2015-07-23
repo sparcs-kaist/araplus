@@ -39,7 +39,8 @@
         });
 		$(".vote").click(function() {
 			var vote_id =  $(this).attr("id").split('_'); 
-                        var vote_url = '/board/' + vote_id[0] + '/' + vote_id[1];
+            var vote_url = '/board/' + vote_id[0] + '/' + vote_id[1];
+            console.log(vote_id[0] + vote_id[1]);
 			$.ajax(
 			{
 				url : vote_url,
@@ -54,39 +55,7 @@
                                     }
 				}
 			});
-		});	
-		$(".adult").click(function() {
-			var vote_uid;
-			var vote_url;
-	        vote_uid = $(this).attr("id").slice(6);
-		    vote_url = '/board/vote_adult/';
-			$.ajax(
-			{
-				url : vote_url,
-				data : { id : vote_uid },
-				dataType : 'json',
-				success : function(data){
-					console.log(data.message);
-                    alert(data.message)
-				}
-			});
-		});	
-		$(".political").click(function() {
-			var vote_uid;
-			var vote_url;
-			vote_uid = $(this).attr("id").slice(10);
-			vote_url = '/board/vote_political/';
-			$.ajax(
-			{
-				url : vote_url,
-				data : { id : vote_uid },
-				dataType : 'json',
-				success : function(data){
-					console.log(data.message);
-                    alert(data.message)
-				}
-			});
-		});	
+		});
         $(".delete").click(function() {
             var yes=confirm("Do yo REALLY want to delete?");
             if(yes == true){
@@ -197,8 +166,8 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                                     <li><a href="javascript:;" class="report" id="report_{{post.content_id}}">신고</a></li>
-                                    <li><a href="javascript:;" class="adult" id="adult_{{post.content_id}}">가버렷</a></li>
-                                    <li><a href="javascript:;" class="political" id="political_{{post.content_id}}">보내야한다</a></li>
+                                    <li><a href="javascript:;" class="vote adult" id="adult_{{post.content_id}}">가버렷</a></li>
+                                    <li><a href="javascript:;" class="vote political" id="political_{{post.content_id}}">보내야한다</a></li>
                             </ul>
                         </div>
                         <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
@@ -241,8 +210,8 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                                         <li><a href="#" class="report" id="report_{{comment.content_id}}">신고</a></li>
-                                        <li><a href="#" class="adult" id="adult_{{comment.content_id}}">가버렷</a></li>
-                                        <li><a href="#" class="political" id="political_{{comment.content_id}}">보내야한다</a></li>
+                                        <li><a href="#" class="vote adult" id="adult_{{comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="vote political" id="political_{{comment.content_id}}">보내야한다</a></li>
                                 </ul>
                             </div>
                             <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
@@ -287,8 +256,8 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                                         <li><a href="#" class="report" id="report_{{re_comment.content_id}}">신고</a></li>
-                                        <li><a href="#" class="adult" id="adult_{{re_comment.content_id}}">가버렷</a></li>
-                                        <li><a href="#" class="political" id="political_{{re_comment.content_id}}">보내야한다</a></li>
+                                        <li><a href="#" class="vote adult" id="adult_{{re_comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="vote political" id="political_{{re_comment.content_id}}">보내야한다</a></li>
                                 </ul>
                             </div>
                             <button class="btn btn-success col-md-1 vote up" id="up_{{re_comment.content_id}}">Up</button>

@@ -184,6 +184,8 @@ def _get_content(request, post_id):
     post = _get_post(request, board_post, 'Post')
     comment_list = []
     for board_comment in board_post.board_comment.all():
+        if not board_comment.original_comment == None:
+            continue
         comment = _get_post(request, board_comment, 'Comment')
         re_comment_list = []
         for board_re_comment in board_comment.re_comment.all():
@@ -319,13 +321,11 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_comment = BoardComment()
             try:
-                if is_post_or_comment == 'Comment':
-                    board_comment.board_post = BoardPost.objects.get(
-                        id=board_post_id)
-                else:
+                if is_post_or_comment == 'Re-Comment':
                     board_comment.original_comment = BoardComment.objects.get(
                         id=board_post_id)
-                board_comment.board_post.save()
+                board_comment.board_post = BoardPost.objects.get(
+                        id=board_post_id)
             except ObjectDoesNotExist:
                 return
         board_comment.author = user_profile

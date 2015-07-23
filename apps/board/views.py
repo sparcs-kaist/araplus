@@ -136,6 +136,7 @@ def post_list(request):
 
 @login_required(login_url='/session/login')
 def content_vote(request, vote_type='', content_id=0):
+    print 1, vote_type, content_id
     result = {}
     result['response'] = 'fail'
     vote_result = _vote(request, vote_type, content_id)
@@ -154,6 +155,7 @@ def delete(request):
 
 @login_required(login_url='/session/login')
 def report(request):
+    print 1
     message = ''
     if request.method == 'POST':
         message = _report(request)
