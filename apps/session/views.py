@@ -3,22 +3,31 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from apps.session.models import UserProfile, Message
 from django.contrib.auth.decorators import login_required
+import json, urllib
 
 
 def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
+    if request.user.is_authenticated():
+        return redirect('/')
+    return redirect('http://bit.sparcs.org:22223/oauth/require?callback=http://bit.sparcs.org:23232/session/login/callback')
 
-        if user is not None and user.is_active:
-            login(request, user)
-            return redirect(request.POST['next'])
+
+def user_login_callback(request):
+    if request.method == "GET":
+        nexturl = request.GET.get('next', '/')
+        uid = request.GET['uid']
+        sso_profile = urllib.urlopen('http://bit.sparcs.org:22223/oauth/info?uid='+uid)
+        sso_profile = json.load(sso_profile)
+        username = sso_profile['username']
+        user_list = User.objects.filter(username=username)
+        if len(user_list) == 0:
+            request.session['info'] = sso_profile
+            return redirect('/session/register')
         else:
-            error = "Invalid login"
-        return render(request, 'session/login.html', {'error': error})
-    return render(request, 'session/login.html',
-                  {'next': request.GET.get('next', '/')})
+            user_list[0].backend = 'django.contrib.auth.backends.ModelBackend'
+            auth.login(request, user_list[0])
+            return redirect('http://naver.com/')
+    return render('/session/login.html', {'error': "Invalid login"})
 
 
 def user_logout(request):
