@@ -42,7 +42,7 @@ def user_login_callback(request):
             return redirect('/session/register')
         else:
             user_list[0].backend = 'django.contrib.auth.backends.ModelBackend'
-            auth.login(request, user_list[0])
+            login(request, user_list[0])
             return redirect(nexturl)
     return render('/session/login.html', {'error': "Invalid login"})
 
@@ -58,10 +58,10 @@ def user_register(request):
         return redirect('/session/login/')
 
     info = request.session['info']
-    if len(User.objects.filter(username=info['username']) > 0):
+    if len(User.objects.filter(username=info['username'])) > 0:
         del request.session['info']
         return redirect('/session/login/')
-    info = None
+
     if request.method == 'POST':
         nickname = request.POST['nickname']
         password = request.POST['password']
