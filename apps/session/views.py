@@ -1,8 +1,26 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from apps.session.models import UserProfile, Message
 from django.contrib.auth.decorators import login_required
+import re
+
+
+def validate_nickname(nickname):
+    if not re.match(r'[\w_-]{5,30}', nickname):
+        return False
+
+    user_profile = UserProfile.objects.filter(nickname=nickname)
+    if len(user_profile) > 0:
+        return False
+    return True
+
+
+def nickname_check(request):
+    if validate_nickname(request.GET.get('nickname', '')):
+        return HttpResponse(status=200)
+    return HttpResponse(status=400)
 
 
 def user_login(request):
@@ -24,31 +42,36 @@ def user_login(request):
 def user_logout(request):
     if request.user.is_authenticated():
         logout(request)
-    return redirect('/session/login')
+    return redirect('/session/login/')
 
 
 def user_register(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        if password != request.POST['password_confirmation']:
-            error = "Password doesn't match the confirmation"
-            return render(request, "session/register.html", {'error': error})
-        email = request.POST['email']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        new_user = User.objects.create_user(username=username,
-                                            email=email,
-                                            password=password,
-                                            first_name=first_name,
-                                            last_name=last_name)
+    #if 'info' not in request.session:
+    #    return redirect('/session/login/')
+
+    #info = request.session['info']
+    #if len(User.objects.filter(username=info['username']) > 0):
+    #    del request.session['info']
+    #    return redirect('/session/login/')
+    info = None
+    if request.method == 'POST':
         nickname = request.POST['nickname']
-        new_user_profile = UserProfile(user=new_user,
+        password = request.POST['password']
+        if validate_nickname(nickname):
+            user = User.objects.create_user(username=info['username'],
+                                            email=info['email'],
+                                            password=password,
+                                            first_name=info['first_name'],
+                                            last_name=info['last_name'])
+
+            user_profile = UserProfile(user=user,
+                                       gender=info['gender'],
+                                       birthday=info['birthday'],
                                        nickname=nickname)
-        new_user_profile.save()
+        user_profile.save()
 
         return render(request, 'session/register_complete.html')
-    return render(request, 'session/register.html')
+    return render(request, 'session/register.html', {'info': info})
 
 
 @login_required(login_url='/session/login/')

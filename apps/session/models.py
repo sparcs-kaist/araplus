@@ -2,8 +2,21 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+MALE = 'M'
+FEMALE = 'F'
+ETC = 'E'
+GENDER = (
+    (MALE, 'Male'),
+    (FEMALE, 'Female'),
+    (ETC, 'etc'),
+)
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
+    gender = models.CharField(max_length=1, choices=GENDER, default=ETC)
+    birthday = models.DateTimeField(blank=True, null=True)
+
     nickname = models.TextField(max_length=12)
     points = models.IntegerField(default=0)
 

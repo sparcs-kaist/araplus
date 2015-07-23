@@ -19,7 +19,8 @@ from django.conf.urls import url
 urlpatterns = [
     url(r'^login/', 'apps.session.views.user_login'),
     url(r'^logout/', 'apps.session.views.user_logout'),
-    url(r'^register/', 'apps.session.views.user_register'),
+    url(r'^register/', 'apps.session.views.user_register'), 
+    url(r'^nickname-check/', 'apps.session.views.nickname_check'),
     url(r'^message/', 'apps.session.views.send_message'),
     url(r'^checkmessage/', 'apps.session.views.check_message')
 ]

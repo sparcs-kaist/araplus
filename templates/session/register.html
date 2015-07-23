@@ -1,40 +1,51 @@
-{% extends "base.html" %}
+{% extends "session/base.html" %}
 {% block content %}
-<div class="container">
-    <form method="POST">
-        {% csrf_token %}
-        <div class="form-group">
-            <label>Username</label>
-            <input type="username" class="form-control" name="username" placeholder="Username">
+<h1>ARA Plus Signup</h1>
+<p>SPARCS SSO 계정으로 ARA에 가입합니다.</p>
+<form id="register" class="form-horizontal" action="/session/register/" method="post">
+	<fieldset>
+		{% csrf_token %}
+		<div class="form-group">
+			<label class="col-xs-2 control-label">Name <span class="required"></span></label>
+			<div class="form-group col-xs-5">
+				<p class="form-control-static">{{info.last_name}}</p>
+			</div>
+			<div class="form-group col-xs-3">
+				<p class="form-control-static">{{info.first_name}}</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-2 control-label">Nickname <span class="required"></span></label>
+			<div class="col-xs-8">
+                <input type="text" class="form-control" name="nickname" placeholder="nickname" required="required" maxlength="30" data-remote="/session/nickname-check/">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Nickname</label>
-            <input type="text" class="form-control" name="nickname" placeholder="Nickname">
+		<div class="form-group">
+			<label class="col-xs-2 control-label">Password <span class="required"></span></label>
+			<div class="form-group col-xs-4">
+				<input type="password" class="form-control" name="password" placeholder="pAss0wd!" id="password" required="required" maxlength="50" data-minlength="7">
+				<span class="help-block">Password must be at least 7 characters</span>
+			</div>
+			<div class="form-group col-xs-4">
+				<input type="password" class="form-control" name="password2" placeholder="Re-type password" data-match="#password" data-match-error="Not match!" required="required" maxlength="50">
+				<div class="help-block with-errors"></div>
+			</div>	
+		</div>
+		<div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <a class="btn btn-warning" href="/account/login/">Login</a>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password">
-        </div>
-        <div class="form-group">
-            <label>Confirm your password</label>
-            <input type="password" class="form-control" name="password_confirmation" placeholder="Password">
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" name="email" placeholder="Password">
-        </div>      
-        <div class="form-group">
-            <label>First name</label>
-            <input type="text" class="form-control" name="first_name" placeholder="first name">
-        </div>
-        <div class="form-group">
-            <label>Last name</label>
-            <input type="text" class="form-control" name="last_name" placeholder="last name">
-        </div>
-        <button type="submit" class="btn btn-default">Create an account</button>
-    </form>
-    {{ error }}
-</div>
-{% endblock %}
+    </fieldset>
+</form>
 
-    
+<script type="text/javascript">
+$(function() {
+	var option = {
+		disable: true,
+	};
+	$('#register').validator(option);
+});
+</script>
+{% endblock %}
