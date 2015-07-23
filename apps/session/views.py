@@ -26,7 +26,7 @@ def user_login_callback(request):
         else:
             user_list[0].backend = 'django.contrib.auth.backends.ModelBackend'
             auth.login(request, user_list[0])
-            return redirect('http://naver.com/')
+            return redirect(nexturl)
     return render('/session/login.html', {'error': "Invalid login"})
 
 
