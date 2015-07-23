@@ -5,16 +5,15 @@
         <h3> {{ group.name }} </h3>
         <ul>
         {% for message in messages %}
-            <li>{{ message.content }}</br>
-            {{ message.sender.nickname }}</li>
+        <li> {{ message.sender.nickname }} : {{ message.content }} </li>
         {% endfor %}
         </ul>
-    {% endif %}
     <form method="POST">
         {% csrf_token %}
         <input type="text" class="form-control" name="content" placeholder="message">
         <button type="submit" class="btn btn_default">Send</button>
     </form>
+    {% endif %}
     {{ error }}
 </div>
 {% endblock %}

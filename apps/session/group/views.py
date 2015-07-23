@@ -36,14 +36,10 @@ def group_message(request, groupname):
     except Group.DoesNotExist:
         return render(request, 'session/group_message.html',
                       {'group': None, 'error': 'The group does not exist'})
-    is_member = False
-    for member in group.members.all():
-        if(member == request.user.userprofile):
-            is_member = True
-    if is_member is False:
+    if not (request.user.userprofile in group.members.all()):
         return render(request, 'session/group_message.html',
                       {'group': None,
-                       'error': 'You are not a member of the group'})
+                       'error': 'You are not a member of this group'})
     messages = GroupMessage.objects.filter(receivers=group)
     messages = messages.order_by('created_time')
     if request.method != "POST":
@@ -62,14 +58,10 @@ def manage(request, groupname):
     except Group.DoesNotExist:
         return render(request, 'session/group_manage.html',
                       {'group': None, 'error': 'The group does not exist'})
-    is_member = False
-    for member in group.members.all():
-        if(member == request.user.userprofile):
-            is_member = True
-    if is_member is False:
+    if not (request.user.userprofile in group.members.all()):
         return render(request, 'session/group_manage.html',
                       {'group': None,
-                       'error': 'You are not a member of the group'})
+                       'error': 'You are not a member of this group'})
     members = group.members.all()
     if request.method != "POST":
         return render(request, 'session/group_manage.html',
