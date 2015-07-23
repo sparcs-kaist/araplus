@@ -63,9 +63,16 @@ def manage(request, groupname):
                       {'group': None,
                        'error': 'You are not a member of this group'})
     members = group.members.all()
-    if request.method != "POST":
+    if request.method == "GET":
         return render(request, 'session/group_manage.html',
                       {'group': group, 'members': members})
+
+    # DELETE request(remove self)
+    if request.method == "DELETE":
+        group.remove_member(request.user.userprofile)
+        return redirect('/session/group/')
+
+    # POST request(add member)
     try:
         invitee = UserProfile.objects.get(nickname=request.POST['nickname'])
     except UserProfile.DoesNotExist:
@@ -73,11 +80,10 @@ def manage(request, groupname):
                       {'group': group,
                        'members': members,
                        'error': 'The user does not exist'})
-    for member in members:
-        if member == invitee:
-            return render(request, 'session/group_manage.html',
-                          {'group': group,
-                           'members': members,
-                           'error': 'The user is already in this group'})
+    if invitee in members:
+        return render(request, 'session/group_manage.html',
+                      {'group': group,
+                       'members': members,
+                       'error': 'The user is already in this group'})
     group.add_member(invitee)
     return redirect('/session/group/message/'+group.name+'/manage/')
