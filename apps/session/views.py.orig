@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from apps.session.models import UserProfile, Message
 from django.contrib.auth.decorators import login_required
-import re, json, urllib
+<<<<<<< HEAD
+import re
 
 
 def validate_nickname(nickname):
@@ -21,6 +22,9 @@ def nickname_check(request):
     if validate_nickname(request.GET.get('nickname', '')):
         return HttpResponse(status=200)
     return HttpResponse(status=400)
+=======
+import json, urllib
+>>>>>>> 274de158e519088d36a0a9497517cfcaf6362fb9
 
 
 def user_login(request):
