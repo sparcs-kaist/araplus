@@ -26,6 +26,7 @@
             var write_comment = "<form action='./re_comment/{{querystring}}' method='POST'>"+
                 "{%csrf_token%}"+
                 "<input type='hidden' name='board_comment_id' value="+board_comment_id+">"+
+                "<input type='hidden' name='board_post_id' value={{post.id}}>"+
                 "<div class='form-group'>"+
                 "    <label>Anonymous</label>"+
                 "    <input type='checkbox' name='anonymous'>"+

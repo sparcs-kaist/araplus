@@ -104,6 +104,7 @@ def comment_modify(request, post_id_check):
 
 @login_required(login_url='/session/login')
 def re_comment_write(request):
+    print "rere"
     if request.method == 'POST':
         post_id = _write_post(request, 'Re-Comment')
     querystring = _get_querystring(request)

@@ -311,7 +311,8 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
                 print 'not allowed'
                 return
         else:
-            board_post_id = request.POST.get('board_comment_id', 0)
+            board_comment_id = request.POST.get('board_comment_id', 0)
+            board_post_id = request.POST.get('board_post_id', 0)
         if modify:
             try:
                 board_comment_id = request.POST.get('board_comment_id', 0)
@@ -323,7 +324,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
             try:
                 if is_post_or_comment == 'Re-Comment':
                     board_comment.original_comment = BoardComment.objects.get(
-                        id=board_post_id)
+                        id=board_comment_id)
                 board_comment.board_post = BoardPost.objects.get(
                         id=board_post_id)
             except ObjectDoesNotExist:
