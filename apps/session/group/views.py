@@ -11,7 +11,8 @@ def make_group(request):
     try:
         Group.objects.get(name=group_name)
         return render(request, 'session/make_group.html',
-                      {'error': 'The name is already being used by other group'})
+                      {'error':
+                          'The name is already being used by other group'})
     except Group.DoesNotExist:
         new_group = Group.objects.create(name=group_name)
     new_group.add_member(request.user.userprofile)
