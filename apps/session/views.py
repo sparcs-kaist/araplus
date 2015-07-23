@@ -46,13 +46,13 @@ def user_logout(request):
 
 
 def user_register(request):
-    #if 'info' not in request.session:
-    #    return redirect('/session/login/')
+    if 'info' not in request.session:
+        return redirect('/session/login/')
 
-    #info = request.session['info']
-    #if len(User.objects.filter(username=info['username']) > 0):
-    #    del request.session['info']
-    #    return redirect('/session/login/')
+    info = request.session['info']
+    if len(User.objects.filter(username=info['username']) > 0):
+        del request.session['info']
+        return redirect('/session/login/')
     info = None
     if request.method == 'POST':
         nickname = request.POST['nickname']
