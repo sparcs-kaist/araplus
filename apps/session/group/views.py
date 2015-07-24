@@ -44,7 +44,9 @@ def group_message(request, groupname):
     messages = messages.order_by('created_time')
     if request.method != "POST":
         return render(request, 'session/group_message.html',
-                      {'group': group, 'messages': messages})
+                      {'group': group,
+                       'me': request.user.userprofile,
+                       'messages': messages})
     GroupMessage.objects.create(content=request.POST['content'],
                                 sender=request.user.userprofile,
                                 receivers=group)

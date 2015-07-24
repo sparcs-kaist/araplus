@@ -1,16 +1,15 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "session/group_base.html" %}
+{% block group_content %}
 <div class="container">
     <ul>
     {% for group in groups %}
         <li>
-        {{ group.name }}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name='groupname' value={{ group.name }}>
+                <button type='submit' class="btn btn-default"> {{ group.name }} </button>
+            </form>
         </li>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name='groupname' value={{ group.name }}>
-            <button type='submit' class="btn btn-default"> Check message </button>
-        </form>
     {% endfor %}
     </ul>
 </div>

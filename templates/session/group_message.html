@@ -1,18 +1,24 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "session/group_base.html" %}
+{% block group_content %}
 <div class="container">
     {% if group != None %}
         <h3> {{ group.name }} </h3>
-        <ul>
-        {% for message in messages %}
-        <li> {{ message.sender.nickname }} : {{ message.content }} </li>
-        {% endfor %}
-        </ul>
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" class="form-control" name="content" placeholder="message">
-        <button type="submit" class="btn btn-default">Send</button>
-    </form>
+        <div>
+            {% for message in messages %}
+                {% if message.sender == me %}
+                    <div class="mybubble">
+                {% else %}
+                    <div class="bubble">
+                {% endif %}
+                    {{ message.sender.nickname }} : {{ message.content }}
+                </div>
+            {% endfor %}
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" class="form-control" name="content" placeholder="message">
+            <button type="submit" class="btn btn-default">Send</button>
+        </form>
     {% endif %}
     {{ error }}
 </div>
