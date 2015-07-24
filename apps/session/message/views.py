@@ -37,6 +37,13 @@ def check_message(request):
 
 
 @login_required(login_url='/session/login/')
+def go_thread(request):
+    if request.method != "POST":
+        return render(request, 'session/go_thread.html')
+    return redirect('/session/message/thread/'+request.POST['nickname']+'/')
+
+
+@login_required(login_url='/session/login/')
 def check_thread(request, nickname):
     receiver = request.user.userprofile
     sender = UserProfile.objects.get(nickname=nickname)

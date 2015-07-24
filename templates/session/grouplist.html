@@ -9,7 +9,7 @@
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name='groupname' value={{ group.name }}>
-            <button type='submit'> Check message </button>
+            <button type='submit' class="btn btn-default"> Check message </button>
         </form>
     {% endfor %}
     </ul>
