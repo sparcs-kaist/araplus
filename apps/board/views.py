@@ -11,16 +11,19 @@ from django.utils import timezone
 import json
 
 
+def home(request):
+    return redirect('all/')
+
+
 @login_required(login_url='/session/login')
-def post_write(request):
+def post_write(request, board_url):
     post = {}
     post['new'] = True
     if request.method == 'POST':
         post_id = _write_post(request, 'Post')
         if post_id:
-            querystring = _get_querystring(request)
             #  board_id = BoardPost.objects.filter(id=post_id)[0].board.id
-            return redirect('../' + str(post_id) + querystring)
+            return redirect('../' + str(post_id))
         else:
             return redirect('../')
     current_board = _get_current_board(request)
@@ -35,11 +38,11 @@ def post_write(request):
 
 
 @login_required(login_url='/session/login')
-def post_read(request, post_id):
+def post_read(request, board_url, post_id):
     get_content = _get_content(request, post_id)
     post = get_content[0]
     comment_list = get_content[1]
-    get_post_list = _get_post_list(request)
+    get_post_list = _get_post_list(request, board_url)
     post_list = get_post_list[0]
     paginator = get_post_list[1]
     board_list = _get_board_list()
@@ -104,7 +107,6 @@ def comment_modify(request, post_id_check):
 
 @login_required(login_url='/session/login')
 def re_comment_write(request):
-    print "rere"
     if request.method == 'POST':
         post_id = _write_post(request, 'Re-Comment')
     querystring = _get_querystring(request)
@@ -112,8 +114,8 @@ def re_comment_write(request):
 
 
 @login_required(login_url='/session/login')
-def post_list(request):
-    get_post_list = _get_post_list(request)
+def post_list(request, board_url):
+    get_post_list = _get_post_list(request, board_url)
     post_list = get_post_list[0]
     paginator = get_post_list[1]
     board_list = _get_board_list()
@@ -136,15 +138,15 @@ def post_list(request):
 
 
 @login_required(login_url='/session/login')
-def content_vote(request, vote_type='', content_id=0):
-    print 1, vote_type, content_id
+def content_vote(request):
     result = {}
     result['response'] = 'fail'
-    vote_result = _vote(request, vote_type, content_id)
-    if 'success' in vote_result:
-        result['response'] = 'success'
-        result['message'] = vote_result['success']
-        result['vote'] = BoardContent.objects.get(id=content_id).get_vote()
+    if request.method == 'POST':
+        vote_result = _vote(request)
+        if 'success' in vote_result:
+            result['response'] = 'success'
+            result['message'] = vote_result['success']
+            result['vote'] = vote_result['vote']
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 
@@ -156,7 +158,6 @@ def delete(request):
 
 @login_required(login_url='/session/login')
 def report(request):
-    print 1
     message = ''
     if request.method == 'POST':
         message = _report(request)

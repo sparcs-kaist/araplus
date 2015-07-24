@@ -40,20 +40,22 @@
         });
 		$(".vote").click(function() {
 			var vote_id =  $(this).attr("id").split('_'); 
-            var vote_url = '/board/' + vote_id[0] + '/' + vote_id[1];
+            var vote_url = 'vote/';
             console.log(vote_id[0] + vote_id[1]);
 			$.ajax(
 			{
 				url : vote_url,
+                type : "POST",
+                data : { vote_type : vote_id[0], vote_id : vote_id[1], csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
 				dataType : 'json',
-                                success : function(data){
-                                    if(data.response == 'success'){
-                                        $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
-                                        alert(data.message);
-                                    }
-                                    else{
-                                        alert('Failed');
-                                    }
+                success : function(data){
+                    if(data.response == 'success'){
+                        $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
+                        alert(data.message);
+                    }
+                    else{
+                        alert('Failed');
+                    }
 				}
 			});
 		});
@@ -62,7 +64,7 @@
             if(yes == true){
                 var delete_uid=$(this).attr("id").slice(7);
                 $.ajax({
-                    url: '/board/delete',
+                    url: 'delete',
                     data:{id: delete_uid},
                     success: function(data){
                         console.log(data);
@@ -115,7 +117,7 @@
             var report_reason = $("#report_reason").val()
             var report_content = $("#report_content").val()
             $.ajax({
-                url : "/board/report/",
+                url : "report/",
                 type : "POST",
                 data : { id : report_uid, report_reason : report_reason, report_content : report_content,csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
                 success : function(data){

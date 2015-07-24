@@ -4,34 +4,29 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
 
-def _get_post_list(request, item_per_page=15):
+def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
-    board_filter = request.GET.get('board')
     try:
         page = int(request.GET['page'])
     except:
         page = 1
-    board_querystring = ''
-    if board_filter:
+    if board_url != 'all':
         try:
-            board = Board.objects.get(id=board_filter)
+            board = Board.objects.get(name=board_url)
         except:
             return ([], [])
-        board_querystring = 'board='+str(board.id)
     post_count = 0
-    if board_filter:
-        board_post_notice = BoardPost.objects.filter(
-            is_notice=True, board=board_filter).order_by('-id')
-        board_post = BoardPost.objects.filter(
-            board=board_filter).order_by('-id')
-        post_count = board.post_count
-    else:
+    if board_url == 'all':
         board_post_notice = BoardPost.objects.filter(
             is_notice=True).order_by('-id')
+        board_post = BoardPost.objects.all().order_by('-id')
+        post_count = BoardPost.objects.count()
+    else:
+        board_post_notice = BoardPost.objects.filter(
+            is_notice=True, board=board).order_by('-id')
         board_post = BoardPost.objects.filter(
-            is_notice=False).order_by('-id')
-        for board in Board.objects.all():
-            post_count += board.post_count
+            board=board).order_by('-id')
+        post_count = board_post.count()
     if post_count == 0:
         post_count = 1
     last_page = (post_count-1)/item_per_page+1
@@ -100,28 +95,19 @@ def _get_post_list(request, item_per_page=15):
     if page > 10:
         paging = {}
         paging['page'] = 'prev'
-        if board_querystring:
-            paging['querystring'] = '?'+board_querystring+'&page='+str((page-page % 10))
-        else:
-            paging['querystring'] = '?page='+str((page-page % 10))
+        paging['querystring'] = '?page='+str((page-page % 10))
         paginator.append(paging)
     for i in range(page-(page-1) % 10, page-(page-1) % 10+10):
         if i > last_page:
             break
         paging = {}
         paging['page'] = str(i)
-        if board_querystring:
-            paging['querystring'] = '?'+board_querystring+'&page='+str(i)
-        else:
-            paging['querystring'] = '?page='+str(i)
+        paging['querystring'] = '?page='+str(i)
         paginator.append(paging)
     if page < last_page-(last_page-1) % 10:
         paging = {}
         paging['page'] = 'next'
-        if board_querystring:
-            paging['querystring'] = '?'+board_querystring+'&page='+str((page-(page-1) % 10+10))
-        else:
-            paging['querystring'] = '?page='+str((page-(page-1) % 10+10))
+        paging['querystring'] = '?page='+str((page-(page-1) % 10+10))
         paginator.append(paging)
     return (post_list, paginator)
 
@@ -285,7 +271,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_post = BoardPost()
         try:
-            board_post.board = Board.objects.get(id=board)
+            board_post.board = Board.objects.get(board=board)
         except ObjectDoesNotExist:
             return
         try:
@@ -378,8 +364,10 @@ def _report(request):
     return 'success'
 
 
-def _vote(request, vote_type, content_id):
+def _vote(request):
     user_profile = request.user.userprofile
+    vote_type = request.POST.get('vote_type', '')
+    content_id = request.POST.get('vote_id', '')
     try:
         board_content = BoardContent.objects.get(id=content_id)
         if vote_type == 'up' or vote_type == 'down':
@@ -390,11 +378,11 @@ def _vote(request, vote_type, content_id):
                     userprofile=user_profile)
                 if content_vote.is_up == is_up_or_down:
                     content_vote.delete()
-                    return {'success': vote_type + ' canceled'}
+                    return {'success': vote_type + ' canceled', 'vote': board_content.get_vote()}
                 else:
                     content_vote.is_up = is_up_or_down
                     content_vote.save()
-                    return {'success': 'changed to ' + vote_type}
+                    return {'success': 'changed to ' + vote_type, 'vote': board_content.get_vote()}
             except:
                 vote = BoardContentVote()
                 vote.is_up = is_up_or_down
@@ -402,14 +390,14 @@ def _vote(request, vote_type, content_id):
             if BoardContentVoteAdult.objects.filter(
                     board_content=board_content,
                     userprofile=user_profile):
-                return {'success': 'Already voted' + vote_type}
+                return {'success': 'Already voted' + vote_type, 'vote': board_content.get_vote()}
             else:
                 vote = BoardContentVoteAdult()
         elif vote_type == 'political':
             if BoardContentVotePolitical.objects.filter(
                     board_content=board_content,
                     userprofile=user_profile):
-                return {'success': 'Already voted ' + vote_type}
+                return {'success': 'Already voted ' + vote_type, 'vote': board_content.get_vote()}
             else:
                 vote = BoardContentVotePolitical()
         else:
@@ -417,6 +405,6 @@ def _vote(request, vote_type, content_id):
         vote.board_content = board_content
         vote.userprofile = user_profile
         vote.save()
-        return {'success': 'vote ' + vote_type}
+        return {'success': 'vote ' + vote_type, 'vote': board_content.get_vote()}
     except ObjectDoesNotExist:
         return {'fail': 'Unvalid ontent id'}

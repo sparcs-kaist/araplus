@@ -16,14 +16,15 @@ Including another URLconf
 from django.conf.urls import include, url
 
 urlpatterns = [
-    url(r'^$', 'apps.board.views.post_list', name='post_list'),
-    url(r'^post/$', 'apps.board.views.post_write'),
-    url(r'^([1-9][0-9]*)/$', 'apps.board.views.post_read'),
-    url(r'^([1-9][0-9]*)/modify/$', 'apps.board.views.post_modify'),
-    url(r'^([1-9][0-9]*)/comment/$', 'apps.board.views.comment_write'),
-    url(r'^([1-9][0-9]*)/comment_mod/$', 'apps.board.views.comment_modify'),
-    url(r'^[1-9][0-9]*/re_comment/$', 'apps.board.views.re_comment_write'),
-    url(r'^delete/$','apps.board.views.delete'),
-    url(r'^([a-z]*)/([1-9][0-9]*)/$', 'apps.board.views.content_vote'),
-    url(r'^report/$', 'apps.board.views.report'),
+    url(r'^$', 'apps.board.views.home'),
+    url(r'^([A-z]*)/$', 'apps.board.views.post_list', name='post_list'),
+    url(r'^([A-z]*)/post/$', 'apps.board.views.post_write'),
+    url(r'^([A-z]*)/([1-9][0-9]*)/$', 'apps.board.views.post_read'),
+    url(r'^[A-z]*/([1-9][0-9]*)/modify/$', 'apps.board.views.post_modify'),
+    url(r'^[A-z]*/([1-9][0-9]*)/comment/$', 'apps.board.views.comment_write'),
+    url(r'^[A-z]*/([1-9][0-9]*)/comment_mod/$', 'apps.board.views.comment_modify'),
+    url(r'^[A-z]*/[1-9][0-9]*/re_comment/$', 'apps.board.views.re_comment_write'),
+    url(r'^[A-z]*/[1-9][0-9]*/delete/$','apps.board.views.delete'),
+    url(r'^[A-z]*/[1-9][0-9]*/vote/$', 'apps.board.views.content_vote'),
+    url(r'^[A-z]*/[1-9][0-9]*/report/$', 'apps.board.views.report'),
 ]
