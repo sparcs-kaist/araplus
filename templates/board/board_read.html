@@ -12,13 +12,13 @@
                 "<input type='hidden' name='board_comment_id' value=" + board_comment_id + ">"+ 
                 "<input type='hidden' name='board_post_id' value={{post.id}}>"+
                 "<div class='form-group'>"+
-                    "<textarea class='form-control' rows='2' name='content'>"+
-                        content+
-                        "</textarea>"+
-                            "<div class='col-md-12'>"+
-                                "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
-                                    "완료"+
-                                    "</button></div></div></form>"
+                "<textarea class='form-control' rows='2' name='content'>"+
+                content+
+                "</textarea>"+
+                "<div class='col-md-12'>"+
+                "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
+                "완료"+
+                "</button></div></div></form>";
             $(mod_comment).replaceAll("#comment_content"+board_comment_id);
         });
         $(".re_comment").click(function(){
@@ -40,11 +40,10 @@
         });
 		$(".vote").click(function() {
 			var vote_id =  $(this).attr("id").split('_'); 
-            var vote_url = 'vote/';
             console.log(vote_id[0] + vote_id[1]);
 			$.ajax(
 			{
-				url : vote_url,
+				url : "vote/",
                 type : "POST",
                 data : { vote_type : vote_id[0], vote_id : vote_id[1], csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
 				dataType : 'json',
@@ -64,8 +63,9 @@
             if(yes == true){
                 var delete_uid=$(this).attr("id").slice(7);
                 $.ajax({
-                    url: 'delete',
-                    data:{id: delete_uid},
+                    url: "delete/",
+                    type : "POST",
+                    data:{id: delete_uid, csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
                     success: function(data){
                         console.log(data);
                         location.reload();

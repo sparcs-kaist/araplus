@@ -152,13 +152,15 @@ def content_vote(request):
 
 @login_required(login_url='/session/login')
 def delete(request):
-    message = _delete_post(request)
+    message = 'invalid access'
+    if request.method == 'POST':
+        message = _delete_post(request)
     return HttpResponse(message)
 
 
 @login_required(login_url='/session/login')
 def report(request):
-    message = ''
+    message = 'invalid access'
     if request.method == 'POST':
         message = _report(request)
     return HttpResponse(message)

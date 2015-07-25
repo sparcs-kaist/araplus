@@ -32,7 +32,7 @@
                     <tr>
                         <td width="20">{{pst.is_read}}</td>
                         <td width="150">{{pst.username}}</td>
-                        <td width="150"><a href="/board/{{pst.board.board_url}}">{{pst.board.board_name}}</a></td>
+                        <td width="150"><a href="/board/{{pst.board.board_url}}/">{{pst.board.board_name}}</a></td>
                         {%if pst.is_notice%}
                         <td width="350"><a href="/board/{{current_board.board_url}}/{{pst.post_id}}/{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
                         {%else%}

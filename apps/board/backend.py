@@ -84,6 +84,8 @@ def _get_post_list(request, board_url='', item_per_page=15):
         post['comment_count'] = board_post.board_comment.count()
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
+        if board_post.board_content.is_deleted:
+            post['title'] = '--Deleted--'
         if BoardPostIs_read.objects.filter(board_post=board_post,
                                            userprofile=request.user.userprofile
                                            ).exists():
@@ -297,15 +299,20 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
             except ObjectDoesNotExist:
                 return
         else:
-            board_comment = BoardComment()
             try:
                 if is_post_or_comment == 'Re-Comment':
-                    board_comment.original_comment = BoardComment.objects.get(
-                        id=board_comment_id)
-                board_comment.board_post = BoardPost.objects.get(
-                        id=board_post_id)
+                    original_comment = BoardComment.objects.get(id=board_comment_id)
+                    if original_comment.board_content.is_deleted:
+                        return
+                board_post = BoardPost.objects.get(id=board_post_id)
+                if board_post.board_content.is_deleted:
+                    return
             except ObjectDoesNotExist:
                 return
+            board_comment = BoardComment()
+            if is_post_or_comment == 'Re-Comment':
+                board_comment.original_comment = original_comment
+            board_comment.board_post = board_post
         board_comment.author = user_profile
         board_content.save()
         board_comment.board_content = board_content
@@ -317,7 +324,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
 
 def _delete_post(request):
     message = ''
-    board_content_id = request.GET.get('id', 0)
+    board_content_id = request.POST.get('id', 0)
     try:
         board_content = BoardContent.objects.get(id=board_content_id)
     except ObjectDoesNotExist:
