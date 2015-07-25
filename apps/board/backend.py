@@ -50,7 +50,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
             post['username'] = board_post.author.user.username
         post_board = {}
         post_board['board_name'] = board_post.board.name
-        post_board['querystring'] = '?board='+str(board_post.board.id)
+        post_board['board_url'] = board_post.board.name
         post['board'] = post_board
         post['title'] = board_post.title
         post['created_time'] = board_post.board_content.created_time
@@ -75,7 +75,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
             post['username'] = board_post.author.user.username
         post_board = {}
         post_board['board_name'] = board_post.board.name
-        post_board['querystring'] = '?board='+str(board_post.board.id)
+        post_board['board_url'] = board_post.board.name
         post['board'] = post_board
         post['title'] = board_post.title
         post['created_time'] = board_post.board_content.created_time
@@ -95,19 +95,19 @@ def _get_post_list(request, board_url='', item_per_page=15):
     if page > 10:
         paging = {}
         paging['page'] = 'prev'
-        paging['querystring'] = '?page='+str((page-page % 10))
+        paging['url'] = str((page-page % 10))
         paginator.append(paging)
     for i in range(page-(page-1) % 10, page-(page-1) % 10+10):
         if i > last_page:
             break
         paging = {}
         paging['page'] = str(i)
-        paging['querystring'] = '?page='+str(i)
+        paging['url'] = str(i)
         paginator.append(paging)
     if page < last_page-(last_page-1) % 10:
         paging = {}
         paging['page'] = 'next'
-        paging['querystring'] = '?page='+str((page-(page-1) % 10+10))
+        paging['url'] = str((page-(page-1) % 10+10))
         paginator.append(paging)
     return (post_list, paginator)
 
@@ -118,37 +118,31 @@ def _get_board_list():
     for board_model in board_model_list:
         board = {}
         board['board_name'] = board_model.name
-        board['querystring'] = '?board='+str(board_model.id)
+        board['board_url'] = board_model.name
         board['board_id'] = board_model.id
         board_list.append(board)
     return board_list
 
 
-def _get_current_board(request):
+def _get_current_board(request, board_url):
     board = {}
     try:
-        board_model = Board.objects.get(id=request.GET.get('board'))
+        board_model = Board.objects.get(name=board_url)
         board['board_id'] = board_model.id
         board['board_name'] = board_model.name
-        board['querystring'] = '?board='+str(board_model.id)
+        board['board_url'] = board_model.name
     except:
-        board['board_id'] = None
-        board['board_name'] = None
+        board['board_id'] = 0
+        board['board_name'] = 'All'
+        board['board_url'] = 'all'
     return board
 
 
 def _get_querystring(request):
     querystring = ''
-    board_filter = request.GET.get('board')
-    page = request.GET.get('page')
-    if board_filter or page:
-        querystring = '?'
-        if board_filter:
-            querystring += 'board='+board_filter
-            if page:
-                querystring += '&page='+page
-        else:
-            querystring += 'page='+page
+    page = request.GET.get('page', '')
+    if page:
+        querystring += '?page='+page
     return querystring
 
 
@@ -271,7 +265,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_post = BoardPost()
         try:
-            board_post.board = Board.objects.get(board=board)
+            board_post.board = Board.objects.get(id=board)
         except ObjectDoesNotExist:
             return
         try:
@@ -286,9 +280,6 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         board_post.author = user_profile
         board_post.title = title
         board_post.save()
-        if not modify:
-            board_post.board.post_count += 1
-            board_post.board.save()
         return board_post.id
     elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':
         if is_post_or_comment == 'Comment':

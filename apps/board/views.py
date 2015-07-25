@@ -26,9 +26,9 @@ def post_write(request, board_url):
             return redirect('../' + str(post_id))
         else:
             return redirect('../')
-    current_board = _get_current_board(request)
+    current_board = _get_current_board(request, board_url)
     # official=request.user.userprofile.is_official
-    board_list = _get_board_list
+    board_list = _get_board_list()
     categories = BoardCategory.objects.all()
     return render(request,
                   'board/board_write.html',
@@ -47,7 +47,7 @@ def post_read(request, board_url, post_id):
     paginator = get_post_list[1]
     board_list = _get_board_list()
     querystring = _get_querystring(request)
-    current_board = _get_current_board(request)
+    current_board = _get_current_board(request, board_url)
     return render(request,
                   'board/board_read.html',
                   {
@@ -63,7 +63,7 @@ def post_read(request, board_url, post_id):
 
 
 @login_required(login_url='/session/login')
-def post_modify(request, post_id):
+def post_modify(request, board_url, post_id):
     try:
         board_post = BoardPost.objects.filter(id=post_id)[0]
         if request.user.userprofile != board_post.author:
@@ -78,7 +78,7 @@ def post_modify(request, post_id):
         return redirect('../')
     post = _get_content(request, post_id)[0]
     post['new'] = False
-    current_board = _get_current_board(request)
+    current_board = _get_current_board(request, board_url)
     board_list = _get_board_list()
     # official=request.user.userprofile.is_official
     categories = BoardCategory.objects.all()
@@ -120,7 +120,7 @@ def post_list(request, board_url):
     paginator = get_post_list[1]
     board_list = _get_board_list()
     querystring = _get_querystring(request)
-    current_board = _get_current_board(request)
+    current_board = _get_current_board(request, board_url)
     adult_filter = request.GET.get('adult_filter')
     is_adult = False
     if adult_filter == "true":
