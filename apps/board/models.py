@@ -4,7 +4,8 @@ import apps.session.models
 
 class BoardContent(models.Model):
     content = models.TextField(null=False)
-    created_time = models.DateTimeField(null=False)
+    created_time = models.DateTimeField(auto_now_add=True)
+    modified_time = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False, null=False)
     is_anonymous = models.BooleanField(default=False, null=False)
     is_adult = models.BooleanField(default=False, null=False)
@@ -88,7 +89,7 @@ class BoardContentVotePolitical(models.Model):
 class BoardReport(models.Model):
     reason = models.TextField(null=False)
     content = models.TextField(default='Write something')
-    created_time = models.DateTimeField(null=False)
+    created_time = models.DateTimeField(auto_now_add=True)
     board_content = models.ForeignKey('BoardContent',
                                       related_name="board_report",
                                       null=False)
@@ -142,7 +143,7 @@ class BoardPostIs_read(models.Model):
                                     related_name='board_post_is_read')
     board_post = models.ForeignKey('BoardPost',
                                    related_name='board_post_is_read')
-    last_read = models.DateTimeField(null=False)
+    last_read = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('userprofile', 'board_post',)

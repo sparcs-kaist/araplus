@@ -59,11 +59,14 @@ def _get_post_list(request, board_url='', item_per_page=15):
         post['comment_count'] = board_post.board_comment.count()
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
-        if BoardPostIs_read.objects.filter(board_post=board_post,
-                                           userprofile=request.user.userprofile
-                                           ).exists():
-            post['is_read'] = ' '
-        else:
+        try:
+            is_read = BoardPostIs_read.objects.get(board_post=board_post,
+                                          userprofile=request.user.userprofile)
+            if is_read.last_read > board_post.board_content.modified_time:
+                post['is_read'] = ' '
+            else:
+                post['is_read'] = 'U'
+        except ObjectDoesNotExist:
             post['is_read'] = 'N'
         post_list.append(post)
     for board_post in board_post_all:
@@ -86,11 +89,14 @@ def _get_post_list(request, board_url='', item_per_page=15):
             post['title'] = 'filtered'
         if board_post.board_content.is_deleted:
             post['title'] = '--Deleted--'
-        if BoardPostIs_read.objects.filter(board_post=board_post,
-                                           userprofile=request.user.userprofile
-                                           ).exists():
-            post['is_read'] = ' '
-        else:
+        try:
+            is_read = BoardPostIs_read.objects.get(board_post=board_post,
+                                          userprofile=request.user.userprofile)
+            if is_read.last_read > board_post.board_content.modified_time:
+                post['is_read'] = ' '
+            else:
+                post['is_read'] = 'U'
+        except ObjectDoesNotExist:
             post['is_read'] = 'N'
         post_list.append(post)
     paginator = []
@@ -256,7 +262,6 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
     board_content.is_adult = bool(is_adult)
     if not modify:
         board_content.is_anonymous = bool(is_anonymous)
-        board_content.created_time = timezone.now()
     if is_post_or_comment == 'Post':
         board = request.POST.get('board', 0)
         is_notice = request.POST.get('notice', False)
@@ -317,6 +322,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         board_content.save()
         board_comment.board_content = board_content
         board_comment.save()
+        board_post.board_content.save()
         return
     else:
         return
@@ -356,7 +362,6 @@ def _report(request):
     board_report.reason = report_reason
     board_report.content = report_content
     board_report.board_content = board_content
-    board_report.created_time = timezone.now()
     board_report.userprofile = request.user.userprofile
     board_report.save()
     return 'success'
