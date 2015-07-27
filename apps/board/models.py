@@ -4,8 +4,7 @@ import apps.session.models
 
 class BoardContent(models.Model):
     content = models.TextField(null=False)
-    created_time = models.DateTimeField(auto_now_add=True)
-    modified_time = models.DateTimeField(auto_now=True)
+    created_time = models.DateTimeField(null=False)
     is_deleted = models.BooleanField(default=False, null=False)
     is_anonymous = models.BooleanField(default=False, null=False)
     is_adult = models.BooleanField(default=False, null=False)
@@ -23,7 +22,7 @@ class BoardContent(models.Model):
     def get_vote(self):
         up = 0
         down = 0
-        for content_vote in self.board_content_vote.all():
+        for content_vote in self.content_vote.all():
             if content_vote.is_up:
                 up = up+1
             else:
@@ -43,17 +42,13 @@ class Attachment(models.Model):
 
 class BoardComment(models.Model):
     board_content = models.OneToOneField('BoardContent',
-                                         related_name="board_comment",
+                                         related_name="comment",
                                          null=False)
     board_post = models.ForeignKey('BoardPost',
-                                   related_name="board_comment",
-                                   null=True)
+                                   related_name="comment",
+                                   null=False)
     author = models.ForeignKey('session.UserProfile',
                                related_name="board_comment")
-    original_comment = models.ForeignKey('BoardComment',
-                                         related_name='re_comment',
-                                         null=True,
-                                         blank=True)
 
     def __str__(self):
         created_time = self.board_content.created_time
@@ -63,35 +58,35 @@ class BoardComment(models.Model):
 
 class BoardContentVote(models.Model):
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="board_content_vote",
+                                      related_name="content_vote",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name="board_content_vote")
+                                    related_name="board_comment_vote")
     is_up = models.BooleanField(null=False)
 
 
 class BoardContentVoteAdult(models.Model):
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="board_content_vote_adult",
+                                      related_name="content_vote_adult",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name="board_content_vote_adult")
+                                    related_name="board_comment_vote_adult")
 
 
 class BoardContentVotePolitical(models.Model):
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="board_content_vote_political",
+                                      related_name="content_vote_political",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name="board_content_vote_political")
+                                    related_name="board_comment_vote_political")
 
 
 class BoardReport(models.Model):
     reason = models.TextField(null=False)
-    content = models.TextField(default='Write something')
-    created_time = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+    created_time = models.DateTimeField(null=False)
     board_content = models.ForeignKey('BoardContent',
-                                      related_name="board_report",
+                                      related_name="report",
                                       null=False)
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="board_report")
@@ -100,6 +95,7 @@ class BoardReport(models.Model):
 class Board(models.Model):
     name = models.CharField(max_length=45, null=False)
     description = models.CharField(max_length=100, null=False)
+    post_count = models.IntegerField(default=0)
 
     def __str__(self):
         return "board %s" % self.name
@@ -107,43 +103,24 @@ class Board(models.Model):
 
 class BoardCategory(models.Model):
     name = models.CharField(max_length=10, null=False)
-    board = models.ForeignKey('Board',
-                              related_name='board_category',
-                              null=False)
+    board = models.ForeignKey('Board', related_name='category', null=False)
 
 
 class BoardPost(models.Model):
     title = models.CharField(max_length=45, null=False)
     is_notice = models.BooleanField(default=False, null=False, db_index=True)
-    board = models.ForeignKey('Board',
-                              related_name='board',
-                              null=False,
-                              db_index=True)
+    board = models.ForeignKey('Board', related_name='board', null=False, db_index=True)
     author = models.ForeignKey('session.UserProfile',
                                related_name='board_post')
-    board_content = models.OneToOneField('BoardContent', null=False,
-                                         related_name='board_post')
+    board_content = models.OneToOneField('BoardContent', null=False)
     board_category = models.ForeignKey('BoardCategory',
-                                       related_name='board_post',
-                                       null=True,
-                                       blank=True)
+                                       related_name='category',
+                                       null=False)
 
-
-    def __unicode__(self):
+    def __str__(self):
         title = self.title
         created_time = self.board_content.created_time
         author = self.author.user
         return "title: %s created in %s, authored by %s" % (title,
                                                             created_time,
                                                             author)
-
-
-class BoardPostIs_read(models.Model):
-    userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name='board_post_is_read')
-    board_post = models.ForeignKey('BoardPost',
-                                   related_name='board_post_is_read')
-    last_read = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('userprofile', 'board_post',)
