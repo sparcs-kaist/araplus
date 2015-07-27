@@ -51,10 +51,6 @@ coverage.xml
 *.log
 migrations/
 
-# node.js / npm
-node_modules/
-npm-debug.log
-
 # Sphinx documentation
 docs/_build/
 
@@ -66,6 +62,3 @@ target/
 
 # SQLITE3 Test database
 db.*
-
-# Mac OS Env
-.DS_Store

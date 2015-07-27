@@ -2,13 +2,13 @@
 {% block js %}
 <script>
     $(document).ready(function(){
-        $(".category_{{Cur_board.id|default:'1'}}").removeAttr("style");
+        $(".category_{{current_board.board_id|default:'1'}}").removeAttr("style");
         $(".board").click(function(){
             var bid = $(this).attr("id");
             var bname = $(this).text() + " <span class='caret'></span>";
             $("#board_id").attr("value", bid);
             $("#dropdownMenu1").html(bname);
-            $("#dropdownMenu2").html("Plz Select Category<div class='caret'></div>");
+            $("#dropdownMenu2").html("------<div class='caret'></div>");
             $("#cateogry_name").attr("value","");
             $(".category").css("display", "none");
             $(".category_"+bid).removeAttr("style");
@@ -50,22 +50,25 @@
             <input type="text" class="form-control" name="title" value="{{post.title}}" placeholder="title">
         </div>
         <div class="form-group">
-            <input type="hidden" class="form-control" id="board_id" name="board" value="{{ Cur_board.id}}">
+            <input type="hidden" class="form-control" id="board_id" name="board" value="{{ current_board.board_id|default:board_list.0.board_id}}">
             <input type="hidden" class="form-control" id="category_name" name="category">
+            {% if not post.new %}
+            <input type="hidden" class="form-control" id="board_post_id" name="board_post_id" value={{ post.id }}>
+            {% endif %}
             <ul class="nav nav-pills">
                 <li>
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{Cur_board.name}}
+                    {{current_board.board_name|default:board_list.0.board_name}}
                     <span class="caret"></span>
                  </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    {% for board in Boards %}
-                    <li><a href="javascript:;" class="board" id="{{board.id}}">{{ board.name }}</a></li>
+                    {% for board in board_list %}
+                    <li><a href="javascript:;" class="board" id="{{board.board_id}}">{{ board.board_name }}</a></li>
                     {% endfor %}
                 </ul>
                 </li>
                 <li>
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Plz select Category
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">------
                     <span class="caret"></span>
                  </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
