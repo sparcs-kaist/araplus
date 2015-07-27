@@ -18,6 +18,7 @@ from django.conf.urls import url
 
 urlpatterns = [
     url(r'^$', 'apps.channel.views.main'),
+    url(r'^register_channel/$', 'apps.channel.views.register_channel'),
     url(r'^post/$', 'apps.channel.views.post_write'),
     url(r'^([^/]+)/$', 'apps.channel.views.post_list'),
     url(r'^([^/]+)/([1-9][0-9]*)/$', 'apps.channel.views.post_read'),

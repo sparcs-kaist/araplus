@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block js %}
+<script>
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#cimage')
+                    .attr('src', e.target.result)
+                    .width(400)
+                    .height(300);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}
+{% block content %}
+<h1>새로운 채널 등록하기</h1>
+<div class="container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">채널 이름:</label>
+            <input type="text" name="name" id="name" size="42"
+            value="{{ channel.name }}" placeholder="Name"><br>
+        </div>
+        <div class="form-group">
+            <label for="description">채널 소개:</label><br>
+            <textarea type="text" name="desicription" id="description"
+                value="{{ channel.description}}" rows="10" cols="54"></textarea><br>
+        </div>
+        <div class="form-group">
+            <label for="thumbnail">채널 이미지:</label><br>
+            <img id="thumbnail" src="#" height="300" width="400"><br>
+            <input type="file" name="thumbnail" value="{{ channel.thumbnail }}"
+            accept="image/gif, image/jpeg, image/png" onchange="readURL(this);" />
+        </div>
+        <button input type="submit" class="btn btn-normal">완료</button>
+    </form>
+</div>
+{% endblock %}
