@@ -4,7 +4,9 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from apps.session.models import UserProfile, Message
 from django.contrib.auth.decorators import login_required
-import re, json, urllib
+import re
+import json
+import urllib
 
 
 def validate_nickname(nickname):
@@ -26,14 +28,16 @@ def nickname_check(request):
 def user_login(request):
     if request.user.is_authenticated():
         return redirect('/')
-    return redirect('http://bit.sparcs.org:22223/oauth/require?callback=http://bit.sparcs.org:23232/session/login/callback')
+    return redirect('http://bit.sparcs.org:22223/oauth/requirecallback=\
+                     http://bit.sparcs.org:23232/session/login/callback')
 
 
 def user_login_callback(request):
     if request.method == "GET":
         nexturl = request.GET.get('next', '/')
         uid = request.GET['uid']
-        sso_profile = urllib.urlopen('http://bit.sparcs.org:22223/oauth/info?uid='+uid)
+        sso_profile = urllib.urlopen('http://bit.sparcs.org:22223/\
+                                      oauth/info?uid='+uid)
         sso_profile = json.load(sso_profile)
         username = sso_profile['username']
         user_list = User.objects.filter(username=username)
