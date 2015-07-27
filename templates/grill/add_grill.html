@@ -1,0 +1,11 @@
+<form
+	method = "POST"
+	action = "{% url 'add_grill' %}"
+	enctype = "multipart/form-data"
+>
+	{% csrf_token %}
+	{{form.as_p}}
+	<p>
+		<input type = "submit"/>
+	</p>
+</form>

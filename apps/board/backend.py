@@ -1,7 +1,6 @@
 # -*- coding: utf-8
 from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
@@ -47,7 +46,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
         if board_post.board_content.is_anonymous:
             post['username'] = 'anonymous'
         else:
-            post['username'] = board_post.author.user.username
+            post['username'] = board_post.author.nickname
         post_board = {}
         post_board['board_name'] = board_post.board.name
         post_board['board_url'] = board_post.board.name
@@ -75,7 +74,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
         if board_post.board_content.is_anonymous:
             post['username'] = 'anonymous'
         else:
-            post['username'] = board_post.author.user.username
+            post['username'] = board_post.author.nickname
         post_board = {}
         post_board['board_name'] = board_post.board.name
         post_board['board_url'] = board_post.board.name
@@ -167,7 +166,6 @@ def _get_content(request, post_id):
         board_post_is_read = BoardPostIs_read()
         board_post_is_read.board_post = board_post
         board_post_is_read.userprofile = request.user.userprofile
-    board_post_is_read.last_read = timezone.now()
     board_post_is_read.save()
     post = _get_post(request, board_post, 'Post')
     comment_list = []
@@ -208,7 +206,6 @@ def _get_post(request, board_post, type):
     else:
         return post
     userprofile = board_post.author
-    user = userprofile.user
     board_content = board_post.board_content
     if board_content.is_deleted:
         post['title'] = '--Deleted--'
@@ -219,7 +216,7 @@ def _get_post(request, board_post, type):
     post['deleted'] = board_content.is_deleted
     post['content_id'] = board_content.id
     post['created_time'] = board_content.created_time
-    post['username'] = user.username
+    post['username'] = userprofile.nickname
     if board_content.is_anonymous:
         post['username'] = 'anonymous'
     post['return'] = (user.id == request.user.id)
