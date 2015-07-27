@@ -4,6 +4,7 @@
     {% if group != None %}
         <h3>{{ group.name }}</h3>
         <a href=".." class="btn btn-default">Back</a>
+        </br></br>
         <ul>
             {% for member in members %}
                 <li>{{ member.nickname }}</li>

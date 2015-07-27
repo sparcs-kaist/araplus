@@ -4,11 +4,7 @@
     <ul>
     {% for group in groups %}
         <li>
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name='groupname' value={{ group.name }}>
-                <button type='submit' class="btn btn-default"> {{ group.name }} </button>
-            </form>
+            <a href="{{ "message/"|add:group.name }}" class="btn btn-default"> {{group.name}} </a>
         </li>
     {% endfor %}
     </ul>

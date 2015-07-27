@@ -23,10 +23,7 @@ def make_group(request):
 @login_required(login_url='/session/login/')
 def view_group_list(request):
     mygroups = request.user.userprofile.groups.all()
-    if request.method != "POST":
-        mygroups = request.user.userprofile.groups.all()
-        return render(request, 'session/grouplist.html', {'groups': mygroups})
-    return redirect('/session/group/message/'+request.POST['groupname']+'/')
+    return render(request, 'session/grouplist.html', {'groups': mygroups})
 
 
 @login_required(login_url='/session/login/')
