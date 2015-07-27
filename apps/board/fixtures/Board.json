@@ -1,0 +1,34 @@
+[
+	{
+		"model": "board.Board",
+		"fields": {
+			"name": "Garbage",
+			"description": "Trash, Garbage, Non-recyclable"
+		},
+		"pk": 1
+	},
+	{
+		"model": "board.Board",
+		"fields": {
+			"name": "Notice",
+			"description": "Notices"
+		},
+		"pk": 2
+	},
+	{
+		"model": "board.Board",
+		"fields": {
+			"name": "Infoworld",
+			"description": "Honey tips provided"
+		},
+		"pk": 3
+	},
+	{
+		"model": "board.Board",
+		"fields": {
+			"name": "Hot Potatoes",
+			"description": "political issues"
+		},
+		"pk": 4
+	}
+]

@@ -1,0 +1,18 @@
+[
+{
+	"fields": {
+		"user": 1,
+		"points": 0
+	},
+	"model": "session.UserProfile",
+	"pk": 1
+},
+{
+	"fields": {
+		"user": 2,
+		"points": 0
+	},
+	"model": "session.UserProfile",
+	"pk": 2
+}
+]
