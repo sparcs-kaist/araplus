@@ -35,7 +35,7 @@ class GroupMessage(models.Model):
                                related_name='group_message_sent')
     receivers = models.ForeignKey('Group',
                                   related_name='group_message_received')
-    created_time = models.DateTimeField(auto_now=True)
+    created_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return "Group Message from %s to %s at %s" % \
