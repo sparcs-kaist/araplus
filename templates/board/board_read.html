@@ -39,7 +39,9 @@
             $("#re_comment_write"+board_comment_id).html(write_comment);
         });
 		$(".vote").click(function() {
-			var vote_id =  $(this).attr("id").split('_'); 
+			var vote_id = $(this).attr("id").split('_'); 
+            var vote_up = $("#up_"+vote_id[1]);
+            var vote_down = $("#down_"+vote_id[1]);
             console.log(vote_id[0] + vote_id[1]);
 			$.ajax(
 			{
@@ -50,6 +52,26 @@
                 success : function(data){
                     if(data.response == 'success'){
                         $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
+                        if(vote_up.hasClass('btn-warning'))
+                        {
+                            vote_up.removeClass('btn-warning');
+                            vote_up.addClass('btn-success');
+                        }
+                        if(vote_down.hasClass('btn-warning'))
+                        {
+                            vote_down.removeClass('btn-warning');
+                            vote_down.addClass('btn-danger');
+                        }
+                        if(vote_id[0] == 'up' && data.cancel == 'no')
+                        {
+                            vote_up.removeClass('btn-success');
+                            vote_up.addClass('btn-warning');
+                        }
+                        if(vote_id[0] == 'down' && data.cancel == 'no')
+                        {
+                            vote_down.removeClass('btn-danger');
+                            vote_down.addClass('btn-warning');
+                        }
                         alert(data.message);
                     }
                     else{
@@ -173,8 +195,16 @@
                                     <li><a href="javascript:;" class="vote political" id="political_{{post.content_id}}">보내야한다</a></li>
                             </ul>
                         </div>
+                        {% if post.vote.is_up %}
+                        <button class="btn btn-warning col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        {% else %}
                         <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
-                        <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+                        {% endif %}
+                        {% if post.vote.is_down %}
+                        <button class="btn btn-warning col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+                        {%else %}
+                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+                        {% endif %}
                         {% if post.return %}			
                         <a class="btn btn-info col-md-1" href="./modify/?board={{post.board_id}}">Modify</a>
                         <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
@@ -217,8 +247,16 @@
                                         <li><a href="#" class="vote political" id="political_{{comment.content_id}}">보내야한다</a></li>
                                 </ul>
                             </div>
+                            {% if comment.vote.is_up %}
+                            <button class="btn btn-warning col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
+                            {% else %}
                             <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
-                            <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {% endif %}
+                            {% if comment.vote.is_down %}
+                            <button class="btn btn-warning col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {%else %}
+                             <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {% endif %}
                             {% if comment.return %}			
 							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
                             <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
@@ -263,8 +301,16 @@
                                         <li><a href="#" class="vote political" id="political_{{re_comment.content_id}}">보내야한다</a></li>
                                 </ul>
                             </div>
+                            {% if re_comment.vote.is_up %}
+                            <button class="btn btn-warning col-md-1 vote up" id="up_{{re_comment.content_id}}">Up</button>
+                            {% else %}
                             <button class="btn btn-success col-md-1 vote up" id="up_{{re_comment.content_id}}">Up</button>
-                            <button class="btn btn-danger col-md-1 vote down" id="down_{{re_comment.content_id}}">Down</button>
+                            {% endif %}
+                            {% if re_comment.vote.is_down %}
+                            <button class="btn btn-warning col-md-1 vote down" id="down_{{re_comment.content_id}}">Down</button>
+                            {%else %}
+                             <button class="btn btn-danger col-md-1 vote down" id="down_{{re_comment.content_id}}">Down</button>
+                            {% endif %}
                             {% if re_comment.return %}			
 							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{re_comment.id}}">Modify</button>
                             <button class="btn btn-normal col-md-1 delete" id="delete_{{re_comment.content_id}}">Delete</button>

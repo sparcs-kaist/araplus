@@ -147,6 +147,7 @@ def content_vote(request):
             result['response'] = 'success'
             result['message'] = vote_result['success']
             result['vote'] = vote_result['vote']
+            result['cancel'] = vote_result['cancel']
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 

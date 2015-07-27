@@ -219,8 +219,18 @@ def _get_post(request, board_post, type):
     post['username'] = userprofile.nickname
     if board_content.is_anonymous:
         post['username'] = 'anonymous'
-    post['return'] = (user.id == request.user.id)
+    post['return'] = (userprofile == request.user.userprofile)
     post['vote'] = board_content.get_vote()
+    post['vote']['is_up'] = False
+    post['vote']['is_down'] = False
+    try:
+        is_vote = BoardContentVote.objects.get(userprofile=userprofile, board_content=board_content)
+        if is_vote.is_up:
+            post['vote']['is_up'] = True
+        else:
+            post['vote']['is_down'] = True
+    except ObjectDoesNotExist:
+        pass
     post['adult'] = board_content.is_adult
     return post
 
@@ -294,6 +304,10 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             board_comment_id = request.POST.get('board_comment_id', 0)
             board_post_id = request.POST.get('board_post_id', 0)
+        try:
+            board_post = BoardPost.objects.get(id=board_post_id)
+        except ObjectsDoesNotExist:
+            return
         if modify:
             try:
                 board_comment_id = request.POST.get('board_comment_id', 0)
@@ -306,7 +320,6 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
                     original_comment = BoardComment.objects.get(id=board_comment_id)
                     if original_comment.board_content.is_deleted:
                         return
-                board_post = BoardPost.objects.get(id=board_post_id)
                 if board_post.board_content.is_deleted:
                     return
             except ObjectDoesNotExist:
@@ -378,11 +391,11 @@ def _vote(request):
                     userprofile=user_profile)
                 if content_vote.is_up == is_up_or_down:
                     content_vote.delete()
-                    return {'success': vote_type + ' canceled', 'vote': board_content.get_vote()}
+                    return {'success': vote_type + ' canceled', 'vote': board_content.get_vote(), 'cancel': 'yes'}
                 else:
                     content_vote.is_up = is_up_or_down
                     content_vote.save()
-                    return {'success': 'changed to ' + vote_type, 'vote': board_content.get_vote()}
+                    return {'success': 'changed to ' + vote_type, 'vote': board_content.get_vote(),'cancel': 'no'}
             except:
                 vote = BoardContentVote()
                 vote.is_up = is_up_or_down
@@ -405,6 +418,6 @@ def _vote(request):
         vote.board_content = board_content
         vote.userprofile = user_profile
         vote.save()
-        return {'success': 'vote ' + vote_type, 'vote': board_content.get_vote()}
+        return {'success': 'vote ' + vote_type, 'vote': board_content.get_vote(), 'cancel': 'no'}
     except ObjectDoesNotExist:
         return {'fail': 'Unvalid ontent id'}
