@@ -41,6 +41,7 @@ def go_thread(request):
     if request.method != "POST":
         messages = Message.objects.filter(Q(sender=request.user.userprofile) |
                                           Q(receiver=request.user.userprofile))
+        messages = messages.order_by('-created_time')
         users = []
         for message in messages:
             if message.sender != request.user.userprofile:
