@@ -2,15 +2,17 @@
 {% block message_content %}
 <div class="container">
     {% if user != None %}
-        Message thread between {{ me.nickname }} and {{ you.nickname }}
+        <h3>{{ you.nickname }}</h3>
         <div>
             {% for message in messages %}
                 {% if message.sender == me %}
-                    <div class="mybubble">
+                <div class="my bubble">
                 {% else %}
-                    <div class="bubble">
+                <div class="bubble">
                 {% endif %}
-                    {{ message.sender.nickname }} : {{ message.content }} ({{message.created_time}})
+                    <div class="info">{{ message.sender.nickname }}</div>
+                    {{ message.content }}
+                    <div class="info">{{ message.created_time }}</div>
                 </div>
             {% endfor %}
         </div>

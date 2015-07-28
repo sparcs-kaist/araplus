@@ -3,8 +3,9 @@
 <div class="container">
     {% for message in messages %}
         <div class="bubble">
-            Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </br>
-            Content : {{ message.content }}
+            <div class="info">From {{ message.sender.nickname }}</div>
+            {{ message.content }}
+            <div class="info">{{ message.created_time }}</div>
         </div>
     {% endfor %}
 </div>

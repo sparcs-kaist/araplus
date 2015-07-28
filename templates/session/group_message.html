@@ -8,11 +8,12 @@
         <div>
             {% for message in messages %}
                 {% if message.sender == me %}
-                    <div class="mybubble">
+                    <div class="my bubble">
                 {% else %}
                     <div class="bubble">
                 {% endif %}
-                    {{ message.sender.nickname }} : {{ message.content }}
+                    <div class="info">{{ message.sender.nickname }}</div>
+                    {{ message.content }}
                 </div>
             {% endfor %}
         </div>
