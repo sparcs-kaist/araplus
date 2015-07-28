@@ -39,23 +39,43 @@ def check_message(request):
 @login_required(login_url='/session/login/')
 def go_thread(request):
     if request.method != "POST":
-        return render(request, 'session/go_thread.html')
+        messages = Message.objects.filter(Q(sender=request.user.userprofile) |
+                                          Q(receiver=request.user.userprofile))
+        users = []
+        for message in messages:
+            if message.sender != request.user.userprofile:
+                user = message.sender
+            elif message.receiver != request.user.userprofile:
+                user = message.receiver
+            if not (user in users):
+                users.append(user)
+        return render(request, 'session/go_thread.html', {'users': users})
     return redirect('/session/message/thread/'+request.POST['nickname']+'/')
 
 
 @login_required(login_url='/session/login/')
 def check_thread(request, nickname):
-    receiver = request.user.userprofile
-    sender = UserProfile.objects.get(nickname=nickname)
-    messages = Message.objects.filter(Q(sender=sender, receiver=receiver) |
-                                      Q(receiver=sender, sender=receiver))
+    me = request.user.userprofile
+    try:
+        you = UserProfile.objects.get(nickname=nickname)
+    except UserProfile.DoesNotExist:
+        return render(request, 'session/message_thread.html',
+                      {'you': None, 'error': 'The user does not exist'})
+    if request.method == "POST":
+        Message.objects.create(content=request.POST['content'],
+                               sender=me,
+                               receiver=you,
+                               is_read=False)
+    messages = Message.objects.filter(Q(sender=me, receiver=you) |
+                                      Q(receiver=me, sender=you))
     messages = messages.order_by('created_time')
     for message in messages:
-        message.read()
-    return render(request,
-                  'session/message_thread.html', {'sender': sender,
-                                                  'receiver': receiver,
-                                                  'messages': messages})
+        if message.receiver == me:
+            message.read()
+    return render(request, 'session/message_thread.html',
+                  {'me': me,
+                   'you': you,
+                   'messages': messages})
 
 
 @login_required(login_url='/session/login/')

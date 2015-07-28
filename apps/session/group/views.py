@@ -37,17 +37,16 @@ def group_message(request, groupname):
         return render(request, 'session/group_message.html',
                       {'group': None,
                        'error': 'You are not a member of this group'})
+    if request.method == "POST":
+        GroupMessage.objects.create(content=request.POST['content'],
+                                    sender=request.user.userprofile,
+                                    receivers=group)
     messages = GroupMessage.objects.filter(receivers=group)
     messages = messages.order_by('created_time')
-    if request.method != "POST":
-        return render(request, 'session/group_message.html',
-                      {'group': group,
-                       'me': request.user.userprofile,
-                       'messages': messages})
-    GroupMessage.objects.create(content=request.POST['content'],
-                                sender=request.user.userprofile,
-                                receivers=group)
-    return redirect('/session/group/message/'+group.name+'/')
+    return render(request, 'session/group_message.html',
+                  {'group': group,
+                   'me': request.user.userprofile,
+                   'messages': messages})
 
 
 @login_required(login_url='/session/login/')

@@ -1,18 +1,25 @@
 {% extends "session/message_base.html" %}
 {% block message_content %}
 <div class="container">
-    Message thread between {{ sender.nickname }} and {{ receiver.nickname }}
-    <div>
-        {% for message in messages %}
-            {% if message.sender == receiver %}
-                <div class="mybubble">
-            {% else %}
-                <div class="bubble">
-            {% endif %}
-                {{ message.sender.nickname }} : {{ message.content }} ({{message.created_time}})
-            </div>
-        {% endfor %}
-    </div>
-</ul>
+    {% if user != None %}
+        Message thread between {{ me.nickname }} and {{ you.nickname }}
+        <div>
+            {% for message in messages %}
+                {% if message.sender == me %}
+                    <div class="mybubble">
+                {% else %}
+                    <div class="bubble">
+                {% endif %}
+                    {{ message.sender.nickname }} : {{ message.content }} ({{message.created_time}})
+                </div>
+            {% endfor %}
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" class="form-control" name="content" placeholder="message">
+            <button type="submit" class="btn btn-default">Send</button>
+        </form>
+    {% endif %}
+    {{error}}
 </div>    
 {% endblock %}
