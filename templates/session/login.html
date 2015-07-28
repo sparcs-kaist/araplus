@@ -2,7 +2,8 @@
 {% block content %}
 <div class="container">
     {% if alreadyloggedin %}
-        You are currently logged in
+    You are currently logged in
+    <a href="/session" class="btn btn-default">Go to session main</a>
     {% else %} 
     <form method="POST">
         {% csrf_token %}
