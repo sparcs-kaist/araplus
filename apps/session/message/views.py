@@ -63,10 +63,11 @@ def check_thread(request, nickname):
         return render(request, 'session/message_thread.html',
                       {'you': None, 'error': 'The user does not exist'})
     if request.method == "POST":
-        Message.objects.create(content=request.POST['content'],
-                               sender=me,
-                               receiver=you,
-                               is_read=False)
+        if request.POST['content'] != "":
+            Message.objects.create(content=request.POST['content'],
+                                   sender=me,
+                                   receiver=you,
+                                   is_read=False)
     messages = Message.objects.filter(Q(sender=me, receiver=you) |
                                       Q(receiver=me, sender=you))
     messages = messages.order_by('created_time')

@@ -15,7 +15,8 @@ def make_group(request):
                        'The name is already being used by other group'})
     except Group.DoesNotExist:
         new_group = Group.objects.create(name=group_name)
-    new_group.add_member(request.user.userprofile)
+    if request.POST['groupname'] != "":
+        new_group.add_member(request.user.userprofile)
     return redirect('/session/group/message/'+new_group.name+'/manage')
 
 
@@ -38,9 +39,10 @@ def group_message(request, groupname):
                       {'group': None,
                        'error': 'You are not a member of this group'})
     if request.method == "POST":
-        GroupMessage.objects.create(content=request.POST['content'],
-                                    sender=request.user.userprofile,
-                                    receivers=group)
+        if request.POST['content'] != "":
+            GroupMessage.objects.create(content=request.POST['content'],
+                                        sender=request.user.userprofile,
+                                        receivers=group)
     messages = GroupMessage.objects.filter(receivers=group)
     messages = messages.order_by('created_time')
     return render(request, 'session/group_message.html',
