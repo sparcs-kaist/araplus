@@ -5,8 +5,7 @@
     $(document).ready(function(){
         $(".comment").click(function(){
             var board_comment_id=$(this).attr("id").slice(3);
-	   
-            var content = $("#comment"+board_comment_id).text();
+            var content = $("#comment"+board_comment_id).html().replace(/<br\s*[\/]?>/gi,'\n');
             var mod_comment = "<form action='./comment_mod/{{querystring}}' method='POST'>"+
                 "{% csrf_token %}"+
                 "<input type='hidden' name='board_comment_id' value=" + board_comment_id + ">"+ 
