@@ -2,10 +2,12 @@
 {% block message_content %}
 <div class="container">
     {% for message in messages %}
-        <div class="bubble">
-            <div class="info">From {{ message.sender.nickname }}</div>
-            {{ message.content }}
-            <div class="info">{{ message.created_time }}</div>
+        <div class="bubblebox">
+            <div class="bubble">
+                <div class="info">From {{ message.sender.nickname }}</div>
+                {{ message.content }}
+                <div class="info">{{ message.created_time }}</div>
+            </div>
         </div>
     {% endfor %}
 </div>
