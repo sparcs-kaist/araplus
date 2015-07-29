@@ -284,7 +284,7 @@
             </div>
             <div class="panel-body">
                 <div id="comment_content{{ re_comment.id }}">
-                    <div id="comment{{re_comment.id}}">{{ re_comment.content|safe }}</div>
+                    <div id="comment{{re_comment.id}}">{{ re_comment.content|force_escape|linebreaksbr }}</div>
                     <div class="col-md-12">
 						<div class="row">
 						    <div class="col-md-6"></div>
