@@ -85,21 +85,20 @@ def add_comment(request, grill_id):
     new_comment.grill.updated_time = datetime.datetime.now()
     new_comment.grill.save()
 
-    ms = '<li id="comment_' + str(new_comment.order) + \
-        '" class="a-comment-of-list">'
-    ms += '<div class="a-comment-area">'
-    ms += ' <span>' + str(new_comment.order) + '</span>'
-    ms += '<div class="a-comment-content">' + \
-        new_comment.replace_tags().encode('utf8') + '</div>'
-    ms += '<div class="a-comment-info">'
-    ms += '<div class="a-comment-author-container">'
-    ms += '<span>' + new_comment.author.nickname.encode('utf8') + '</span>'
-    ms += '<span class="a-comment-date">' + \
-        str(new_comment.created_time) + '</span>'
-    ms += '</div>'
-    ms += '<div class="a-comment-vote-container">'
-    ms += '<button class="vote_up a-comment-vote"> 추천 (+0) </button>'
-    ms += '<button class="vote_down a-comment-vote"> 반대 (-0)</button>'
+    ms = '<li id="comment-' + str(new_comment.order) +\
+         '" class="list-group-item">'
+    ms += '<div>'
+    ms += '<div class="comment-meta">'
+    ms += '<span class="col-md-1">' + str(new_comment.order) + '</span>'
+    ms += '<strong>' + new_comment.author.nickname.encode('utf-8')
+    ms += '</strong>'
+    ms += '<span class="pull-right">' + str(new_comment.created_time)
+    ms += '</span></div>'
+    ms += '<div class="comment-content-container">'
+    ms += '<span>' + new_comment.replace_tags().encode('utf8') + '</span>'
+    ms += '<div class="comment-vote-container">'
+    ms += '<button class="vote-up btn btn-default"> 추천 (+0) </button>'
+    ms += '<button class="vote-down btn btn-default"> 반대 (-0)</button>'
     ms += '</div></div></div></li>'
     data = {'html': ms}
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder),
