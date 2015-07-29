@@ -1,0 +1,37 @@
+<li id="comment-{{comment.order}}" class="list-group-item">
+    <div>
+        <div class="comment-meta">
+            <span class="col-md-1">{{ comment.order }}</span>
+            <strong>{{ comment.author.nickname }}</strong>
+            <span class="pull-right">{{ comment.created_time }}</span>
+        </div>
+        <div class="comment-content-container">
+            {% if comment.hate %}
+            <div class="hate-content">
+                <p>----------------------반대된 코멘트입니다.----------------------</p>
+            </div>
+            <button class="open-comment btn btn-default">보기</button> 
+            <div class="hate-comment-content" style="display: none;">
+                <span>{{ comment.content|safe }}</span>
+                <div class="comment-vote-container">
+                    {% if comment.vote_disable %}
+                    <button class="vote-up btn btn-default" disabled> 추천 (+{{ comment.like }}) </button>
+                    <button class="vote-down btn btn-default" disabled> 반대 (-{{ comment.hate }}) </button>
+                    {% else %}
+                    <button class="vote-up btn btn-default"> 추천 (+{{ comment.like }})</button>
+                    <button class="vote-down btn btn-default"> 반대 (-{{ comment.hate }})</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="comment-content">
+                <span>{{ comment.content|safe }}</span>
+                <div class="comment-vote-container">
+                    <button class="vote-up btn btn-default"> 추천 (+{{ comment.like }})</button>
+                    <button class="vote-down btn btn-default"> 반대 (-{{ comment.hate }})</button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</li>

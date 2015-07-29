@@ -1,0 +1,26 @@
+#btn-comment-first {
+    margin-bottom: 20px;
+}
+
+#comment-input-container {
+    margin-bottom: 20px;
+}
+#comment-input-container textarea {
+    margin-bottom: 20px;
+}
+#comment-input-container span {
+    margin-left: 20px;
+}
+
+.comment-meta {
+    margin-bottom: 20px;
+}
+.comment-content-container {
+    padding-top: 0px;
+    padding-bottom: 15px;
+    padding-right: 40px;
+    padding-left: 55px;
+}
+.comment-vote-container {
+    margin-top: 15px;
+}

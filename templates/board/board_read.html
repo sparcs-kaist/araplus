@@ -1,0 +1,383 @@
+
+{% extends "board/board_list.html" %}
+{% block js %}
+<script>
+    $(document).ready(function(){
+        $(".comment").click(function(){
+            var board_comment_id=$(this).attr("id").slice(3);
+            var content = $("#comment"+board_comment_id).html().replace(/<br\s*[\/]?>/gi,'\n');
+            var mod_comment = "<form action='./comment_mod/{{querystring}}' method='POST'>"+
+                "{% csrf_token %}"+
+                "<input type='hidden' name='board_comment_id' value=" + board_comment_id + ">"+ 
+                "<input type='hidden' name='board_post_id' value={{post.id}}>"+
+                "<div class='form-group'>"+
+                "<textarea class='form-control' rows='2' name='content'>"+
+                content+
+                "</textarea>"+
+                "<div class='col-md-12'>"+
+                "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
+                "완료"+
+                "</button></div></div></form>";
+            $(mod_comment).replaceAll("#comment_content"+board_comment_id);
+        });
+        $(".re_comment").click(function(){
+            var board_comment_id=$(this).attr("id").slice(11);
+            var write_comment = "<form action='./re_comment/{{querystring}}' method='POST'>"+
+                "{%csrf_token%}"+
+                "<input type='hidden' name='board_comment_id' value="+board_comment_id+">"+
+                "<input type='hidden' name='board_post_id' value={{post.id}}>"+
+                "<div class='form-group'>"+
+                "    <label>Anonymous</label>"+
+                "    <input type='checkbox' name='anonymous'>"+
+                "</div>"+
+                "<div class='form-group'>"+
+                "    <textarea class='form-control' rows='3' name='content'></textarea>"+
+                "</div>"+
+                "<button type='submit' class='btn btn-normal col-md-1 col-md-offset-11'>Submit</button>"+
+                "</form>";
+            $("#re_comment_write"+board_comment_id).html(write_comment);
+        });
+		$(".vote").click(function() {
+			var vote_id = $(this).attr("id").split('_'); 
+            var vote_up = $("#up_"+vote_id[1]);
+            var vote_down = $("#down_"+vote_id[1]);
+            console.log(vote_id[0] + vote_id[1]);
+			$.ajax(
+			{
+				url : "vote/",
+                type : "POST",
+                data : { vote_type : vote_id[0], vote_id : vote_id[1], csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+				dataType : 'json',
+                success : function(data){
+                    if(data.response == 'success'){
+                        $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
+                        if(vote_up.hasClass('btn-warning'))
+                        {
+                            vote_up.removeClass('btn-warning');
+                            vote_up.addClass('btn-success');
+                        }
+                        if(vote_down.hasClass('btn-warning'))
+                        {
+                            vote_down.removeClass('btn-warning');
+                            vote_down.addClass('btn-danger');
+                        }
+                        if(vote_id[0] == 'up' && data.cancel == 'no')
+                        {
+                            vote_up.removeClass('btn-success');
+                            vote_up.addClass('btn-warning');
+                        }
+                        if(vote_id[0] == 'down' && data.cancel == 'no')
+                        {
+                            vote_down.removeClass('btn-danger');
+                            vote_down.addClass('btn-warning');
+                        }
+                        alert(data.message);
+                    }
+                    else{
+                        alert('Failed');
+                    }
+				}
+			});
+		});
+        $(".delete").click(function() {
+            var yes=confirm("Do yo REALLY want to delete?");
+            if(yes == true){
+                var delete_uid=$(this).attr("id").slice(7);
+                $.ajax({
+                    url: "delete/",
+                    type : "POST",
+                    data:{id: delete_uid, csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                    success: function(data){
+                        console.log(data);
+                        location.reload();
+                    }
+                });
+                return true;
+            }
+            else{
+                return false;
+            }
+        });
+        var isOpen = false;
+        var report_uid = 0;
+        function showOverlayBox() {
+            if(isOpen==false) return;
+            $(".overlayBox").css({
+                display:"block",
+                left:($(window).width()-$(".overlayBox").width())/2,
+                top:($(window).height()-$(".overlayBox").height())/2-20,
+                position:'absolute'
+            });
+            $(".bgCover").css({
+                display:"block",
+                width:$(window).width(),
+                height:$(window).height()
+            });
+        }
+        function doOverlayOpen() {
+            isOpen = true;
+            showOverlayBox();
+            $('.bgCover').css({opacity:0}).animate( {opacity:0.5, backgroundColor:'#000'} );
+            return false;
+        }
+        function doOverlayClose() {
+            isOpen = false;
+            $('.overlayBox').css( 'display', 'none' );
+            $('.bgCover').animate( {opacity:0}, null, null, function() { $(this).hide(); } );
+        }
+        $(window).bind('resize',showOverlayBox);
+        $('a.report').click(function() {
+            $("#report_content").val("")
+            $("#report_reason").attr("value", 0);
+            $("#report_reason_dropdown").html("신고 이유 <span class='caret'></span>");
+            doOverlayOpen();
+            report_uid = $(this).attr("id").slice(7)
+        });
+        $("a.closeLink").click( doOverlayClose);
+        $(".report_submit").click(function() {
+            var report_reason = $("#report_reason").val()
+            var report_content = $("#report_content").val()
+            $.ajax({
+                url : "report/",
+                type : "POST",
+                data : { id : report_uid, report_reason : report_reason, report_content : report_content,csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                success : function(data){
+                    alert(data);
+                }
+            });
+            doOverlayClose();
+        });
+        $(".reason").click(function(){
+            var bid = $(this).attr("id");
+            var bname = $(this).text() + " <span class='caret'></span>";
+            $("#report_reason").attr("value", bid);
+            $("#report_reason_dropdown").html(bname);
+        });
+    });
+</script>
+{% endblock %}
+{% block board_read %}
+<div class="container">
+    <div class="col-md-12">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <div>
+                    <label class="col-md-5">
+                        {% if post.adult %}
+                        <label style="color:red">+19</label>
+                        {% endif %}
+                        Title:{{ post.title }}
+                    </label>
+                    <span class="col-md-3">User:{{ post.username }}</span>
+                    <span class="col-md-2">Board:{{post.board}}</span>
+                    <span class="col-md-2">Category:{{post.category}}</span>
+                </div>
+                <div>
+                    <span class="col-md-10">{{post.created_time}}</span>
+                    <span id="vote_{{post.content_id}}">추천 +{{post.vote.up}}/-{{post.vote.down}}</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                {{post.content | force_escape | linebreaksbr}}
+				<div class="col-md-12">
+					<div class="row">
+						<div class="col-md-7"></div>
+                        {% if not post.deleted %}
+                        <div class="dropdown col-md-1">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                Report
+                                <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                    <li><a href="javascript:;" class="report" id="report_{{post.content_id}}">신고</a></li>
+                                    <li><a href="javascript:;" class="vote adult" id="adult_{{post.content_id}}">가버렷</a></li>
+                                    <li><a href="javascript:;" class="vote political" id="political_{{post.content_id}}">보내야한다</a></li>
+                            </ul>
+                        </div>
+                        {% if post.vote.is_up %}
+                        <button class="btn btn-warning col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        {% else %}
+                        <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        {% endif %}
+                        {% if post.vote.is_down %}
+                        <button class="btn btn-warning col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+                        {%else %}
+                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+                        {% endif %}
+                        {% if post.return %}			
+                        <a class="btn btn-info col-md-1" href="./modify/?board={{post.board_id}}">Modify</a>
+                        <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
+                        {% endif %}
+                        {% endif %}		
+					</div>
+                </div>
+            </div>
+        </div>
+        {% for comment in comment_list %}
+        {% if comment.best_comment %}
+        <div class="panel panel-danger">
+        {% else %}
+        <div class="panel panel-success">
+        {% endif %}
+            <div class="panel-heading">
+                <div>
+                    <span> {{ comment.username }}</span>
+                </div>
+                <div> 
+                    <span class="col-md-10">{{comment.created_time}}</span>
+                    <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="comment_content{{ comment.id }}">
+                    <div id="comment{{comment.id}}">{{ comment.content | force_escape | linebreaksbr }}</div>
+                    <div class="col-md-12">
+						<div class="row">
+						    <div class="col-md-6"></div>
+                            {% if not comment.deleted %}
+                            <div class="dropdown col-md-1">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    Report
+                                    <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                        <li><a href="#" class="report" id="report_{{comment.content_id}}">신고</a></li>
+                                        <li><a href="#" class="vote adult" id="adult_{{comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="vote political" id="political_{{comment.content_id}}">보내야한다</a></li>
+                                </ul>
+                            </div>
+                            {% if comment.vote.is_up %}
+                            <button class="btn btn-warning col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
+                            {% else %}
+                            <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
+                            {% endif %}
+                            {% if comment.vote.is_down %}
+                            <button class="btn btn-warning col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {%else %}
+                             <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {% endif %}
+                            {% if comment.return %}			
+							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
+                            <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
+                            {% else %}
+                            <div class="col-md-2"></div>
+                            {% endif %}
+                            <button class="btn btn-info col-md-1 re_comment" id="re_comment_{{comment.id}}">Re-comment</button>
+                            {% endif %}		
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="re_comment_write{{comment.id}}">
+        </div>
+        {% for re_comment in comment.re_comment_list %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div>
+                    <span> {{ re_comment.username }}</span>
+                </div>
+                <div> 
+                    <span class="col-md-10">{{re_comment.created_time}}</span>
+                    <span id="vote_{{re_comment.content_id}}">추천 +{{re_comment.vote.up}}/-{{re_comment.vote.down}}</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="comment_content{{ re_comment.id }}">
+                    <div id="comment{{re_comment.id}}">{{ re_comment.content|force_escape|linebreaksbr }}</div>
+                    <div class="col-md-12">
+						<div class="row">
+						    <div class="col-md-6"></div>
+                            {% if not re_comment.deleted %}
+                            <div class="dropdown col-md-1">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    Report
+                                    <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                        <li><a href="#" class="report" id="report_{{re_comment.content_id}}">신고</a></li>
+                                        <li><a href="#" class="vote adult" id="adult_{{re_comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="vote political" id="political_{{re_comment.content_id}}">보내야한다</a></li>
+                                </ul>
+                            </div>
+                            {% if re_comment.vote.is_up %}
+                            <button class="btn btn-warning col-md-1 vote up" id="up_{{re_comment.content_id}}">Up</button>
+                            {% else %}
+                            <button class="btn btn-success col-md-1 vote up" id="up_{{re_comment.content_id}}">Up</button>
+                            {% endif %}
+                            {% if re_comment.vote.is_down %}
+                            <button class="btn btn-warning col-md-1 vote down" id="down_{{re_comment.content_id}}">Down</button>
+                            {%else %}
+                             <button class="btn btn-danger col-md-1 vote down" id="down_{{re_comment.content_id}}">Down</button>
+                            {% endif %}
+                            {% if re_comment.return %}			
+							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{re_comment.id}}">Modify</button>
+                            <button class="btn btn-normal col-md-1 delete" id="delete_{{re_comment.content_id}}">Delete</button>
+                            {% else %}
+                            <div class="col-md-2"></div>
+                            {% endif %}
+                            {% endif %}		
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% endfor %}
+        {% if not post.deleted %}
+        <div>
+            <form action="./comment/{{querystring}}" method="POST">
+                {%csrf_token%}
+                <input type="hidden" name="board_post_id" value="{{ post.id }}">
+                <div class="form-group">
+                    <label>Anonymous</label>
+                    <input type="checkbox" name="anonymous">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" name="content"></textarea>
+                </div>
+                <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>   
+</div>
+
+</div>
+<div class="bgCover" style="background:#000; position:absolute; left:0; top:0; display:none; overflow:hidden">&nbsp;</div>
+<div class="overlayBox" style="position:absolute; display:none; width:500px; height:300px; background:#fff;">
+    <div class="overlayContent col-md-12">
+        <br />
+        <div class="row"> 
+            <div class="col-sm-3"><h4><b>신고하기</b></h4></div>
+            <div class="form-group col-sm-3">
+                <input type="hidden" class="form-control" id="report_reason" name="report_reason" value="2">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="report_reason_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width:250px">
+                        신고 이유
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="report_reason_dropdown">
+                        <li><a href="#" class="reason" id="이유1">이유1</a></li>
+                        <li><a href="#" class="reason" id="이유2">이유2</a></li>
+                        <li><a href="#" class="reason" id="기타">기타</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-5"></div>
+            <div class="col-sm-1">
+                <h4><a href="javascript:void()" class="closeLink">X</a></h4>
+            </div>
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" rows="6" id="report_content" name="report_content"></textarea>
+        </div>
+        <div class="col-md-9"></div>
+		<button type="submit" class="btn btn-info col-md-3 report_submit" id="report_submit">Submit</button>
+          
+    </div>
+</div>
+{% endblock %}
+
+
