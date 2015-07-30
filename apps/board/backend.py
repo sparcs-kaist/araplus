@@ -143,11 +143,14 @@ def _get_current_board(request, board_url):
     return board
 
 
-def _get_querystring(request):
+def _get_querystring(request, *args):
+    query_list = []
     querystring = ''
-    page = request.GET.get('page', '')
-    if page:
-        querystring += '?page='+page
+    for field in args:
+        if request.GET.get(field):
+            query_list.append(field + '=' + request.GET[field])
+    if query_list:
+        querystring = '?' + '&'.join(query_list)
     return querystring
 
 
