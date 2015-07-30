@@ -67,11 +67,19 @@ def post_read(request, board_url, post_id):
 def post_modify_log(request, board_url, post_id):
     diff_obj = diff_match_patch.diff_match_patch()
     board_post = BoardPost.objects.filter(id=post_id)[0]
-    html = ""
+    board_content = board_post.board_content
+    board_list = _get_board_list()
+    modify_log = [[board_post.title,
+                  board_content.modified_time,
+                  board_content.content]]
     for log in board_post.get_log():
-        html = html + "<br>--------------------------<br>"+\
-               diff_obj.diff_prettyHtml(log)
-    return render(request, "board/test.html", {'html': html})
+        modify_log = modify_log +\
+                     [[log[0],
+                       log[1],
+                       diff_obj.diff_prettyHtml(log[2])]]
+    return render(request, "board/test.html",
+                  {'modify_log': modify_log,
+                   'board_list': board_list})
 
 
 @login_required(login_url='/session/login')

@@ -299,12 +299,16 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
             new_content_diff = []
             for diff_element in content_diff:
                 diff_element = list(diff_element)
+                diff_element[1] = diff_element[1].replace("\r\n", " ")
                 if diff_element[0] == 0 and len(diff_element[1]) >= 15:
                     diff_element[1] = diff_element[1][0:5] +\
                                       ' ... ' +\
                                       diff_element[1][-5:]
                 new_content_diff = new_content_diff + [diff_element]
-            board_post.set_log([new_content_diff]+board_post.get_log())
+            new_content_diff = [[title,
+                                str(board_content.modified_time),
+                                new_content_diff]]
+            board_post.set_log(new_content_diff+board_post.get_log())
         board_post.save()
         return board_post.id
     elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':
