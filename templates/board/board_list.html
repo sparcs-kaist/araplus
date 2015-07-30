@@ -51,11 +51,20 @@
             <a href="/board/{{current_board.board_url|default:'all'}}/{{querystirng}}&adult_filter=true" id='1'>Filter Adult Post</a>
             {% endif %}
         </button>
+        {% if not current_board.best %}
+        <a class="btn btn-success" href="/board/{{current_board.board_url|default:'all'}}/?best=true">Best</a>
         <a class="btn btn-info" href="/board/{{current_board.board_url|default:board_list.0.board_url}}/post/">Write</a>
+        {% endif %}
         <div class="paginator">
+            {% if current_board.best %}
+            {%for page in paginator%}
+            <a href="/board/{{current_board.board_url|default:'all'}}/?best=true&page={{page.url}}">{{page.page}} </a>
+            {%endfor%}
+            {% else %}
             {%for page in paginator%}
             <a href="/board/{{current_board.board_url|default:'all'}}/?page={{page.url}}">{{page.page}} </a>
             {%endfor%}
+            {% endif %}
         </div>
     </div>
 </div>

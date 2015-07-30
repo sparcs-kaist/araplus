@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
+    best_filter = request.GET.get('best', '')
     try:
         page = int(request.GET['page'])
     except:
@@ -18,13 +19,21 @@ def _get_post_list(request, board_url='', item_per_page=15):
     if board_url == 'all':
         board_post_notice = BoardPost.objects.filter(
             is_notice=True).order_by('-id')
-        board_post = BoardPost.objects.all().order_by('-id')
-        post_count = BoardPost.objects.count()
+        if best_filter == 'true':
+            board_post = BoardPost.objects.filter(is_best=True).order_by('-id')
+            post_count = board_post.count()
+        else:
+            board_post = BoardPost.objects.all().order_by('-id')
+            post_count = BoardPost.objects.count()
     else:
         board_post_notice = BoardPost.objects.filter(
             is_notice=True, board=board).order_by('-id')
-        board_post = BoardPost.objects.filter(
-            board=board).order_by('-id')
+        if best_filter == 'true':
+            board_post = BoardPost.objects.filter(
+                board=board, is_best=True).order_by('-id')
+        else:
+            board_post = BoardPost.objects.filter(
+                board=board).order_by('-id')
         post_count = board_post.count()
     if post_count == 0:
         post_count = 1
@@ -140,6 +149,8 @@ def _get_current_board(request, board_url):
         board['board_url'] = board_model.name
     except:
         pass
+    if request.GET.get('best', '') == 'true':
+        board['best'] = True
     return board
 
 
@@ -396,6 +407,7 @@ def _vote(request):
                 else:
                     content_vote.is_up = is_up_or_down
                     content_vote.save()
+                    _make_best(board_content)
                     return {'success': 'changed to ' + vote_type, 'vote': board_content.get_vote(),'cancel': 'no'}
             except:
                 vote = BoardContentVote()
@@ -419,6 +431,18 @@ def _vote(request):
         vote.board_content = board_content
         vote.userprofile = user_profile
         vote.save()
+        _make_best(board_content)
         return {'success': 'vote ' + vote_type, 'vote': board_content.get_vote(), 'cancel': 'no'}
     except ObjectDoesNotExist:
         return {'fail': 'Unvalid ontent id'}
+
+
+def _make_best(board_content):
+    if hasattr(board_content, 'board_post'):
+        board_post = board_content.board_post
+        vote = board_content.get_vote()
+        if vote['up'] > 0 and board_post.is_best == False:
+            board_post.is_best = True
+            board_post.save()
+            return True
+    return False

@@ -69,3 +69,5 @@ db.*
 
 # Mac OS Env
 .DS_Store
+
+*.orig

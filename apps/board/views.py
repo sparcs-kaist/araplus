@@ -46,7 +46,7 @@ def post_read(request, board_url, post_id):
     post_list = get_post_list[0]
     paginator = get_post_list[1]
     board_list = _get_board_list()
-    querystring = _get_querystring(request, 'page')
+    querystring = _get_querystring(request, 'best', 'page')
     current_board = _get_current_board(request, board_url)
     return render(request,
                   'board/board_read.html',
@@ -73,7 +73,7 @@ def post_modify(request, board_url, post_id):
     if request.method == 'POST':
         post_id = _write_post(request, 'Post', modify=True)
         if post_id:
-            querystring = _get_querystring(request, 'page')
+            querystring = _get_querystring(request, 'best', 'page')
             return redirect('../'+querystring)
         return redirect('../')
     post = _get_content(request, post_id)[0]
@@ -93,7 +93,7 @@ def post_modify(request, board_url, post_id):
 def comment_write(request, post_id_check):
     if request.method == 'POST':
         post_id = _write_post(request, 'Comment', post_id_check)
-    querystring = _get_querystring(request, 'page')
+    querystring = _get_querystring(request, 'bset', 'page')
     return redirect('../'+querystring)
 
 
@@ -101,7 +101,7 @@ def comment_write(request, post_id_check):
 def comment_modify(request, post_id_check):
     if request.method == 'POST':
         post_id = _write_post(request, 'Comment', post_id_check, True)
-    querystring = _get_querystring(request, 'page')
+    querystring = _get_querystring(request, 'best', 'page')
     return redirect('../'+querystring)
 
 
@@ -109,7 +109,7 @@ def comment_modify(request, post_id_check):
 def re_comment_write(request):
     if request.method == 'POST':
         post_id = _write_post(request, 'Re-Comment')
-    querystring = _get_querystring(request, 'page')
+    querystring = _get_querystring(request, 'best', 'page')
     return redirect('../'+querystring)
 
 
@@ -119,7 +119,7 @@ def post_list(request, board_url):
     post_list = get_post_list[0]
     paginator = get_post_list[1]
     board_list = _get_board_list()
-    querystring = _get_querystring(request, 'page')
+    querystring = _get_querystring(request, 'best', 'page')
     current_board = _get_current_board(request, board_url)
     adult_filter = request.GET.get('adult_filter')
     is_adult = False

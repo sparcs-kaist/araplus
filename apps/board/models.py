@@ -115,6 +115,7 @@ class BoardCategory(models.Model):
 class BoardPost(models.Model):
     title = models.CharField(max_length=45, null=False)
     is_notice = models.BooleanField(default=False, null=False, db_index=True)
+    is_best = models.BooleanField(default=False, db_index=True)
     board = models.ForeignKey('Board',
                               related_name='board',
                               null=False,
