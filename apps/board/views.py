@@ -69,27 +69,22 @@ def post_modify_log(request, board_url, post_id):
     board_post = BoardPost.objects.filter(id=post_id)[0]
     board_content = board_post.board_content
     board_list = _get_board_list()
-    get_post_list = _get_post_list(request, board_url)
-    post_list = get_post_list[0]
-    paginator = get_post_list[1]
-    querystring = _get_querystring(request, 'best', 'page')
     current_board = _get_current_board(request, board_url)
-    modify_log = [[board_post.title,
-                  board_content.modified_time,
-                  board_content.content]]
+    post = [board_post.title,
+            board_content.modified_time,
+            board_content.content]
+    modify_log = []
     for log in board_post.get_log():
         modify_log = modify_log +\
                      [[log[0],
                        log[1],
                        diff_obj.diff_prettyHtml(log[2])]]
-    return render(request, "board/test.html",
+    return render(request, "board/board_modifylog.html",
                   {
+                      'post': post,
                       'modify_log': modify_log,
                       'board_list': board_list,
-                      'querystring': querystring,
-                      'post_list': post_list,
                       'current_board': current_board,
-                      'paginator': paginator,
                   })
 
 
