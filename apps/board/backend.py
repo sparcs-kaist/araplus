@@ -140,9 +140,7 @@ def _get_current_board(request, board_url):
         board['board_name'] = board_model.name
         board['board_url'] = board_model.name
     except:
-        board['board_id'] = 0
-        board['board_name'] = 'All'
-        board['board_url'] = 'all'
+        pass
     return board
 
 

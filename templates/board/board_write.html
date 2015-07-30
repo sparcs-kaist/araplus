@@ -2,7 +2,7 @@
 {% block js %}
 <script>
     $(document).ready(function(){
-        $(".category_{{current_board.board_id|default:'1'}}").removeAttr("style");
+        $(".category_{{current_board.board_id|default:board_list.0.board_id}}").removeAttr("style");
         $(".board").click(function(){
             var bid = $(this).attr("id");
             var bname = $(this).text() + " <span class='caret'></span>";

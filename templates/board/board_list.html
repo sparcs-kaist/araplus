@@ -34,9 +34,9 @@
                         <td width="150">{{pst.username}}</td>
                         <td width="150"><a href="/board/{{pst.board.board_url}}/">{{pst.board.board_name}}</a></td>
                         {%if pst.is_notice%}
-                        <td width="350"><a href="/board/{{current_board.board_url}}/{{pst.post_id}}/{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
+                        <td width="350"><a href="/board/{{current_board.board_url|default:'all'}}/{{pst.post_id}}/{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
                         {%else%}
-                        <td width="350"><a href="/board/{{current_board.board_url}}/{{pst.post_id}}/{{querystring}}">{{pst.title}} [{{pst.comment_count}}]</a></td>
+                        <td width="350"><a href="/board/{{current_board.board_url|default:'all'}}/{{pst.post_id}}/{{querystring}}">{{pst.title}} [{{pst.comment_count}}]</a></td>
                         {%endif%}
                         <td width="100">+{{pst.vote.up}}/-{{pst.vote.down}}</td>
                         <td width="150">{{pst.created_time}}</td>
@@ -46,15 +46,15 @@
         </table>
         <button class="btn btn-warn">
             {% if is_adult %}
-            <a href="/board/{{current_board.board_url}}/{{querystring}}&adult_filter=false" id='2'>See Adult</a>
+            <a href="/board/{{current_board.board_url|default:'all'}}/{{querystring}}&adult_filter=false" id='2'>See Adult</a>
             {% else %}
-            <a href="/board/{{current_board.board_url}}/{{querystirng}}&adult_filter=true" id='1'>Filter Adult Post</a>
+            <a href="/board/{{current_board.board_url|default:'all'}}/{{querystirng}}&adult_filter=true" id='1'>Filter Adult Post</a>
             {% endif %}
         </button>
-        <a class="btn btn-info" href="/board/{{current_board.board_url}}/post/">Write</a>
+        <a class="btn btn-info" href="/board/{{current_board.board_url|default:board_list.0.board_url}}/post/">Write</a>
         <div class="paginator">
             {%for page in paginator%}
-            <a href="/board/{{current_board.board_url}}/?page={{page.url}}">{{page.page}} </a>
+            <a href="/board/{{current_board.board_url|default:'all'}}/?page={{page.url}}">{{page.page}} </a>
             {%endfor%}
         </div>
     </div>
