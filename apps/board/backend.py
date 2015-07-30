@@ -94,6 +94,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
         post['post_id'] = board_post.id
         post['vote'] = board_post.board_content.get_vote()
         post['comment_count'] = board_post.board_comment.count()
+        post['is_best'] = board_post.is_best
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
         if board_post.board_content.is_deleted:

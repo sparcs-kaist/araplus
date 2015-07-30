@@ -35,6 +35,8 @@
                         <td width="150"><a href="/board/{{pst.board.board_url}}/">{{pst.board.board_name}}</a></td>
                         {%if pst.is_notice%}
                         <td width="350"><a href="/board/{{current_board.board_url|default:'all'}}/{{pst.post_id}}/{{querystring}}"><label style="color :black">Notice:{{pst.title}}</label></a></td>
+                        {%elif pst.is_best%}
+                        <td width="350"><a href="/board/{{current_board.board_url|default:'all'}}/{{pst.post_id}}/{{querystring}}" style="color:red">{{pst.title}} [{{pst.comment_count}}]</a></td>
                         {%else%}
                         <td width="350"><a href="/board/{{current_board.board_url|default:'all'}}/{{pst.post_id}}/{{querystring}}">{{pst.title}} [{{pst.comment_count}}]</a></td>
                         {%endif%}
