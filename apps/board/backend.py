@@ -1,6 +1,7 @@
 # -*- coding: utf-8
 from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
+import diff_match_patch
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
@@ -111,12 +112,12 @@ def _get_post_list(request, board_url='', item_per_page=15):
         paging['page'] = str(i)
         paging['url'] = str(i)
         paginator.append(paging)
-    if page < last_page-(last_page-1) % 10:
-        paging = {}
-        paging['page'] = 'next'
-        paging['url'] = str((page-(page-1) % 10+10))
-        paginator.append(paging)
-    return (post_list, paginator)
+        if page < last_page-(last_page-1) % 10:
+            paging = {}
+            paging['page'] = 'next'
+            paging['url'] = str((page-(page-1) % 10+10))
+            paginator.append(paging)
+        return (post_list, paginator)
 
 
 def _get_board_list():
@@ -265,6 +266,8 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         board_content = BoardContent()
     if not content:
         return
+    diff_obj = diff_match_patch.diff_match_patch()
+    content_diff = diff_obj.diff_main(board_content.content, content)
     board_content.content = content
     board_content.is_adult = bool(is_adult)
     if not modify:
@@ -293,6 +296,17 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         board_post.is_notice = bool(is_notice)
         board_post.author = user_profile
         board_post.title = title
+        if modify:
+            diff_obj.diff_cleanupSemantic(content_diff)
+            new_content_diff = []
+            for diff_element in content_diff:
+                diff_element = list(diff_element)
+                if diff_element[0] == 0 and len(diff_element[1]) >= 15:
+                    diff_element[1] = diff_element[1][0:5] +\
+                                      ' ... ' +\
+                                      diff_element[1][-5:]
+                new_content_diff = new_content_diff + [diff_element]
+            board_post.set_log([new_content_diff]+board_post.get_log())
         board_post.save()
         return board_post.id
     elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':

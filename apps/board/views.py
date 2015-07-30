@@ -9,6 +9,7 @@ from apps.board.backend import _write_post, _get_current_board
 from apps.board.backend import _delete_post, _report, _vote
 from django.utils import timezone
 import json
+import diff_match_patch
 
 
 def home(request):
@@ -60,6 +61,17 @@ def post_read(request, board_url, post_id):
                       'current_board': current_board,
                       'paginator': paginator,
                   })
+
+
+@login_required(login_url='/session/login')
+def post_modify_log(request, board_url, post_id):
+    diff_obj = diff_match_patch.diff_match_patch()
+    board_post = BoardPost.objects.filter(id=post_id)[0]
+    html = ""
+    for log in board_post.get_log():
+        html = html + "<br>--------------------------<br>"+\
+               diff_obj.diff_prettyHtml(log)
+    return render(request, "board/test.html", {'html': html})
 
 
 @login_required(login_url='/session/login')

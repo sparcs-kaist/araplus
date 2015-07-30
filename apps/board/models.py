@@ -1,5 +1,6 @@
 from django.db import models
 import apps.session.models
+import json
 
 
 class BoardContent(models.Model):
@@ -127,6 +128,11 @@ class BoardPost(models.Model):
                                        related_name='board_post',
                                        null=True,
                                        blank=True)
+    modify_log = models.CharField(max_length=5000, default='[]')
+    def set_log(self, log):
+        self.modify_log = json.dumps(log)
+    def get_log(self):
+        return json.loads(self.modify_log)
 
 
     def __unicode__(self):
