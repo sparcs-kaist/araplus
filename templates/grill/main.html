@@ -1,4 +1,12 @@
 {% extends "base.html" %}
+{% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function() {
+        jQuery("abbr.timeago").timeago();
+    });
+</script>
+{% endblock %}
 {% block content %}
 <div class="container">
     <table class="table" width=700>
@@ -19,7 +27,9 @@
                         <a href="{% url 'view_grill' grill.id %}">{{ grill.title }}</a>
                     </p>
                 </td>
-                <td width=100><p align=center>{{ grill.created_time }}</p></td>
+                <td width=100><p align=center>
+                    <abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
+            </p></td>
             </tr>
             {% endfor %}
         </ul>

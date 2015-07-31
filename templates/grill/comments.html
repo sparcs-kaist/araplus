@@ -3,7 +3,9 @@
         <div class="comment-meta">
             <span class="col-md-1">{{ comment.order }}</span>
             <strong>{{ comment.author.nickname }}</strong>
-            <span class="pull-right">{{ comment.created_time }}</span>
+            <span class="pull-right">
+                <abbr class="timeago" timeago="{{ comment.created_time|date:"c" }}" title="{{ comment.created_time }}"></abbr>
+            </span>
         </div>
         <div class="comment-content-container">
             {% if comment.hate %}

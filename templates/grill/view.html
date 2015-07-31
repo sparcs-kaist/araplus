@@ -8,6 +8,15 @@ ARA Plus Grill
 {% block js %}
 <script src="http://bit.sparcs.org:9779/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function() {
+        jQuery("abbr.timeago").timeago();
+    });
+    setInterval(function() {
+        jQuery("abbr.timeago").timeago();
+    }, 1000);
+</script>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -22,11 +31,15 @@ ARA Plus Grill
         </div>
         <div>
             <span class="col-md-2">작성일:</span>
-            <span>{{ grill.created_time }}</span>
+            <span>
+                <abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
+            </span>
         </div>
         <div>
             <span class="col-md-2">최근 댓글:</span>
-            <span>{{ grill.updated_time }}</span>
+            <span>
+                <abbr class="timeago" timeago="{{ grill.updated_time|date:"c" }}" title="{{ grill.updated_time }}"></abbr>
+            </span>
         </div>
         <div>
             <span class="col-md-2">내용:</span>

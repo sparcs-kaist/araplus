@@ -95,8 +95,10 @@ def add_comment(request, grill_id):
     ms += '<span class="col-md-1">' + str(new_comment.order) + '</span>'
     ms += '<strong>' + new_comment.author.nickname.encode('utf-8')
     ms += '</strong>'
-    ms += '<span class="pull-right">' + str(new_comment.created_time)
-    ms += '</span></div>'
+    ms += '<span class="pull-right"><abbr class="timeago" timeago='
+    ms += new_comment.created_time.isoformat()
+    ms += ' title='+str(new_comment.created_time)+'>'
+    ms += '</abbr></span></div>'
     ms += '<div class="comment-content-container">'
     ms += '<span>' + new_comment.replace_tags().encode('utf8') + '</span>'
     ms += '<div class="comment-vote-container">'
