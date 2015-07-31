@@ -2,6 +2,10 @@
 from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import diff_match_patch
+import random
+
+prefix = ['잔인한', '츤츤대는', '멋진', '운좋은', '귀여운']
+name = ['양아치', '루저', '외톨', '올빼미', '밤비']
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
@@ -38,14 +42,14 @@ def _get_post_list(request, board_url='', item_per_page=15):
         post_count = board_post.count()
     if post_count == 0:
         post_count = 1
-    last_page = (post_count-1)/item_per_page+1
+    last_page = (post_count - 1) / item_per_page + 1
     if page < 1:
         page = 1
     elif page > last_page:
         page = last_page
     board_post_notice = board_post_notice[:5]
     board_post_all = board_post[
-        (page*item_per_page-item_per_page):(page*item_per_page)]
+        (page * item_per_page - item_per_page):(page * item_per_page)]
     post_list = []
     for board_post in board_post_notice:
         post = {}
@@ -54,7 +58,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
                 continue
             post['is_notice'] = True
         if board_post.board_content.is_anonymous:
-            post['username'] = 'anonymous'
+            post['username'] = board_post.board_content.is_anonymous
         else:
             post['username'] = board_post.author.nickname
         post_board = {}
@@ -70,7 +74,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
             post['title'] = 'filtered'
         try:
             is_read = BoardPostIs_read.objects.get(board_post=board_post,
-                                          userprofile=request.user.userprofile)
+                                                   userprofile=request.user.userprofile)
             if is_read.last_read > board_post.board_content.modified_time:
                 post['is_read'] = ' '
             else:
@@ -82,7 +86,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
         post = {}
         post['is_notice'] = False
         if board_post.board_content.is_anonymous:
-            post['username'] = 'anonymous'
+            post['username'] = board_post.board_content.is_anonymous
         else:
             post['username'] = board_post.author.nickname
         post_board = {}
@@ -101,7 +105,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
             post['title'] = '--Deleted--'
         try:
             is_read = BoardPostIs_read.objects.get(board_post=board_post,
-                                          userprofile=request.user.userprofile)
+                                                   userprofile=request.user.userprofile)
             if is_read.last_read > board_post.board_content.modified_time:
                 post['is_read'] = ' '
             else:
@@ -113,19 +117,19 @@ def _get_post_list(request, board_url='', item_per_page=15):
     if page > 10:
         paging = {}
         paging['page'] = 'prev'
-        paging['url'] = str((page-page % 10))
+        paging['url'] = str((page - page % 10))
         paginator.append(paging)
-    for i in range(page-(page-1) % 10, page-(page-1) % 10+10):
+    for i in range(page - (page - 1) % 10, page - (page - 1) % 10 + 10):
         if i > last_page:
             break
         paging = {}
         paging['page'] = str(i)
         paging['url'] = str(i)
         paginator.append(paging)
-        if page < last_page-(last_page-1) % 10:
+        if page < last_page - (last_page - 1) % 10:
             paging = {}
             paging['page'] = 'next'
-            paging['url'] = str((page-(page-1) % 10+10))
+            paging['url'] = str((page - (page - 1) % 10 + 10))
             paginator.append(paging)
         return (post_list, paginator)
 
@@ -184,7 +188,7 @@ def _get_content(request, post_id):
     post = _get_post(request, board_post, 'Post')
     comment_list = []
     for board_comment in board_post.board_comment.all():
-        if not board_comment.original_comment == None:
+        if board_comment.original_comment is not None:
             continue
         comment = _get_post(request, board_comment, 'Comment')
         re_comment_list = []
@@ -232,13 +236,14 @@ def _get_post(request, board_post, type):
     post['created_time'] = board_content.created_time
     post['username'] = userprofile.nickname
     if board_content.is_anonymous:
-        post['username'] = 'anonymous'
+        post['username'] = board_content.is_anonymous
     post['return'] = (userprofile == request.user.userprofile)
     post['vote'] = board_content.get_vote()
     post['vote']['is_up'] = False
     post['vote']['is_down'] = False
     try:
-        is_vote = BoardContentVote.objects.get(userprofile=userprofile, board_content=board_content)
+        is_vote = BoardContentVote.objects.get(
+            userprofile=userprofile, board_content=board_content)
         if is_vote.is_up:
             post['vote']['is_up'] = True
         else:
@@ -283,8 +288,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
     content_diff = diff_obj.diff_main(board_content.content, content)
     board_content.content = content
     board_content.is_adult = bool(is_adult)
-    if not modify:
-        board_content.is_anonymous = bool(is_anonymous)
+
     if is_post_or_comment == 'Post':
         board = request.POST.get('board', 0)
         is_notice = request.POST.get('notice', False)
@@ -294,6 +298,10 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
             board_post = board_content.board_post
         else:
             board_post = BoardPost()
+            if bool(is_anonymous):
+                board_content.is_anonymous = _generate_name()  # 닉네임 부여
+            else:
+                board_content.is_anonymous = None
         try:
             board_post.board = Board.objects.get(id=board)
         except ObjectDoesNotExist:
@@ -317,15 +325,16 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
                 diff_element[1] = diff_element[1].replace("\r\n", " ")
                 if diff_element[0] == 0 and len(diff_element[1]) >= 15:
                     diff_element[1] = diff_element[1][0:5] +\
-                                      ' ... ' +\
-                                      diff_element[1][-5:]
+                        ' ... ' +\
+                        diff_element[1][-5:]
                 new_content_diff = new_content_diff + [diff_element]
             new_content_diff = [[title,
-                                str(board_content.modified_time),
-                                new_content_diff]]
-            board_post.set_log(new_content_diff+board_post.get_log())
+                                 str(board_content.modified_time),
+                                 new_content_diff]]
+            board_post.set_log(new_content_diff + board_post.get_log())
         board_post.save()
         return board_post.id
+    # comment
     elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':
         if is_post_or_comment == 'Comment':
             board_post_id = request.POST.get('board_post_id', 0)
@@ -348,7 +357,8 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
         else:
             try:
                 if is_post_or_comment == 'Re-Comment':
-                    original_comment = BoardComment.objects.get(id=board_comment_id)
+                    original_comment = BoardComment.objects.get(
+                        id=board_comment_id)
                     if original_comment.board_content.is_deleted:
                         return
                 if board_post.board_content.is_deleted:
@@ -359,6 +369,20 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
             if is_post_or_comment == 'Re-Comment':
                 board_comment.original_comment = original_comment
             board_comment.board_post = board_post
+
+            if bool(is_anonymous):
+                if user_profile == board_post.author and board_post.board_content.is_anonymous:
+                    board_content.is_anonymous = board_post.board_content.is_anonymous
+                else:
+                    former_comments = board_post.board_comment.all()
+                    board_content.is_anonymous = None
+                    for comment in former_comments:
+                        if user_profile == comment.author and comment.board_post.is_anonymous:
+                            board_content.is_anonymous = comment.board_post.is_anonymous
+                            break
+                    if not board_content.is_anonymous:
+                        board_content.is_anonymous = _generate_name(board_post)
+
         board_comment.author = user_profile
         board_content.save()
         board_comment.board_content = board_content
@@ -370,7 +394,7 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
 
 
 def _delete_post(request):
-    message = ''
+    # message = ''
     board_content_id = request.POST.get('id', 0)
     try:
         board_content = BoardContent.objects.get(id=board_content_id)
@@ -427,7 +451,7 @@ def _vote(request):
                     content_vote.is_up = is_up_or_down
                     content_vote.save()
                     _make_best(board_content)
-                    return {'success': 'changed to ' + vote_type, 'vote': board_content.get_vote(),'cancel': 'no'}
+                    return {'success': 'changed to ' + vote_type, 'vote': board_content.get_vote(), 'cancel': 'no'}
             except:
                 vote = BoardContentVote()
                 vote.is_up = is_up_or_down
@@ -460,8 +484,42 @@ def _make_best(board_content):
     if hasattr(board_content, 'board_post'):
         board_post = board_content.board_post
         vote = board_content.get_vote()
-        if vote['up'] > 0 and board_post.is_best == False:
+        if vote['up'] > 0 and board_post.is_best is False:
             board_post.is_best = True
             board_post.save()
             return True
     return False
+
+
+def _is_anonymous_duplicate(board_post, name, cache):
+    if not board_post:
+        return False, []
+    if cache:
+        return name in cache, cache
+    former_comments = board_post.board_comment.all()
+    names = [comment.board_content.is_anonymous
+             for comment in former_comments
+             if comment.board_content.is_anonymous]
+    names.append(board_post.board_content.is_anonymous)
+
+    if name in names:
+        return True, names
+    else:
+        return False, names
+
+
+def _generate_name(board_post=None):
+    prefix_index = random.randint(0, 4)
+    name_index = random.randint(0, 4)
+
+    anonymous_name = prefix[prefix_index] + ' ' + name[name_index]
+    ret_val, cache = _is_anonymous_duplicate(board_post, anonymous_name, [])
+    while ret_val:
+        prefix_index = random.randint(0, 4)
+        name_index = random.randint(0, 4)
+
+        anonymous_name = prefix[prefix_index] + ' ' + name[name_index]
+        ret_val, cache = _is_anonymous_duplicate(board_post, anonymous_name,
+                                                 cache)
+
+    return anonymous_name

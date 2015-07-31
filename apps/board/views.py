@@ -7,7 +7,6 @@ from apps.board.backend import _get_post_list, _get_board_list
 from apps.board.backend import _get_querystring, _get_content
 from apps.board.backend import _write_post, _get_current_board
 from apps.board.backend import _delete_post, _report, _vote
-from django.utils import timezone
 import json
 import diff_match_patch
 
@@ -76,9 +75,9 @@ def post_modify_log(request, board_url, post_id):
     modify_log = []
     for log in board_post.get_log():
         modify_log = modify_log +\
-                     [[log[0],
-                       log[1],
-                       diff_obj.diff_prettyHtml(log[2])]]
+            [[log[0],
+              log[1],
+              diff_obj.diff_prettyHtml(log[2])]]
     return render(request, "board/board_modifylog.html",
                   {
                       'post': post,
@@ -100,7 +99,7 @@ def post_modify(request, board_url, post_id):
         post_id = _write_post(request, 'Post', modify=True)
         if post_id:
             querystring = _get_querystring(request, 'best', 'page')
-            return redirect('../'+querystring)
+            return redirect('../' + querystring)
         return redirect('../')
     post = _get_content(request, post_id)[0]
     post['new'] = False
@@ -120,7 +119,7 @@ def comment_write(request, post_id_check):
     if request.method == 'POST':
         post_id = _write_post(request, 'Comment', post_id_check)
     querystring = _get_querystring(request, 'bset', 'page')
-    return redirect('../'+querystring)
+    return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')
@@ -128,7 +127,7 @@ def comment_modify(request, post_id_check):
     if request.method == 'POST':
         post_id = _write_post(request, 'Comment', post_id_check, True)
     querystring = _get_querystring(request, 'best', 'page')
-    return redirect('../'+querystring)
+    return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')
@@ -136,7 +135,7 @@ def re_comment_write(request):
     if request.method == 'POST':
         post_id = _write_post(request, 'Re-Comment')
     querystring = _get_querystring(request, 'best', 'page')
-    return redirect('../'+querystring)
+    return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')

@@ -8,7 +8,7 @@ class BoardContent(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False, null=False)
-    is_anonymous = models.BooleanField(default=False, null=False)
+    is_anonymous = models.TextField(default=None, null=True)
     is_adult = models.BooleanField(default=False, null=False)
 
     def __str__(self):
