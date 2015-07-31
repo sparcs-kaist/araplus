@@ -7,6 +7,7 @@ from .forms import GrillAddForm, CommentAddForm
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import SuspiciousOperation
 import json
 import datetime
 
@@ -79,6 +80,8 @@ def add_comment(request, grill_id):
     post_data = request.POST
     grill = get_object_or_404(Grill, pk=grill_id)
     userprofile = UserProfile.objects.get(user=request.user)
+    if len(post_data.get('new_content')) > 140:
+        raise SuspiciousOperation('Too long content')
     new_comment = GrillComment(
         grill=grill, author=userprofile, content=post_data.get('new_content'))
     new_comment.save()
