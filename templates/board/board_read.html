@@ -1,6 +1,12 @@
 
 {% extends "board/board_list.html" %}
 {% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+  jQuery(document).ready(function() {
+    jQuery("abbr.timeago").timeago();
+  });
+</script>
 <script>
     $(document).ready(function(){
         $(".comment").click(function(){
