@@ -1,4 +1,14 @@
 {% extends "base.html" %}
+{% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+  jQuery(document).ready(function() {
+    jQuery("abbr.timeago").timeago();
+  });
+</script>
+{% block js2 %}
+{% endblock %}
+{% endblock %}
 {% block content %}
 {% block board_read %}
 {% endblock %}
@@ -41,7 +51,9 @@
                         <td width="350"><a href="/board/{{current_board.board_url|default:'all'}}/{{pst.post_id}}/{{querystring}}">{{pst.title}} [{{pst.comment_count}}]</a></td>
                         {%endif%}
                         <td width="100">+{{pst.vote.up}}/-{{pst.vote.down}}</td>
-                        <td width="150">{{pst.created_time}}</td>
+                        <td width="150">
+                            <abbr class="timeago" title={{pst.created_time|date:"c"}}>{{pst.created_time}}</abbr>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
