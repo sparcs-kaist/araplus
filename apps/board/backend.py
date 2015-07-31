@@ -376,7 +376,6 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
                 else:
                     former_comments = board_post.board_comment.filter(
                         author=user_profile)
-                    print former_comments
                     board_content.is_anonymous = None
                     for comment in former_comments:
                         if comment.board_content.is_anonymous:
