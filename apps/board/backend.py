@@ -374,11 +374,13 @@ def _write_post(request, is_post_or_comment, check=0, modify=False):
                 if user_profile == board_post.author and board_post.board_content.is_anonymous:
                     board_content.is_anonymous = board_post.board_content.is_anonymous
                 else:
-                    former_comments = board_post.board_comment.all()
+                    former_comments = board_post.board_comment.filter(
+                        author=user_profile)
+                    print former_comments
                     board_content.is_anonymous = None
                     for comment in former_comments:
-                        if user_profile == comment.author and comment.board_post.is_anonymous:
-                            board_content.is_anonymous = comment.board_post.is_anonymous
+                        if comment.board_content.is_anonymous:
+                            board_content.is_anonymous = comment.board_content.is_anonymous
                             break
                     if not board_content.is_anonymous:
                         board_content.is_anonymous = _generate_name(board_post)
