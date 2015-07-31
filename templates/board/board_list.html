@@ -52,7 +52,7 @@
                         {%endif%}
                         <td width="100">+{{pst.vote.up}}/-{{pst.vote.down}}</td>
                         <td width="150">
-                            <abbr class="timeago" title={{pst.created_time|date:"c"}}>{{pst.created_time}}</abbr>
+                            <abbr class="timeago" timeago="{{pst.created_time|date:"c"}}" title="{{pst.created_time}}"></abbr>
                         </td>
                     </tr>
                 {% endfor %}

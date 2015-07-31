@@ -93,7 +93,7 @@
     datetime: function(elem) {
       // jQuery's `is()` doesn't play well with HTML5 in IE
       var isTime = $(elem).get(0).tagName.toLowerCase() == "time"; // $(elem).is("time");
-      var iso8601 = isTime ? $(elem).attr("datetime") : $(elem).attr("title");
+      var iso8601 = isTime ? $(elem).attr("datetime") : $(elem).attr("timeago");
       return $t.parse(iso8601);
     }
   });
@@ -121,10 +121,8 @@
     element = $(element);
     var data = element.data("timeago");
     if (!data.datetime) {
-      data = $.extend(true, {}, data, { datetime: $t.datetime(element) })
-      element.data("timeago", data);
-      var text = $.trim(element.text());
-      if (text.length > 0) element.attr("title", text);
+        data = $.extend(true, {}, data, { datetime: $t.datetime(element) })
+        element.data("timeago", data);
     }
     return data;
   }
