@@ -3,6 +3,7 @@ from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import diff_match_patch
 import random
+from apps.board.forms import *
 
 prefix = ['잔인한', '츤츤대는', '멋진', '운좋은', '귀여운']
 name = ['양아치', '루저', '외톨', '올빼미', '밤비']
@@ -254,7 +255,66 @@ def _get_post(request, board_post, type):
     return post
 
 
+# for test(아직 수정로그를 추가하는 작업을 하지 못했음)
+def _write_post_test(request, board="All", is_modify=False, post=None, content=None):
+    form_content = BoardContentForm(
+        request.POST,
+        instance=content,
+        is_modify=is_modify)
+    form_post = BoardPostForm(
+        request.POST,
+        instance=post)
+    if form_post.is_valid() and form_content.is_valid():
+        board_post = form_post.save(
+            author=request.user.userprofile,
+            content=form_content.save(author=request.user.userprofile,
+                                      post=post))
+        return {'save': board_post}
+    else:
+        return {'failed': [form_content, form_post]}
+
+
+
+def _write_comment(request, post_id, is_modify=False, is_recomment=False):
+    user_profile = request.user.userprofile
+    comment_id = request.POST.get('board_comment_id', 0)
+    if is_modify:
+        try:
+            board_comment = BoardComment.objects.get(id=comment_id)
+            if board_comment.author != user_profile:
+                return  # wrong request
+            content_form = BoardContentForm(
+                request.POST,
+                instance=board_comment.board_content,
+                is_modify=True)
+        except:
+            return  # no board_comment
+    else:  # wirte new comment
+        content_form = BoardContentForm(request.POST)
+        board_comment = BoardComment(author=user_profile)
+        try:
+            board_comment.board_post = BoardPost.objects.get(id=post_id)
+        except:
+            return  # no post
+        if is_recomment:
+            try:
+                board_comment.original_comment = BoardComment.objects.get(
+                    id=comment_id)
+            except:
+                return  # no original comment
+    if content_form.is_valid():
+        board_comment.board_content = content_form.save(
+            author=user_profile,
+            post=board_comment.board_post)
+    else:
+        return  # Invalid form
+    board_comment.save()
+    return board_comment.board_post.id
+##########################################################################
+
+
 def _write_post(request, is_post_or_comment, check=0, modify=False):
+    # 현재 사용하지는 않으나 수정 로그 구현을 참고하기 위해 남겨둠
     user_profile = request.user.userprofile
     content = request.POST.get('content', '')
     is_anonymous = request.POST.get('anonymous', False)
@@ -490,37 +550,3 @@ def _make_best(board_content):
             board_post.save()
             return True
     return False
-
-
-def _is_anonymous_duplicate(board_post, name, cache):
-    if not board_post:
-        return False, []
-    if cache:
-        return name in cache, cache
-    former_comments = board_post.board_comment.all()
-    names = [comment.board_content.is_anonymous
-             for comment in former_comments
-             if comment.board_content.is_anonymous]
-    names.append(board_post.board_content.is_anonymous)
-
-    if name in names:
-        return True, names
-    else:
-        return False, names
-
-
-def _generate_name(board_post=None):
-    prefix_index = random.randint(0, 4)
-    name_index = random.randint(0, 4)
-
-    anonymous_name = prefix[prefix_index] + ' ' + name[name_index]
-    ret_val, cache = _is_anonymous_duplicate(board_post, anonymous_name, [])
-    while ret_val:
-        prefix_index = random.randint(0, 4)
-        name_index = random.randint(0, 4)
-
-        anonymous_name = prefix[prefix_index] + ' ' + name[name_index]
-        ret_val, cache = _is_anonymous_duplicate(board_post, anonymous_name,
-                                                 cache)
-
-    return anonymous_name

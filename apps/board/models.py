@@ -103,7 +103,7 @@ class Board(models.Model):
     description = models.CharField(max_length=100, null=False)
 
     def __str__(self):
-        return "board %s" % self.name
+        return self.name
 
 
 class BoardCategory(models.Model):

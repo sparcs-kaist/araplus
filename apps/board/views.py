@@ -1,5 +1,5 @@
 # -*- coding: utf-8
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from apps.board.models import *
@@ -7,34 +7,63 @@ from apps.board.backend import _get_post_list, _get_board_list
 from apps.board.backend import _get_querystring, _get_content
 from apps.board.backend import _write_post, _get_current_board
 from apps.board.backend import _delete_post, _report, _vote
+from apps.board.backend import _write_post_test, _write_comment
 import json
 import diff_match_patch
+from apps.board.forms import *
 
 
 def home(request):
     return redirect('all/')
 
 
+# test ############################################
 @login_required(login_url='/session/login')
-def post_write(request, board_url):
-    post = {}
-    post['new'] = True
+def post_write(request, board="All"):
     if request.method == 'POST':
-        post_id = _write_post(request, 'Post')
-        if post_id:
-            #  board_id = BoardPost.objects.filter(id=post_id)[0].board.id
-            return redirect('../' + str(post_id))
+        result = _write_post_test(request, board)
+        if 'save' in result:
+            return redirect('../' + str(result['save'].id) + '/')
         else:
-            return redirect('../')
-    current_board = _get_current_board(request, board_url)
-    # official=request.user.userprofile.is_official
-    board_list = _get_board_list()
-    categories = BoardCategory.objects.all()
+            form_content, form_post = result['failed']
+    else:
+        try:
+            board = Board.objects.get(nema=board)
+        except:
+            board = Board.objects.get(id=1)
+        form_content = BoardContentForm()
+        form_post = BoardPostForm(initial={'board': board.id})
     return render(request,
                   'board/board_write.html',
-                  {"post": post, "board_list": board_list,
-                   "current_board": current_board,
-                   "Categories": categories})
+                  {'content_form': form_content,
+                   'post_form': form_post})
+
+
+@login_required(login_url='/session/login')
+def post_modify(request, post_id=0):
+    post_instance = get_object_or_404(BoardPost, id=post_id)
+    if post_instance.author != request.user.userprofile:
+        return redirect('../')
+    if request.method == "POST":
+        result = _write_post_test(request,
+                                  post=post_instance,
+                                  content=post_instance.board_content,
+                                  is_modify=True)
+        if 'save' in result:
+            return redirect('../')
+        else:
+            form_content, form_post = result['failed']
+    else:
+        form_content = BoardContentForm(
+            is_modify=True,
+            instance=post_instance.board_content)
+        form_post = BoardPostForm(is_modify=True, instance=post_instance)
+    return render(request,
+                  'board/board_write.html',
+                  {'content_form': form_content,
+                   'post_form': form_post})
+
+######################################################
 
 
 @login_required(login_url='/session/login')
@@ -88,52 +117,25 @@ def post_modify_log(request, board_url, post_id):
 
 
 @login_required(login_url='/session/login')
-def post_modify(request, board_url, post_id):
-    try:
-        board_post = BoardPost.objects.filter(id=post_id)[0]
-        if request.user.userprofile != board_post.author:
-            return
-    except:
-        return
+def comment_write(request, post_id):
     if request.method == 'POST':
-        post_id = _write_post(request, 'Post', modify=True)
-        if post_id:
-            querystring = _get_querystring(request, 'best', 'page')
-            return redirect('../' + querystring)
-        return redirect('../')
-    post = _get_content(request, post_id)[0]
-    post['new'] = False
-    current_board = _get_current_board(request, board_url)
-    board_list = _get_board_list()
-    # official=request.user.userprofile.is_official
-    categories = BoardCategory.objects.all()
-    return render(request,
-                  'board/board_write.html',
-                  {"post": post, "board_list": board_list,
-                   "current_board": current_board,
-                   "Categories": categories})
-
-
-@login_required(login_url='/session/login')
-def comment_write(request, post_id_check):
-    if request.method == 'POST':
-        post_id = _write_post(request, 'Comment', post_id_check)
+        post_id = _write_comment(request, post_id)
     querystring = _get_querystring(request, 'bset', 'page')
     return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')
-def comment_modify(request, post_id_check):
+def comment_modify(request, post_id):
     if request.method == 'POST':
-        post_id = _write_post(request, 'Comment', post_id_check, True)
+        post_id = _write_comment(request, post_id, True)
     querystring = _get_querystring(request, 'best', 'page')
     return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')
-def re_comment_write(request):
+def re_comment_write(request,post_id):
     if request.method == 'POST':
-        post_id = _write_post(request, 'Re-Comment')
+        post_id = _write_comment(request, post_id, is_recomment=True)
     querystring = _get_querystring(request, 'best', 'page')
     return redirect('../' + querystring)
 

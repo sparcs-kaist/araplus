@@ -1,22 +1,17 @@
 {% extends "base.html" %}
+{% load bootstrap %}
 {% block js %}
 <script>
     $(document).ready(function(){
-        $(".category_{{current_board.board_id|default:board_list.0.board_id}}").removeAttr("style");
-        $(".board").click(function(){
-            var bid = $(this).attr("id");
-            var bname = $(this).text() + " <span class='caret'></span>";
-            $("#board_id").attr("value", bid);
-            $("#dropdownMenu1").html(bname);
-            $("#dropdownMenu2").html("------<div class='caret'></div>");
-            $("#cateogry_name").attr("value","");
-            $(".category").css("display", "none");
-            $(".category_"+bid).removeAttr("style");
-        });
-        $(".category").click(function(){
-            var cname = $(this).attr("id");
-            $("#category_name").attr("value",cname)
-            $("#dropdownMenu2").html(cname+'<span class="caret"></span>');
+        var selected_board = $( "#id_board option:selected");
+        var valid_categories = $(".category-"+selected_board.text());
+        valid_categories.removeAttr("style");
+        $("#id_board").change(function(){
+            selected_board = $( "#id_board option:selected");
+            valid_categories = $(".category-"+selected_board.text());
+            $("#id_board_category option:eq(0)").prop("selected", true);
+            $("#id_board_category .board_category").css("display", "none");
+            valid_categories.removeAttr("style");
         });
     });
 </script>
@@ -24,67 +19,60 @@
 {% block content %}
 <div class="container">
     <form method="POST">
-        {%csrf_token%}
-        {% if error %}
-        <div class="alert alert-danger" role="alert">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            <span class="sr-only">Error:</span>
-            {{ error }}
+        {% csrf_token %}
+        <div class="title">
+            {{ post_form.title|bootstrap }}
         </div>
-		{% endif %}
-		{% if post.new %}
-		<div class="form-group">
-			<label>Notice</label>
-			<input type="checkbox" name="notice">
-		</div>
-        <div class="form-group">
-            <label>Anonymous</label>
-            <input type="checkbox" name="anonymous">
+        <div id=selecting" class="col-xs-12" style="padding-left: 0;">
+            <div id="board" class="col-xs-3" style="padding-left: 0;">
+                {{ post_form.board|bootstrap }}
+            </div>
+            <div id="category" class="col-xs-2">
+                {% if post_form.board_category.errors %}
+                <div class="form-group has-error">
+                {% else %}
+                <div class="form-group">
+                {% endif %}
+                    <label class="control-label"
+                        for="id_board_category">Category</label>
+                    <div class=" ">
+                        <select class="form-control" id="id_board_category"
+                            name="board_category">
+                            <option value selected="selected">---------</option>
+                            {% for choice in post_form.board_category.field.queryset %}
+                            <option class="category-{{ choice.board }} board_category"
+                                value="{{ choice.id }}"
+                                style="display:none;">{{ choice.name }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if post_form.board_category.errors %}
+                        <span
+                            class="help-block">{{ post_form.board_category.errors|striptags }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="select">
+                <div id="adult" class="col-xs-2">
+                    {{ content_form.is_adult|bootstrap }}
+                </div>
+                {% if content_form.is_anonymous %}
+                <div id="anonymous" class="col-xs-3">
+                    {{ content_form.is_anonymous|bootstrap }}
+                </div>
+                {% endif %}
+                {% if post_form.is_notice %}
+                <div id="notice" class="col-xs-2"> 
+                    {{ post_form.is_notice|bootstrap }}
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
-        <div class="form-group">
-            <label>Adult</label>
-            <input type="checkbox" name="adult">
-		</div>		
-        <div class="form-group">            
-            <input type="text" class="form-control" name="title" value="{{post.title}}" placeholder="title">
+        <div id="content">
+            {{ content_form.content|bootstrap }}
         </div>
-        <div class="form-group">
-            <input type="hidden" class="form-control" id="board_id" name="board" value="{{ current_board.board_id|default:board_list.0.board_id}}">
-            <input type="hidden" class="form-control" id="category_name" name="category">
-            {% if not post.new %}
-            <input type="hidden" class="form-control" id="board_post_id" name="board_post_id" value={{ post.id }}>
-            {% endif %}
-            <ul class="nav nav-pills">
-                <li>
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{current_board.board_name|default:board_list.0.board_name}}
-                    <span class="caret"></span>
-                 </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    {% for board in board_list %}
-                    <li><a href="javascript:;" class="board" id="{{board.board_id}}">{{ board.board_name }}</a></li>
-                    {% endfor %}
-                </ul>
-                </li>
-                <li>
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">------
-                    <span class="caret"></span>
-                 </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                    {% for category in Categories %}
-                    <li><a href="javascript:;" class="category category_{{category.board.id}}" id="{{category.name}}" style="display: none;">{{ category.name }}</a></li>
-                    {% endfor %}
-                </ul>
-                </li>
-            </ul>
-        </div>
-        <div class="form-group">
-            <label>본문</label>
-            <textarea class="form-control" rows="15" name="content">{{post.content}}</textarea>
-        </div>
-        <button type="submit" class="btn btn-normal">Submit</button>
+        <button type="submit" class="btn btn-default">Submit</button>
     </form>
 </div>
 {% endblock %}
-
