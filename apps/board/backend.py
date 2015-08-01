@@ -5,9 +5,6 @@ import diff_match_patch
 import random
 from apps.board.forms import *
 
-prefix = ['잔인한', '츤츤대는', '멋진', '운좋은', '귀여운']
-name = ['양아치', '루저', '외톨', '올빼미', '밤비']
-
 
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
