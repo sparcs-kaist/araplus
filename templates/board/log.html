@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block css %}
+<style>
+    .panel-heading{
+        height: 72px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <div>
+                <label class="col-md-5">Title: {{ post.0 }}</label>
+                <span class="col-md-3"></span>
+                <span class="col-md-2">Board: {{ post.1 }}</span>
+                <span class="col-md2">Category: {{ post.2|default:"" }}</span>
+            </div>
+            <div>
+                <span class="col-md-10">{{ post.3}}</span>
+            </div>
+        </div>
+        <div class="panel-body">
+            {% autoescape off %}{{ post.4 }}{% endautoescape %}
+        </div>
+    </div>
+</div>
+<div class="container">
+    <span class="col-md-10">현재 게시글은 총 {{ modify_log|length }} 번 수정되었습니다.(최근에 수정 된 순서대로 표시 됩니다.)</span>
+</div>
+<div class="container">
+    {% for log in modify_log %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div>
+                <label class="col-md-5">Title: {% autoescape off %}{{ log.0 }}{% endautoescape %}</label>
+                <span class="col-md-3"></span>
+                <span class="col-md-2">Board: {% autoescape off %}{{ log.1 }}{% endautoescape %}</span>
+                <span class="col-md2">Category: {% autoescape off %}{{ log.2 }}{% endautoescape %}</span>
+            </div>
+            <div>
+                <span class="col-md-10">{{ log.3}}</span>
+            </div>
+        </div>
+        <div class="panel-body">
+            {% autoescape off %}{{ log.4 }}{% endautoescape %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

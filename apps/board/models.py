@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 import apps.session.models
 import json
@@ -97,8 +98,17 @@ class BoardContentVotePolitical(models.Model):
 
 
 class BoardReport(models.Model):
-    reason = models.TextField(null=False)
-    content = models.TextField(default='Write something')
+    Reason1 = u'이유1'
+    Reason2 = u'이유2'
+    Etc = u'기타'
+    Reason_Choice = (
+        (Reason1, u'이유1'),
+        (Reason2, u'이유2'),
+        (Etc, u'기타'))
+    reason = models.CharField(max_length=4,
+                              choices=Reason_Choice,
+                              default=Etc)
+    content = models.TextField()
     created_time = models.DateTimeField(auto_now_add=True)
     board_content = models.ForeignKey('BoardContent',
                                       related_name="board_report",

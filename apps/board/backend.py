@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import diff_match_patch
 import random
 from apps.board.forms import *
+from django.core import serializers
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
@@ -264,17 +265,27 @@ def _write_post(request, is_modify=False, post=None,
         request.POST,
         instance=post)  # get form from post and instance
     try:  # for modify log, get title and content before modify.
+        # modify log for content
         content_before = content.content
+        # modify log for post
         title_before = post.title
+        board_before = post.board.name
+        category_before = post.board_category.name
     except:  # no such a content : is not modify
         pass
     if form_post.is_valid() and form_content.is_valid():
         if is_modify:
+            try:
+                category_after = post.board_category.name
+            except:
+                category_after = ""
             content_diff = [[str(content.modified_time),
                             _get_diff_match(content_before, content.content)]]
-            title_diff = [[post.title,
-                           _get_diff_match(title_before, post.title)]]
-            post.set_log(title_diff + post.get_log())
+            post_diff = [[
+                _get_diff_match(title_before, post.title),
+                _get_diff_match(board_before, post.board.name),
+                _get_diff_match(category_before, category_after)]]
+            post.set_log(post_diff + post.get_log())
             content.set_log(content_diff + content.get_log())
         board_post = form_post.save(
             author=request.user.userprofile,
@@ -344,21 +355,18 @@ def _delete_post(request):
 
 def _report(request):
     content_id = request.POST.get('id', 0)
-    report_reason = request.POST.get('report_reason', '')
-    report_content = request.POST.get('report_content', '')
-    if report_reason == '' or report_reason == '0':
-        return 'no reason'
-    try:
-        board_content = BoardContent.objects.get(id=content_id)
-    except ObjectDoesNotExist:
-        return 'no content'
-    board_report = BoardReport()
-    board_report.reason = report_reason
-    board_report.content = report_content
-    board_report.board_content = board_content
-    board_report.userprofile = request.user.userprofile
-    board_report.save()
-    return 'success'
+    report_form = BoardReportForm(request.POST)
+    print report_form.errors
+    if report_form.is_valid():
+        try:
+            board_content = BoardContent.objects.get(id=content_id)
+        except:
+            return {'message': 'No content'}
+        report_form.save(user=request.user.userprofile,
+                         content=board_content)
+        return {'message': 'Success'}
+    else:
+        return {'message': 'Invalid form'}
 
 
 def _vote(request):

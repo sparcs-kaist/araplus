@@ -84,6 +84,7 @@ class BoardReportForm(ModelForm):
 
     def save(self, *args, **kwargs):
         self.instance.userprofile = kwargs.pop('user')
+        self.instance.board_content = kwargs.pop('content')
         return super(BoardReportForm, self).save(*args, **kwargs)
 
 
