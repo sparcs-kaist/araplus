@@ -7,10 +7,11 @@ import random
 prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
 name = [u'양아치', u'루저', u'외톨', u'올빼미', u'밤비']
 
+
 class BoardContentForm(ModelForm):
     class Meta:
         model = BoardContent
-        exclude = ['created_time', 'is_deleted', ]
+        exclude = ['is_deleted', 'modify_log']
         widgets = {
             'content': Textarea(attrs={'rows': 15, }),
         }
@@ -29,7 +30,6 @@ class BoardContentForm(ModelForm):
             if self.cleaned_data['is_anonymous']:
                 self.instance.is_anonymous = _get_name(author, board_post)
             else:
-                print self.instance.is_anonymous
                 self.instance.is_anonymous = None
         except:
             self.cleaned_data['is_anonymous'] = self.instance.is_anonymous
@@ -55,6 +55,8 @@ class BoardPostForm(ModelForm):
     def save(self, *args, **kwargs):
         self.instance.author = kwargs.pop('author')
         self.instance.board_content = kwargs.pop('content')
+        if kwargs.pop('is_modify', False):  # update modify log
+            diff_obj
         return super(BoardPostForm, self).save(*args, **kwargs)
 
     def clean(self):

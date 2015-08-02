@@ -71,8 +71,9 @@ def _get_post_list(request, board_url='', item_per_page=15):
         if adult_filter == 'true' and board_post.board_content.is_adult:
             post['title'] = 'filtered'
         try:
-            is_read = BoardPostIs_read.objects.get(board_post=board_post,
-                                                   userprofile=request.user.userprofile)
+            is_read = BoardPostIs_read.objects.get(
+                board_post=board_post,
+                userprofile=request.user.userprofile)
             if is_read.last_read > board_post.board_content.modified_time:
                 post['is_read'] = ' '
             else:
@@ -102,8 +103,9 @@ def _get_post_list(request, board_url='', item_per_page=15):
         if board_post.board_content.is_deleted:
             post['title'] = '--Deleted--'
         try:
-            is_read = BoardPostIs_read.objects.get(board_post=board_post,
-                                                   userprofile=request.user.userprofile)
+            is_read = BoardPostIs_read.objects.get(
+                board_post=board_post,
+                userprofile=request.user.userprofile)
             if is_read.last_read > board_post.board_content.modified_time:
                 post['is_read'] = ' '
             else:
@@ -252,24 +254,35 @@ def _get_post(request, board_post, type):
     return post
 
 
-# for test(아직 수정로그를 추가하는 작업을 하지 못했음)
-def _write_post_test(request, board="All", is_modify=False, post=None, content=None):
+def _write_post(request, is_modify=False, post=None,
+                content=None, board="All"):
     form_content = BoardContentForm(
         request.POST,
         instance=content,
         is_modify=is_modify)
     form_post = BoardPostForm(
         request.POST,
-        instance=post)
+        instance=post)  # get form from post and instance
+    try:  # for modify log, get title and content before modify.
+        content_before = content.content
+        title_before = post.title
+    except:  # no such a content : is not modify
+        pass
     if form_post.is_valid() and form_content.is_valid():
+        if is_modify:
+            content_diff = [[str(content.modified_time),
+                            _get_diff_match(content_before, content.content)]]
+            title_diff = [[post.title,
+                           _get_diff_match(title_before, post.title)]]
+            post.set_log(title_diff + post.get_log())
+            content.set_log(content_diff + content.get_log())
         board_post = form_post.save(
             author=request.user.userprofile,
             content=form_content.save(author=request.user.userprofile,
-                                      post=post))
+                                      post=post))  # save
         return {'save': board_post}
     else:
         return {'failed': [form_content, form_post]}
-
 
 
 def _write_comment(request, post_id, is_modify=False, is_recomment=False):
@@ -307,148 +320,6 @@ def _write_comment(request, post_id, is_modify=False, is_recomment=False):
         return  # Invalid form
     board_comment.save()
     return board_comment.board_post.id
-##########################################################################
-
-
-def _write_post(request, is_post_or_comment, check=0, modify=False):
-    # 현재 사용하지는 않으나 수정 로그 구현을 참고하기 위해 남겨둠
-    user_profile = request.user.userprofile
-    content = request.POST.get('content', '')
-    is_anonymous = request.POST.get('anonymous', False)
-    is_adult = request.POST.get('adult', False)
-    if modify:
-        try:
-            if is_post_or_comment == 'Post':
-                board_post_id = int(request.POST.get('board_post_id', 0))
-                board_post = BoardPost.objects.get(id=board_post_id)
-                board_content = board_post.board_content
-                author = board_post.author
-            elif (is_post_or_comment == 'Comment'
-                    or is_post_or_comment == 'Re-Comment'):
-                board_comment_id = int(request.POST.get('board_comment_id', 0))
-                board_comment = BoardComment.objects.get(id=board_comment_id)
-                board_content = board_comment.board_content
-                author = board_comment.author
-            else:
-                return
-        except:
-            return
-        if author != user_profile:
-            return
-        if board_content.is_deleted:
-            return
-    else:
-        board_content = BoardContent()
-    if not content:
-        return
-    diff_obj = diff_match_patch.diff_match_patch()
-    content_diff = diff_obj.diff_main(board_content.content, content)
-    board_content.content = content
-    board_content.is_adult = bool(is_adult)
-
-    if is_post_or_comment == 'Post':
-        board = request.POST.get('board', 0)
-        is_notice = request.POST.get('notice', False)
-        category = request.POST.get('category', 0)
-        title = request.POST.get('title', '')
-        if modify:
-            board_post = board_content.board_post
-        else:
-            board_post = BoardPost()
-            if bool(is_anonymous):
-                board_content.is_anonymous = _generate_name()  # 닉네임 부여
-            else:
-                board_content.is_anonymous = None
-        try:
-            board_post.board = Board.objects.get(id=board)
-        except ObjectDoesNotExist:
-            return
-        try:
-            board_post.board_category = BoardCategory.objects.get(
-                name=category,
-                board=board_post.board)
-        except ObjectDoesNotExist:
-            pass
-        board_content.save()
-        board_post.board_content = board_content
-        board_post.is_notice = bool(is_notice)
-        board_post.author = user_profile
-        board_post.title = title
-        if modify:
-            diff_obj.diff_cleanupSemantic(content_diff)
-            new_content_diff = []
-            for diff_element in content_diff:
-                diff_element = list(diff_element)
-                diff_element[1] = diff_element[1].replace("\r\n", " ")
-                if diff_element[0] == 0 and len(diff_element[1]) >= 15:
-                    diff_element[1] = diff_element[1][0:5] +\
-                        ' ... ' +\
-                        diff_element[1][-5:]
-                new_content_diff = new_content_diff + [diff_element]
-            new_content_diff = [[title,
-                                 str(board_content.modified_time),
-                                 new_content_diff]]
-            board_post.set_log(new_content_diff + board_post.get_log())
-        board_post.save()
-        return board_post.id
-    # comment
-    elif is_post_or_comment == 'Comment' or is_post_or_comment == 'Re-Comment':
-        if is_post_or_comment == 'Comment':
-            board_post_id = request.POST.get('board_post_id', 0)
-            if not check == board_post_id:
-                print 'not allowed'
-                return
-        else:
-            board_comment_id = request.POST.get('board_comment_id', 0)
-            board_post_id = request.POST.get('board_post_id', 0)
-        try:
-            board_post = BoardPost.objects.get(id=board_post_id)
-        except ObjectsDoesNotExist:
-            return
-        if modify:
-            try:
-                board_comment_id = request.POST.get('board_comment_id', 0)
-                board_comment = BoardComment.objects.get(id=board_comment_id)
-            except ObjectDoesNotExist:
-                return
-        else:
-            try:
-                if is_post_or_comment == 'Re-Comment':
-                    original_comment = BoardComment.objects.get(
-                        id=board_comment_id)
-                    if original_comment.board_content.is_deleted:
-                        return
-                if board_post.board_content.is_deleted:
-                    return
-            except ObjectDoesNotExist:
-                return
-            board_comment = BoardComment()
-            if is_post_or_comment == 'Re-Comment':
-                board_comment.original_comment = original_comment
-            board_comment.board_post = board_post
-
-            if bool(is_anonymous):
-                if user_profile == board_post.author and board_post.board_content.is_anonymous:
-                    board_content.is_anonymous = board_post.board_content.is_anonymous
-                else:
-                    former_comments = board_post.board_comment.filter(
-                        author=user_profile)
-                    board_content.is_anonymous = None
-                    for comment in former_comments:
-                        if comment.board_content.is_anonymous:
-                            board_content.is_anonymous = comment.board_content.is_anonymous
-                            break
-                    if not board_content.is_anonymous:
-                        board_content.is_anonymous = _generate_name(board_post)
-
-        board_comment.author = user_profile
-        board_content.save()
-        board_comment.board_content = board_content
-        board_comment.save()
-        board_post.board_content.save()
-        return
-    else:
-        return
 
 
 def _delete_post(request):
@@ -504,12 +375,14 @@ def _vote(request):
                     userprofile=user_profile)
                 if content_vote.is_up == is_up_or_down:
                     content_vote.delete()
-                    return {'success': vote_type + ' canceled', 'vote': board_content.get_vote(), 'cancel': 'yes'}
+                    return {'success': vote_type + ' canceled',
+                            'vote': board_content.get_vote(), 'cancel': 'yes'}
                 else:
                     content_vote.is_up = is_up_or_down
                     content_vote.save()
                     _make_best(board_content)
-                    return {'success': 'changed to ' + vote_type, 'vote': board_content.get_vote(), 'cancel': 'no'}
+                    return {'success': 'changed to ' + vote_type,
+                            'vote': board_content.get_vote(), 'cancel': 'no'}
             except:
                 vote = BoardContentVote()
                 vote.is_up = is_up_or_down
@@ -517,14 +390,16 @@ def _vote(request):
             if BoardContentVoteAdult.objects.filter(
                     board_content=board_content,
                     userprofile=user_profile):
-                return {'success': 'Already voted' + vote_type, 'vote': board_content.get_vote()}
+                return {'success': 'Already voted' + vote_type,
+                        'vote': board_content.get_vote()}
             else:
                 vote = BoardContentVoteAdult()
         elif vote_type == 'political':
             if BoardContentVotePolitical.objects.filter(
                     board_content=board_content,
                     userprofile=user_profile):
-                return {'success': 'Already voted ' + vote_type, 'vote': board_content.get_vote()}
+                return {'success': 'Already voted ' + vote_type,
+                        'vote': board_content.get_vote()}
             else:
                 vote = BoardContentVotePolitical()
         else:
@@ -533,7 +408,8 @@ def _vote(request):
         vote.userprofile = user_profile
         vote.save()
         _make_best(board_content)
-        return {'success': 'vote ' + vote_type, 'vote': board_content.get_vote(), 'cancel': 'no'}
+        return {'success': 'vote ' + vote_type,
+                'vote': board_content.get_vote(), 'cancel': 'no'}
     except ObjectDoesNotExist:
         return {'fail': 'Unvalid ontent id'}
 
@@ -547,3 +423,19 @@ def _make_best(board_content):
             board_post.save()
             return True
     return False
+
+
+def _get_diff_match(before, after):  # get different match
+    diff_obj = diff_match_patch.diff_match_patch()
+    diff = diff_obj.diff_main(before, after)
+    diff_obj.diff_cleanupSemantic(diff)
+    new_diff = []
+    for diff_element in diff:
+        diff_element = list(diff_element)
+        diff_element[1] = diff_element[1].replace("\r\n", " ")
+        if diff_element[0] == 0 and len(diff_element[1]) >= 15:
+            diff_element[1] = diff_element[1][0:5] + \
+                '...' +\
+                diff_element[1][-5:]
+        new_diff = new_diff + [diff_element]
+    return new_diff

@@ -10,6 +10,13 @@ class BoardContent(models.Model):
     is_deleted = models.BooleanField(default=False, null=False)
     is_anonymous = models.TextField(default=None, null=True)
     is_adult = models.BooleanField(default=False, null=False)
+    modify_log = models.TextField(default='[]')
+
+    def set_log(self, log):
+        self.modify_log = json.dumps(log)
+
+    def get_log(self):
+        return json.loads(self.modify_log)
 
     def __str__(self):
         if(self.id % 10 == 1):
@@ -80,11 +87,13 @@ class BoardContentVoteAdult(models.Model):
 
 
 class BoardContentVotePolitical(models.Model):
-    board_content = models.ForeignKey('BoardContent',
-                                      related_name="board_content_vote_political",
-                                      null=False)
-    userprofile = models.ForeignKey('session.UserProfile',
-                                    related_name="board_content_vote_political")
+    board_content = models.ForeignKey(
+        'BoardContent',
+        related_name="board_content_vote_political",
+        null=False)
+    userprofile = models.ForeignKey(
+        'session.UserProfile',
+        related_name="board_content_vote_political")
 
 
 class BoardReport(models.Model):
@@ -130,11 +139,12 @@ class BoardPost(models.Model):
                                        null=True,
                                        blank=True)
     modify_log = models.TextField(default='[]')
+
     def set_log(self, log):
         self.modify_log = json.dumps(log)
+
     def get_log(self):
         return json.loads(self.modify_log)
-
 
     def __unicode__(self):
         title = self.title

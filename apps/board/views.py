@@ -7,7 +7,8 @@ from apps.board.backend import _get_post_list, _get_board_list
 from apps.board.backend import _get_querystring, _get_content
 from apps.board.backend import _write_post, _get_current_board
 from apps.board.backend import _delete_post, _report, _vote
-from apps.board.backend import _write_post_test, _write_comment
+from apps.board.backend import _write_comment
+from itertools import izip
 import json
 import diff_match_patch
 from apps.board.forms import *
@@ -17,11 +18,10 @@ def home(request):
     return redirect('all/')
 
 
-# test ############################################
 @login_required(login_url='/session/login')
 def post_write(request, board="All"):
     if request.method == 'POST':
-        result = _write_post_test(request, board)
+        result = _write_post(request, board=board)
         if 'save' in result:
             return redirect('../' + str(result['save'].id) + '/')
         else:
@@ -45,11 +45,9 @@ def post_modify(request, post_id=0):
     if post_instance.author != request.user.userprofile:
         return redirect('../')
     if request.method == "POST":
-        result = _write_post_test(request,
-                                  post=post_instance,
-                                  content=post_instance.board_content,
-                                  is_modify=True)
-        if 'save' in result:
+        result = _write_post(request, True, post_instance,
+                             post_instance.board_content)
+        if 'save' in result:  # success modify
             return redirect('../')
         else:
             form_content, form_post = result['failed']
@@ -62,8 +60,6 @@ def post_modify(request, post_id=0):
                   'board/board_write.html',
                   {'content_form': form_content,
                    'post_form': form_post})
-
-######################################################
 
 
 @login_required(login_url='/session/login')
@@ -102,11 +98,12 @@ def post_modify_log(request, board_url, post_id):
             board_content.modified_time,
             board_content.content]
     modify_log = []
-    for log in board_post.get_log():
+    for log_title, log_content in izip(board_post.get_log(),
+                                       board_post.board_content.get_log()):
         modify_log = modify_log +\
-            [[log[0],
-              log[1],
-              diff_obj.diff_prettyHtml(log[2])]]
+            [[diff_obj.diff_prettyHtml(log_title[1]),
+              log_content[0],
+              diff_obj.diff_prettyHtml(log_content[1])]]
     return render(request, "board/board_modifylog.html",
                   {
                       'post': post,
@@ -133,7 +130,7 @@ def comment_modify(request, post_id):
 
 
 @login_required(login_url='/session/login')
-def re_comment_write(request,post_id):
+def re_comment_write(request, post_id):
     if request.method == 'POST':
         post_id = _write_comment(request, post_id, is_recomment=True)
     querystring = _get_querystring(request, 'best', 'page')
