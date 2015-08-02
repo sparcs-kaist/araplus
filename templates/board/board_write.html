@@ -38,11 +38,12 @@
                     <div class=" ">
                         <select class="form-control" id="id_board_category"
                             name="board_category">
-                            <option value selected="selected">---------</option>
+                            <option value="">---------</option>
                             {% for choice in post_form.board_category.field.queryset %}
                             <option class="category-{{ choice.board }} board_category"
-                                value="{{ choice.id }}"
-                                style="display:none;">{{ choice.name }}</option>
+                            value="{{ choice.id }}" style="display:none;"
+                            {% if post_form.board_category.value == choice.id %} selected {% endif %}
+                            >{{ choice.name }}</option>
                             {% endfor %}
                         </select>
                         {% if post_form.board_category.errors %}
