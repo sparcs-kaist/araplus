@@ -370,6 +370,7 @@ def _report(request):
 
 
 def _vote(request):
+    cancel = ''
     user_profile = request.user.userprofile
     vote_type = request.POST.get('vote_type', '')
     content_id = request.POST.get('vote_id', '')
@@ -392,6 +393,7 @@ def _vote(request):
                     return {'success': 'changed to ' + vote_type,
                             'vote': board_content.get_vote(), 'cancel': 'no'}
             except:
+                cancel = 'no'
                 vote = BoardContentVote()
                 vote.is_up = is_up_or_down
         elif vote_type == 'adult':
@@ -417,7 +419,7 @@ def _vote(request):
         vote.save()
         _make_best(board_content)
         return {'success': 'vote ' + vote_type,
-                'vote': board_content.get_vote(), 'cancel': 'no'}
+                'vote': board_content.get_vote(), 'cancel': cancel}
     except ObjectDoesNotExist:
         return {'fail': 'Unvalid ontent id'}
 

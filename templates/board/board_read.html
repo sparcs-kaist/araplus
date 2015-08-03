@@ -57,25 +57,12 @@
                 success : function(data){
                     if(data.response == 'success'){
                         $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
-                        if(vote_up.hasClass('btn-warning'))
+                        if(data.cancel == 'no' || data.cancel == 'yes')
                         {
-                            vote_up.removeClass('btn-warning');
-                            vote_up.addClass('btn-success');
-                        }
-                        if(vote_down.hasClass('btn-warning'))
-                        {
-                            vote_down.removeClass('btn-warning');
-                            vote_down.addClass('btn-danger');
-                        }
-                        if(vote_id[0] == 'up' && data.cancel == 'no')
-                        {
-                            vote_up.removeClass('btn-success');
-                            vote_up.addClass('btn-warning');
-                        }
-                        if(vote_id[0] == 'down' && data.cancel == 'no')
-                        {
-                            vote_down.removeClass('btn-danger');
-                            vote_down.addClass('btn-warning');
+                            toggle(vote_up, 'btn-warning', 'btn-success');
+                            toggle(vote_down, 'btn-warning', 'btn-danger');
+                            if(vote_id[0] == 'up' && data.cancel == 'no') toggle(vote_up, 'btn-success', 'btn-warning');
+                            if(vote_id[0] == 'down' && data.cancel == 'no') toggle(vote_down, 'btn-danger', 'btn-warning');
                         }
                         alert(data.message);
                     }
@@ -106,6 +93,12 @@
         });
         var isOpen = false;
         var report_uid = 0;
+        function toggle(obj,toclass,fromclass) {
+            if(obj.hasClass(toclass)){
+                obj.removeClass(toclass);
+                obj.addClass(fromclass);
+            }
+        }
         function showOverlayBox() {
             if(isOpen==false) return;
             $(".overlayBox").css({
