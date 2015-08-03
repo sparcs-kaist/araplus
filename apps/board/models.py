@@ -157,8 +157,8 @@ class BoardPost(models.Model):
         created_time = self.board_content.created_time
         author = self.author.user
         return u"title: %s created in %s, authored by %s" % (title,
-                                                            created_time,
-                                                            author)
+                                                             created_time,
+                                                             author)
 
 
 class BoardPostIs_read(models.Model):

@@ -2,9 +2,7 @@
 from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import diff_match_patch
-import random
 from apps.board.forms import *
-from django.core import serializers
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
@@ -274,7 +272,6 @@ def _write_post(request, is_modify=False, post=None,
                 category_after = ""
             content_diff = [[str(content.modified_time),
                             _get_diff_match(content_before, content.content)]]
-            title_diff = _get_diff_match(title_before, post.title)
             if board_before == post.board.name:
                 board_diff = [[0, board_before]]
             else:
@@ -325,7 +322,7 @@ def _write_comment(request, post_id, is_modify=False):
             board_comment.board_content.set_log(
                 [[str(board_comment.board_content.modified_time),
                   _get_diff_match(content_before,
-                                 board_comment.board_content.content)]] +\
+                                  board_comment.board_content.content)]] +
                 board_comment.board_content.get_log())
         board_comment.board_content = content_form.save(
             author=user_profile,
