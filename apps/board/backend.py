@@ -272,7 +272,7 @@ def _write_post(request, is_modify=False, post=None,
         board_before = post.board.name
         category_before = post.board_category.name
     except:  # no such a content : is not modify
-        pass
+        category_before = ""
     if form_post.is_valid() and form_content.is_valid():
         if is_modify:
             try:
@@ -281,10 +281,18 @@ def _write_post(request, is_modify=False, post=None,
                 category_after = ""
             content_diff = [[str(content.modified_time),
                             _get_diff_match(content_before, content.content)]]
-            post_diff = [[
-                _get_diff_match(title_before, post.title),
-                _get_diff_match(board_before, post.board.name),
-                _get_diff_match(category_before, category_after)]]
+            title_diff = _get_diff_match(title_before, post.title)
+            if board_before == post.board.name:
+                board_diff = [[0, board_before]]
+            else:
+                board_diff = [[-1, board_before], [1, post.board.name]]
+            if category_before == category_after:
+                category_diff = [[0, category_before]]
+            else:
+                category_diff = [[-1, category_before], [1, category_after]]
+            post_diff = [[_get_diff_match(title_before, post.title),
+                          board_diff,
+                          category_diff]]
             post.set_log(post_diff + post.get_log())
             content.set_log(content_diff + content.get_log())
         board_post = form_post.save(
