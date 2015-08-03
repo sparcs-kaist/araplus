@@ -74,7 +74,7 @@ def post_read(request, board_url, post_id):
     querystring = _get_querystring(request, 'best', 'page')
     current_board = _get_current_board(request, board_url)
     # tested for report ########
-    # report_form = BoardReportForm()
+    report_form = BoardReportForm()
     """return render(request,
                   'board/modal_test.html',
                   {'report_form': report_form})"""
@@ -90,6 +90,7 @@ def post_read(request, board_url, post_id):
                       'board_list': board_list,
                       'current_board': current_board,
                       'paginator': paginator,
+                      'report_form': report_form
                   })
 
 

@@ -299,31 +299,42 @@ def _write_post(request, is_modify=False, post=None,
 
 def _write_comment(request, post_id, is_modify=False):
     user_profile = request.user.userprofile
-    comment_id = request.POST.get('board_comment_id', 0)
     if is_modify:
+        comment_id = request.POST.get('board_comment_id', 0)
         try:
             board_comment = BoardComment.objects.get(id=comment_id)
+            content_before = board_comment.board_content.content
             if board_comment.author != user_profile:
                 return  # wrong request
             content_form = BoardContentForm(
                 request.POST,
                 instance=board_comment.board_content,
                 is_modify=True)
-        except:
-            return  # no board_comment
-    else:  # wirte new comment
-        content_form = BoardContentForm(request.POST)
-        board_comment = BoardComment(author=user_profile)
+        except ObjectDoesNotExist:
+            return  # no comment
+    else:
         try:
-            board_comment.board_post = BoardPost.objects.get(id=post_id)
+            board_comment = BoardComment(
+                author=user_profile,
+                board_post=BoardPost.objects.get(id=post_id))
+            content_form = BoardContentForm(request.POST)
         except:
             return  # no post
     if content_form.is_valid():
+        if is_modify:
+            board_comment.board_content.set_log(
+                [[str(board_comment.board_content.modified_time),
+                  _get_diff_match(content_before,
+                                 board_comment.board_content.content)]] +\
+                board_comment.board_content.get_log())
         board_comment.board_content = content_form.save(
             author=user_profile,
             post=board_comment.board_post)
     else:
         return  # Invalid form
+        board_comment.board_content = content_form.save(
+            author=user_profile,
+            post=board_comment.board_post)
     board_comment.save()
     return board_comment.board_post.id
 

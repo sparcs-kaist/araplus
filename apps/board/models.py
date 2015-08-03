@@ -156,7 +156,7 @@ class BoardPost(models.Model):
         title = self.title
         created_time = self.board_content.created_time
         author = self.author.user
-        return "title: %s created in %s, authored by %s" % (title,
+        return u"title: %s created in %s, authored by %s" % (title,
                                                             created_time,
                                                             author)
 
