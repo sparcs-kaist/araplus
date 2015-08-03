@@ -189,14 +189,7 @@ def _get_content(request, post_id):
     post = _get_post(request, board_post, 'Post')
     comment_list = []
     for board_comment in board_post.board_comment.all():
-        if board_comment.original_comment is not None:
-            continue
         comment = _get_post(request, board_comment, 'Comment')
-        re_comment_list = []
-        for board_re_comment in board_comment.re_comment.all():
-            re_comment = _get_post(request, board_re_comment, 'Re-Comment')
-            re_comment_list.append(re_comment)
-        comment['re_comment_list'] = re_comment_list
         comment_list.append(comment)
     best_comment = {}
     best_vote = 0
@@ -304,7 +297,7 @@ def _write_post(request, is_modify=False, post=None,
         return {'failed': [form_content, form_post]}
 
 
-def _write_comment(request, post_id, is_modify=False, is_recomment=False):
+def _write_comment(request, post_id, is_modify=False):
     user_profile = request.user.userprofile
     comment_id = request.POST.get('board_comment_id', 0)
     if is_modify:
@@ -325,12 +318,6 @@ def _write_comment(request, post_id, is_modify=False, is_recomment=False):
             board_comment.board_post = BoardPost.objects.get(id=post_id)
         except:
             return  # no post
-        if is_recomment:
-            try:
-                board_comment.original_comment = BoardComment.objects.get(
-                    id=comment_id)
-            except:
-                return  # no original comment
     if content_form.is_valid():
         board_comment.board_content = content_form.save(
             author=user_profile,

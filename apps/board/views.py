@@ -140,14 +140,6 @@ def comment_modify(request, post_id):
 
 
 @login_required(login_url='/session/login')
-def re_comment_write(request, post_id):
-    if request.method == 'POST':
-        post_id = _write_comment(request, post_id, is_recomment=True)
-    querystring = _get_querystring(request, 'best', 'page')
-    return redirect('../' + querystring)
-
-
-@login_required(login_url='/session/login')
 def post_list(request, board_url):
     get_post_list = _get_post_list(request, board_url)
     post_list = get_post_list[0]
