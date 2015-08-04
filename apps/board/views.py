@@ -28,7 +28,7 @@ def post_write(request, board="All"):
             form_content, form_post = result['failed']
     else:
         try:
-            board = Board.objects.get(nema=board)
+            board = Board.objects.get(url=board)
         except:
             board = Board.objects.get(id=1)
         form_content = BoardContentForm()
