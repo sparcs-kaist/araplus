@@ -14,7 +14,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
         page = 1
     if board_url != 'all':
         try:
-            board = Board.objects.get(name=board_url)
+            board = Board.objects.get(url=board_url)
         except:
             return ([], [])
     post_count = 0
@@ -59,8 +59,8 @@ def _get_post_list(request, board_url='', item_per_page=15):
         else:
             post['username'] = board_post.author.nickname
         post_board = {}
-        post_board['board_name'] = board_post.board.name
-        post_board['board_url'] = board_post.board.name
+        post_board['board_kor_name'] = board_post.board.kor_name
+        post_board['board_url'] = board_post.board.url
         post['board'] = post_board
         post['title'] = board_post.title
         post['created_time'] = board_post.board_content.created_time
@@ -88,8 +88,8 @@ def _get_post_list(request, board_url='', item_per_page=15):
         else:
             post['username'] = board_post.author.nickname
         post_board = {}
-        post_board['board_name'] = board_post.board.name
-        post_board['board_url'] = board_post.board.name
+        post_board['board_kor_name'] = board_post.board.kor_name
+        post_board['board_url'] = board_post.board.url
         post['board'] = post_board
         post['title'] = board_post.title
         post['created_time'] = board_post.board_content.created_time
@@ -138,8 +138,10 @@ def _get_board_list():
     board_list = []
     for board_model in board_model_list:
         board = {}
-        board['board_name'] = board_model.name
-        board['board_url'] = board_model.name
+        board['board_kor_name'] = board_model.kor_name
+        board['board_eng_name'] = board_model.eng_name
+        board['board_url'] = board_model.url
+        board['board_description'] = board_model.description
         board['board_id'] = board_model.id
         board_list.append(board)
     return board_list
@@ -148,10 +150,11 @@ def _get_board_list():
 def _get_current_board(request, board_url):
     board = {}
     try:
-        board_model = Board.objects.get(name=board_url)
+        board_model = Board.objects.get(url=board_url)
+        board['board_kor_name'] = board_model.kor_name
+        board['board_eng_name'] = board_model.eng_name
+        board['board_url'] = board_model.url
         board['board_id'] = board_model.id
-        board['board_name'] = board_model.name
-        board['board_url'] = board_model.name
     except:
         pass
     if request.GET.get('best', '') == 'true':
@@ -207,7 +210,7 @@ def _get_post(request, board_post, type):
         pass
     elif type == 'Post':
         post['title'] = board_post.title
-        post['board'] = board_post.board.name
+        post['board'] = board_post.board.kor_name
         post['board_id'] = board_post.board.id
         try:
             post['category'] = board_post.board_category.name
@@ -260,7 +263,7 @@ def _write_post(request, is_modify=False, post=None,
         content_before = content.content
         # modify log for post
         title_before = post.title
-        board_before = post.board.name
+        board_before = post.board.kor_name
         category_before = post.board_category.name
     except:  # no such a content : is not modify
         category_before = ""
@@ -272,10 +275,10 @@ def _write_post(request, is_modify=False, post=None,
                 category_after = ""
             content_diff = [[str(content.modified_time),
                             _get_diff_match(content_before, content.content)]]
-            if board_before == post.board.name:
+            if board_before == post.board.kor_name:
                 board_diff = [[0, board_before]]
             else:
-                board_diff = [[-1, board_before], [1, post.board.name]]
+                board_diff = [[-1, board_before], [1, post.board.kor_name]]
             if category_before == category_after:
                 category_diff = [[0, category_before]]
             else:

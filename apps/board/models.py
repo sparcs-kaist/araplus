@@ -114,11 +114,13 @@ class BoardReport(models.Model):
 
 
 class Board(models.Model):
-    name = models.CharField(max_length=45, null=False)
+    kor_name = models.CharField(max_length=45, null=False, unique=True)
+    eng_name = models.CharField(max_length=45, null=False, unique=True)
+    url = models.CharField(max_length=45, null=False, unique=True)
     description = models.CharField(max_length=100, null=False)
 
-    def __str__(self):
-        return self.name
+    def __unicode__(self):
+        return self.kor_name
 
 
 class BoardCategory(models.Model):

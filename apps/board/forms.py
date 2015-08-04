@@ -55,8 +55,6 @@ class BoardPostForm(ModelForm):
     def save(self, *args, **kwargs):
         self.instance.author = kwargs.pop('author')
         self.instance.board_content = kwargs.pop('content')
-        if kwargs.pop('is_modify', False):  # update modify log
-            diff_obj
         return super(BoardPostForm, self).save(*args, **kwargs)
 
     def clean(self):

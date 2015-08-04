@@ -2,7 +2,9 @@
 	{
 		"model": "board.Board",
 		"fields": {
-			"name": "Garbage",
+            "kor_name": "가비지",
+			"eng_name": "Garbage",
+            "url": "garbage",
 			"description": "Trash, Garbage, Non-recyclable"
 		},
 		"pk": 1
@@ -10,7 +12,9 @@
 	{
 		"model": "board.Board",
 		"fields": {
-			"name": "Notice",
+            "kor_name": "공지",
+			"eng_name": "Notice",
+            "url": "notice",
 			"description": "Notices"
 		},
 		"pk": 2
@@ -18,7 +22,9 @@
 	{
 		"model": "board.Board",
 		"fields": {
-			"name": "Infoworld",
+            "kor_name": "인포월드",
+			"eng_name": "Infoworld",
+            "url": "infoworld",
 			"description": "Honey tips provided"
 		},
 		"pk": 3
@@ -26,7 +32,9 @@
 	{
 		"model": "board.Board",
 		"fields": {
-			"name": "Hot Potatoes",
+            "kor_name": "뜨거운 감자",
+			"eng_name": "Hot Potatoes",
+            "url": "hot_potatoes",
 			"description": "political issues"
 		},
 		"pk": 4
