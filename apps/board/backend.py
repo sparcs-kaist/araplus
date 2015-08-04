@@ -2,12 +2,17 @@
 from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import diff_match_patch
+from django.db.models import Q
 from apps.board.forms import *
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
     best_filter = request.GET.get('best', '')
+    search_title = request.GET.get('title', '')
+    search_content = request.GET.get('content', '')  # title + content
+    search_nickname = request.GET.get('nickname', '')
+
     try:
         page = int(request.GET['page'])
     except:
@@ -23,10 +28,8 @@ def _get_post_list(request, board_url='', item_per_page=15):
             is_notice=True).order_by('-id')
         if best_filter == 'true':
             board_post = BoardPost.objects.filter(is_best=True).order_by('-id')
-            post_count = board_post.count()
         else:
             board_post = BoardPost.objects.all().order_by('-id')
-            post_count = BoardPost.objects.count()
     else:
         board_post_notice = BoardPost.objects.filter(
             is_notice=True, board=board).order_by('-id')
@@ -36,7 +39,16 @@ def _get_post_list(request, board_url='', item_per_page=15):
         else:
             board_post = BoardPost.objects.filter(
                 board=board).order_by('-id')
-        post_count = board_post.count()
+    if search_title:
+        board_post = board_post.filter(title__contains=search_title)
+    if search_content:
+        board_post = board_post.filter(
+            Q(board_content__content__contains=search_content)
+            | Q(title__contains=search_content))
+    if search_nickname:
+        board_post = board_post.filter(author__nickname=search_nickname,
+                                       board_content__is_anonymous=None)
+    post_count = board_post.count()
     if post_count == 0:
         post_count = 1
     last_page = (post_count - 1) / item_per_page + 1
@@ -271,7 +283,7 @@ def _write_post(request, is_modify=False, post=None,
             except:
                 category_after = ""
             content_diff = [[str(content.modified_time),
-                            _get_diff_match(content_before, content.content)]]
+                             _get_diff_match(content_before, content.content)]]
             if board_before == post.board.name:
                 board_diff = [[0, board_before]]
             else:
