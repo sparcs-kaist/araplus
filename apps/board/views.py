@@ -3,11 +3,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from apps.board.models import *
-from apps.board.backend import _get_post_list, _get_board_list
-from apps.board.backend import _get_querystring, _get_content
-from apps.board.backend import _write_post, _get_current_board
-from apps.board.backend import _delete_post, _report, _vote
-from apps.board.backend import _write_comment
+from apps.board.backend import (
+    _get_post_list,
+    _get_querystring,
+    _get_content,
+    _write_post,
+    _delete_post,
+    _report,
+    _vote,
+    _write_comment,
+)
 from itertools import izip
 import json
 import diff_match_patch
@@ -64,9 +69,7 @@ def post_modify(request, post_id=0):
 
 @login_required(login_url='/session/login')
 def post_read(request, board_url, post_id):
-    get_content = _get_content(request, post_id)
-    post = get_content[0]
-    comment_list = get_content[1]
+    post, comment_list = _get_content(request, post_id)
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     try:
@@ -103,8 +106,6 @@ def post_modify_log(request, board_url, post_id):
     diff_obj = diff_match_patch.diff_match_patch()
     board_post = BoardPost.objects.filter(id=post_id)[0]
     board_content = board_post.board_content
-    board_list = _get_board_list()
-    current_board = _get_current_board(request, board_url)
     post = [board_post.title,
             board_post.board.kor_name,
             board_post.board_category,
@@ -123,8 +124,6 @@ def post_modify_log(request, board_url, post_id):
                   {
                       'post': post,
                       'modify_log': modify_log,
-                      'board_list': board_list,
-                      'current_board': current_board,
                   })
 
 

@@ -51,35 +51,6 @@ def _get_post_list(request, board_url='', item_per_page=15):
     return notice_list, post_list, post_paginator.page_range, current_page
 
 
-def _get_board_list():
-    board_model_list = Board.objects.all()
-    board_list = []
-    for board_model in board_model_list:
-        board = {}
-        board['board_kor_name'] = board_model.kor_name
-        board['board_eng_name'] = board_model.eng_name
-        board['board_url'] = board_model.url
-        board['board_description'] = board_model.description
-        board['board_id'] = board_model.id
-        board_list.append(board)
-    return board_list
-
-
-def _get_current_board(request, board_url):
-    board = {}
-    try:
-        board_model = Board.objects.get(url=board_url)
-        board['board_kor_name'] = board_model.kor_name
-        board['board_eng_name'] = board_model.eng_name
-        board['board_url'] = board_model.url
-        board['board_id'] = board_model.id
-    except:
-        pass
-    if request.GET.get('best', '') == 'true':
-        board['best'] = True
-    return board
-
-
 def _get_querystring(request, *args):
     query_list = []
     querystring = ''

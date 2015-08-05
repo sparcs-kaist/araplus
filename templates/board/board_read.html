@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load bootstrap %}
 {% block js %}
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
@@ -135,6 +134,31 @@
             $("#report_reason").attr("value", bid);
             $("#report_reason_dropdown").html(bname);
         });
+        $(".report").click(function(){
+            $("#modal-report").modal();
+            var content_id = $(this).attr('id').split('_')[1];
+            $("#content_id").attr("value", content_id);
+        });
+        var frm = $("#form_report");
+        frm.submit(function(){
+            $.ajax({
+                type: frm.attr('method'),
+                url: frm.attr('action'),
+                data: frm.serialize(),
+                success: function(data){
+                    if (data.message != 'Invalid form'){
+                        alert(data.message)
+                        $("#id_content").val('');
+                        $("#id_reason").val('기타');
+                        $("#modal-report").modal('hide');
+                    }
+                    else{
+                        alert(data.message)
+                    }
+                }
+            });
+            return false
+        });
     });
 </script>
 {% endblock %}
@@ -224,7 +248,8 @@
                                     <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                        <li><a href="#" class="report" id="report_{{comment.content_id}}">신고</a></li>
+                                        <li><a href="#" class="report"
+                                            id="report_{{comment.content_id}}">신고</a></li>
                                         <li><a href="#" class="vote adult" id="adult_{{comment.content_id}}">가버렷</a></li>
                                         <li><a href="#" class="vote political" id="political_{{comment.content_id}}">보내야한다</a></li>
                                 </ul>
@@ -272,41 +297,7 @@
 </div>
 
 {% include "board/list.html" %}
-
-</div>
-<div class="bgCover" style="background:#000; position:absolute; left:0; top:0; display:none; overflow:hidden">&nbsp;</div>
-<div class="overlayBox" style="position:absolute; display:none; width:500px; height:300px; background:#fff;">
-    <div class="overlayContent col-md-12">
-        <br />
-        <div class="row"> 
-            <div class="col-sm-3"><h4><b>신고하기</b></h4></div>
-            <div class="form-group col-sm-3">
-                <input type="hidden" class="form-control" id="report_reason" name="report_reason" value="2">
-                <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="report_reason_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width:250px">
-                        신고 이유
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="report_reason_dropdown">
-                        <li><a href="#" class="reason" id="이유1">이유1</a></li>
-                        <li><a href="#" class="reason" id="이유2">이유2</a></li>
-                        <li><a href="#" class="reason" id="기타">기타</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-sm-5"></div>
-            <div class="col-sm-1">
-                <h4><a href="javascript:void()" class="closeLink">X</a></h4>
-            </div>
-        </div>
-        <div class="form-group">
-            <textarea class="form-control" rows="6" id="report_content" name="report_content"></textarea>
-        </div>
-        <div class="col-md-9"></div>
-		<button type="submit" class="btn btn-info col-md-3 report_submit" id="report_submit">Submit</button>
-          
-    </div>
-</div>
+{% include "board/modal.html" %}
 {% endblock %}
 
 
