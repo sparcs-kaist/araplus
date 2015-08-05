@@ -24,10 +24,10 @@
             <td width=80 style="text-align: center;"><span>date</span></td>
         </tr>
         <ul>
-            {% for notice in notice %}
+            {% for notice in notice_list %}
             <tr>
-                {% if notice.board_post_is_read %}
-                {% if notice.board_content.modified_time > notice.board_post_is_read.last_read %}
+                {% if notice.1 %}
+                {% if notice.0.board_content.modified_time > notice.1.last_read %}
                 <td width=5>U</td>
                 {% else %}
                 <td width=5></td>
@@ -35,29 +35,29 @@
                 {% else %}
                 <td width=5>N</td>
                 {% endif %}
-                {% if notice.board_content.is_anonymous %}
-                <td width=90><p align=center>{{notice.board_content.is_anonymous}}</p></td>
+                {% if notice.0.board_content.is_anonymous %}
+                <td width=90><p align=center>{{notice.0.board_content.is_anonymous}}</p></td>
                 {% else %}
-                <td width=90><p align=center>{{notice.author.nickname}}</p></td>
+                <td width=90><p align=center>{{notice.0.author.nickname}}</p></td>
                 {% endif %}
                 <td width=70><p align=center><a
-                        href="/board/{{notice.board.url|default:'all'}}">{{notice.board}}</a></p></td>
-                <td width=60><p align=center>{{notice.board_category.name}}
+                        href="/board/{{notice.board.0.url|default:'all'}}">{{notice.0.board}}</a></p></td>
+                <td width=60><p align=center>{{notice.0.board_category.name}}
                 <td width=320><a style="font-weight: bold; color: black;"
-                        href="{{notice.id}}">{{notice.title}}</a></td>
+                        href="{{notice.0.id}}">{{notice.0.title}}</a></td>
                 <td width=80><p
-                    align=center>+{{notice.board_content.get_vote.up}}
-                    / -{{notice.board_content.get_vote.down}}</p></td>
+                    align=center>+{{notice.0.board_content.get_vote.up}}
+                    / -{{notice.0.board_content.get_vote.down}}</p></td>
                 <td width=80 style="text-align: center;">
-                    <span class="timeago" timeago="{{notice.board_content.created_time|date:"c"}}"
-                        title="{{notice.board_content.created_time}}"></span>
+                    <span class="timeago" timeago="{{notice.0.board_content.created_time|date:"c"}}"
+                        title="{{notice.0.board_content.created_time}}"></span>
                 </td>
             </tr>
             {% endfor %}
             {% for post in post_list %}
             <tr>
-                {% if post.board_post_is_read %}
-                {% if post.board_content.modified_time > post.board_post_is_read.last_read %}
+                {% if post.1 %}
+                {% if post.0.board_content.modified_time > post.1.last_read %}
                 <td width=5>U</td>
                 {% else %}
                 <td width=5></td>
@@ -65,25 +65,25 @@
                 {% else %}
                 <td width=5>N</td>
                 {% endif %}
-                {% if post.board_content.is_anonymous %}
-                <td width=90><p align=center>{{post.board_content.is_anonymous}}</p></td>
+                {% if post.0.board_content.is_anonymous %}
+                <td width=90><p align=center>{{post.0.board_content.is_anonymous}}</p></td>
                 {% else %}
-                <td width=90><p align=center>{{post.author.nickname}}</p></td>
+                <td width=90><p align=center>{{post.0.author.nickname}}</p></td>
                 {% endif %}
                 <td width=70><p align=center><a
-                        href="/board/{{post.board.url|default:'all'}}">{{post.board}}</a></p></td>
-                <td width=60><p align=center>{{post.board_category.name}}</p></td>
-                <td width=320><a href="{{post.id}}"
-                        {% if post.is_best %} style="color: red;" {% endif %}>
-                        {% if post.board_content.is_deleted %}--deleted--
+                        href="/board/{{post.0.board.url|default:'all'}}">{{post.0.board}}</a></p></td>
+                <td width=60><p align=center>{{post.0.board_category.name}}</p></td>
+                <td width=320><a href="{{post.0.id}}"
+                        {% if post.0.is_best %} style="color: red;" {% endif %}>
+                        {% if post.0.board_content.is_deleted %}--deleted--
                         {% else %}
-                        {{post.title}} [{{post.board_comment|length}}]{% endif %}</a></td>
+                        {{post.0.title}} [{{post.0.board_comment|length}}]{% endif %}</a></td>
                 <td width=80><p
-                    align=center>+{{post.board_content.get_vote.up}}
-                    / -{{post.board_content.get_vote.down}}</p></td>
+                    align=center>+{{post.0.board_content.get_vote.up}}
+                    / -{{post.0.board_content.get_vote.down}}</p></td>
                 <td width=80 style="text-align: center;">
-                    <span class="timeago" timeago="{{post.board_content.created_time|date:"c"}}"
-                        title="{{post.board_content.created_time}}"></span>
+                    <span class="timeago" timeago="{{post.0.board_content.created_time|date:"c"}}"
+                        title="{{post.0.board_content.created_time}}"></span>
                 </td>
             </tr>
             {% endfor %}
@@ -96,7 +96,7 @@
     <div style="text-align: center;">
         <ul class="pagination pagination-sm">
             {% for page in pages %}
-            {% if page == post_list.number %}
+            {% if page == current_page %}
             <li class="active"><a href="?page={{page}}">{{page}} <span class="sr-only"></span></a></li>
             {% else %}
             <li><a href="?page={{page}}">{{page}}</a></li>

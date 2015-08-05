@@ -10,6 +10,7 @@ from apps.board.forms import *
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
     best_filter = bool(request.GET.get('best', False))
+    page = int(request.GET.get('page', 1))
     search_title = request.GET.get('title', '')
     search_content = request.GET.get('content', '')  # title + content
     search_nickname = request.GET.get('nickname', '')
@@ -38,8 +39,16 @@ def _get_post_list(request, board_url='', item_per_page=15):
         board_post = board_post.filter(author__nickname=search_nickname,
                                        board_content__is_anonymous=None)
     board_post_notice = board_post_notice[:5]
-    board_list = Paginator(board_post, item_per_page)
-    return (board_post_notice, board_list)
+    post_paginator = Paginator(board_post, item_per_page)
+    post_list = []
+    notice_list = []
+    post_paged = post_paginator.page(page)
+    current_page = post_paged.number
+    for post in post_paged:
+        post_list += [[post, post.get_is_read(request)]]
+    for notice in board_post_notice:
+        notice_list += [[notice, notice.get_is_read(request)]]
+    return notice_list, post_list, post_paginator.page_range, current_page
 
 
 def _get_board_list():

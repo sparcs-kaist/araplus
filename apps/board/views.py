@@ -67,8 +67,7 @@ def post_read(request, board_url, post_id):
     get_content = _get_content(request, post_id)
     post = get_content[0]
     comment_list = get_content[1]
-    page = int(request.GET.get('page', 1))
-    board_post_notice, post_list = _get_post_list(request, board_url)
+    notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     try:
         current_board = board_list.get(url=board_url)
@@ -89,8 +88,10 @@ def post_read(request, board_url, post_id):
                       'post': post,  # post for post
                       'comment_list': comment_list,  # comment for post
                       # Below,there are thing for postList.
-                      'post_list': post_list.page(page),
-                      'pages': post_list.page_range,
+                      'notice_list': notice_list,
+                      'post_list': post_list,
+                      'pages': pages,
+                      'current_page': page,
                       'board_list': board_list,
                       'current_board': current_board,
                       'report_form': report_form
@@ -145,8 +146,7 @@ def comment_modify(request, post_id):
 
 @login_required(login_url='/session/login')
 def post_list(request, board_url):
-    board_post_notice, post_list = _get_post_list(request, board_url)
-    page = int(request.GET.get('page', 1))
+    notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     try:
         current_board = board_list.get(url=board_url)
@@ -155,11 +155,12 @@ def post_list(request, board_url):
     querystring = _get_querystring(request, 'best', 'page')
     return render(request,
                   'board/board_list.html',
-                  {'notice':  board_post_notice,
-                   'post_list': post_list.page(page),
+                  {'notice_list':  notice_list,
+                   'post_list': post_list,
                    'board_list': board_list,
                    'current_board': current_board,
-                   'pages': post_list.page_range,
+                   'pages': pages,
+                   'current_page': page,
                    'querystring': querystring})
 
 

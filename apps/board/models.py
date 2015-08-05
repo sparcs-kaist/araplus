@@ -151,6 +151,13 @@ class BoardPost(models.Model):
     class Meta:
         ordering = ['-id']
 
+    def get_is_read(self, request):
+        try:
+            return self.board_post_is_read.get(
+                userprofile=request.user.userprofile)
+        except:
+            return None
+
     def set_log(self, log):
         self.modify_log = json.dumps(log)
 
