@@ -1,6 +1,7 @@
 # -*- coding: utf-8
 from apps.board.models import *
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 import diff_match_patch
 from django.db.models import Q
 from apps.board.forms import *
@@ -8,37 +9,25 @@ from apps.board.forms import *
 
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
-    best_filter = request.GET.get('best', '')
+    best_filter = bool(request.GET.get('best', False))
     search_title = request.GET.get('title', '')
     search_content = request.GET.get('content', '')  # title + content
     search_nickname = request.GET.get('nickname', '')
-
-    try:
-        page = int(request.GET['page'])
-    except:
-        page = 1
     if board_url != 'all':
         try:
             board = Board.objects.get(url=board_url)
         except:
-            return ([], [])
-    post_count = 0
+            return  # Wrong board request
     if board_url == 'all':
-        board_post_notice = BoardPost.objects.filter(
-            is_notice=True).order_by('-id')
-        if best_filter == 'true':
-            board_post = BoardPost.objects.filter(is_best=True).order_by('-id')
-        else:
-            board_post = BoardPost.objects.all().order_by('-id')
+        board_post_notice = BoardPost.objects.filter(is_notice=True)
+        board_post = BoardPost.objects.all()
     else:
-        board_post_notice = BoardPost.objects.filter(
-            is_notice=True, board=board).order_by('-id')
-        if best_filter == 'true':
-            board_post = BoardPost.objects.filter(
-                board=board, is_best=True).order_by('-id')
-        else:
-            board_post = BoardPost.objects.filter(
-                board=board).order_by('-id')
+        board_post_notice = BoardPost.objects.filter(is_notice=True,
+                                                     board=board)
+        board_post = BoardPost.objects.filter(board=board)
+    # search
+    if best_filter:
+        board_post = board_post.filter(is_best=True)
     if search_title:
         board_post = board_post.filter(title__contains=search_title)
     if search_content:
@@ -48,101 +37,9 @@ def _get_post_list(request, board_url='', item_per_page=15):
     if search_nickname:
         board_post = board_post.filter(author__nickname=search_nickname,
                                        board_content__is_anonymous=None)
-    post_count = board_post.count()
-    if post_count == 0:
-        post_count = 1
-    last_page = (post_count - 1) / item_per_page + 1
-    if page < 1:
-        page = 1
-    elif page > last_page:
-        page = last_page
     board_post_notice = board_post_notice[:5]
-    board_post_all = board_post[
-        (page * item_per_page - item_per_page):(page * item_per_page)]
-    post_list = []
-    for board_post in board_post_notice:
-        post = {}
-        if board_post.is_notice:
-            if board_post.board_content.is_deleted:
-                continue
-            post['is_notice'] = True
-        if board_post.board_content.is_anonymous:
-            post['username'] = board_post.board_content.is_anonymous
-        else:
-            post['username'] = board_post.author.nickname
-        post_board = {}
-        post_board['board_kor_name'] = board_post.board.kor_name
-        post_board['board_url'] = board_post.board.url
-        post['board'] = post_board
-        post['title'] = board_post.title
-        post['created_time'] = board_post.board_content.created_time
-        post['post_id'] = board_post.id
-        post['vote'] = board_post.board_content.get_vote()
-        post['comment_count'] = board_post.board_comment.count()
-        if adult_filter == 'true' and board_post.board_content.is_adult:
-            post['title'] = 'filtered'
-        try:
-            is_read = BoardPostIs_read.objects.get(
-                board_post=board_post,
-                userprofile=request.user.userprofile)
-            if is_read.last_read > board_post.board_content.modified_time:
-                post['is_read'] = ' '
-            else:
-                post['is_read'] = 'U'
-        except ObjectDoesNotExist:
-            post['is_read'] = 'N'
-        post_list.append(post)
-    for board_post in board_post_all:
-        post = {}
-        post['is_notice'] = False
-        if board_post.board_content.is_anonymous:
-            post['username'] = board_post.board_content.is_anonymous
-        else:
-            post['username'] = board_post.author.nickname
-        post_board = {}
-        post_board['board_kor_name'] = board_post.board.kor_name
-        post_board['board_url'] = board_post.board.url
-        post['board'] = post_board
-        post['title'] = board_post.title
-        post['created_time'] = board_post.board_content.created_time
-        post['post_id'] = board_post.id
-        post['vote'] = board_post.board_content.get_vote()
-        post['comment_count'] = board_post.board_comment.count()
-        post['is_best'] = board_post.is_best
-        if adult_filter == 'true' and board_post.board_content.is_adult:
-            post['title'] = 'filtered'
-        if board_post.board_content.is_deleted:
-            post['title'] = '--Deleted--'
-        try:
-            is_read = BoardPostIs_read.objects.get(
-                board_post=board_post,
-                userprofile=request.user.userprofile)
-            if is_read.last_read > board_post.board_content.modified_time:
-                post['is_read'] = ' '
-            else:
-                post['is_read'] = 'U'
-        except ObjectDoesNotExist:
-            post['is_read'] = 'N'
-        post_list.append(post)
-    paginator = []
-    if page > 10:
-        paging = {}
-        paging['page'] = 'prev'
-        paging['url'] = str((page - page % 10))
-        paginator.append(paging)
-    for i in range(page - (page - 1) % 10, page - (page - 1) % 10 + 10):
-        if i > last_page:
-            break
-        paging = {}
-        paging['page'] = str(i)
-        paging['url'] = str(i)
-        paginator.append(paging)
-        if page < last_page - (last_page - 1) % 10:
-            paging = {}
-            paging['page'] = 'next'
-            paging['url'] = str((page - (page - 1) % 10 + 10))
-            paginator.append(paging)
-        return (post_list, paginator)
+    board_list = Paginator(board_post, item_per_page)
+    return (board_post_notice, board_list)
 
 
 def _get_board_list():

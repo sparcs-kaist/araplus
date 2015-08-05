@@ -1,0 +1,109 @@
+<div class="container">
+    <table class="table" width=700>
+        <tr>
+            <td width=5></td>
+            <td width=90><p align=center>User</p></td>
+            <td width=70><div style="text-align: center;"role="presentation" class="dropdown">
+                    <a id="board-list" class="dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" role="button" aria-expeanded="true">
+                        {{current_board|default:'All'}}
+                        <span class="caret"></span></a>
+                    <ul id="board-menu" class="dropdown-menu" role="menu" aria-labelledby="board-list">
+                        <li role="presentation"><a role="menuitem" tabindex="-1"
+                            href="/board/all">All</a></li>
+                        {% for board in board_list %}
+                        <li role="presentation"><a role="menuitem" tabinedex="-1"
+                            href="/board/{{board.url}}">{{board}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </td>
+            <td width=60><p align=center>Category</p></td>
+            <td width=320><p>Title<p></td>
+            <td width=80><p align=center>+/-</p></td>
+            <td width=80 style="text-align: center;"><span>date</span></td>
+        </tr>
+        <ul>
+            {% for notice in notice %}
+            <tr>
+                {% if notice.board_post_is_read %}
+                {% if notice.board_content.modified_time > notice.board_post_is_read.last_read %}
+                <td width=5>U</td>
+                {% else %}
+                <td width=5></td>
+                {% endif %}
+                {% else %}
+                <td width=5>N</td>
+                {% endif %}
+                {% if notice.board_content.is_anonymous %}
+                <td width=90><p align=center>{{notice.board_content.is_anonymous}}</p></td>
+                {% else %}
+                <td width=90><p align=center>{{notice.author.nickname}}</p></td>
+                {% endif %}
+                <td width=70><p align=center><a
+                        href="/board/{{notice.board.url|default:'all'}}">{{notice.board}}</a></p></td>
+                <td width=60><p align=center>{{notice.board_category.name}}
+                <td width=320><a style="font-weight: bold; color: black;"
+                        href="{{notice.id}}">{{notice.title}}</a></td>
+                <td width=80><p
+                    align=center>+{{notice.board_content.get_vote.up}}
+                    / -{{notice.board_content.get_vote.down}}</p></td>
+                <td width=80 style="text-align: center;">
+                    <span class="timeago" timeago="{{notice.board_content.created_time|date:"c"}}"
+                        title="{{notice.board_content.created_time}}"></span>
+                </td>
+            </tr>
+            {% endfor %}
+            {% for post in post_list %}
+            <tr>
+                {% if post.board_post_is_read %}
+                {% if post.board_content.modified_time > post.board_post_is_read.last_read %}
+                <td width=5>U</td>
+                {% else %}
+                <td width=5></td>
+                {% endif %}
+                {% else %}
+                <td width=5>N</td>
+                {% endif %}
+                {% if post.board_content.is_anonymous %}
+                <td width=90><p align=center>{{post.board_content.is_anonymous}}</p></td>
+                {% else %}
+                <td width=90><p align=center>{{post.author.nickname}}</p></td>
+                {% endif %}
+                <td width=70><p align=center><a
+                        href="/board/{{post.board.url|default:'all'}}">{{post.board}}</a></p></td>
+                <td width=60><p align=center>{{post.board_category.name}}</p></td>
+                <td width=320><a href="{{post.id}}"
+                        {% if post.is_best %} style="color: red;" {% endif %}>
+                        {% if post.board_content.is_deleted %}--deleted--
+                        {% else %}
+                        {{post.title}} [{{post.board_comment|length}}]{% endif %}</a></td>
+                <td width=80><p
+                    align=center>+{{post.board_content.get_vote.up}}
+                    / -{{post.board_content.get_vote.down}}</p></td>
+                <td width=80 style="text-align: center;">
+                    <span class="timeago" timeago="{{post.board_content.created_time|date:"c"}}"
+                        title="{{post.board_content.created_time}}"></span>
+                </td>
+            </tr>
+            {% endfor %}
+        </ul>
+    </table>
+    <div class="pull-right">
+        <a class="btn btn-info" href="?best=true">Best</a>
+        <a class="btn btn-default" href="post">글 쓰기</a>
+    </div>
+    <div style="text-align: center;">
+        <ul class="pagination pagination-sm">
+            {% for page in pages %}
+            {% if page == post_list.number %}
+            <li class="active"><a href="?page={{page}}">{{page}} <span class="sr-only"></span></a></li>
+            {% else %}
+            <li><a href="?page={{page}}">{{page}}</a></li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+          
+

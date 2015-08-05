@@ -67,10 +67,13 @@ def post_read(request, board_url, post_id):
     get_content = _get_content(request, post_id)
     post = get_content[0]
     comment_list = get_content[1]
-    get_post_list = _get_post_list(request, board_url)
-    post_list = get_post_list[0]
-    paginator = get_post_list[1]
-    board_list = _get_board_list()
+    page = int(request.GET.get('page', 1))
+    board_post_notice, post_list = _get_post_list(request, board_url)
+    board_list = Board.objects.all()
+    try:
+        current_board = board_list.get(url=board_url)
+    except:
+        current_board = None
     querystring = _get_querystring(request, 'best', 'page')
     current_board = _get_current_board(request, board_url)
     # tested for report ########
@@ -86,10 +89,10 @@ def post_read(request, board_url, post_id):
                       'post': post,  # post for post
                       'comment_list': comment_list,  # comment for post
                       # Below,there are thing for postList.
-                      'post_list': post_list,
+                      'post_list': post_list.page(page),
+                      'pages': post_list.page_range,
                       'board_list': board_list,
                       'current_board': current_board,
-                      'paginator': paginator,
                       'report_form': report_form
                   })
 
@@ -102,7 +105,7 @@ def post_modify_log(request, board_url, post_id):
     board_list = _get_board_list()
     current_board = _get_current_board(request, board_url)
     post = [board_post.title,
-            board_post.board.name,
+            board_post.board.kor_name,
             board_post.board_category,
             board_content.modified_time,
             board_content.content]
@@ -142,26 +145,22 @@ def comment_modify(request, post_id):
 
 @login_required(login_url='/session/login')
 def post_list(request, board_url):
-    get_post_list = _get_post_list(request, board_url)
-    post_list = get_post_list[0]
-    paginator = get_post_list[1]
-    board_list = _get_board_list()
+    board_post_notice, post_list = _get_post_list(request, board_url)
+    page = int(request.GET.get('page', 1))
+    board_list = Board.objects.all()
+    try:
+        current_board = board_list.get(url=board_url)
+    except:
+        current_board = None
     querystring = _get_querystring(request, 'best', 'page')
-    current_board = _get_current_board(request, board_url)
-    adult_filter = request.GET.get('adult_filter')
-    is_adult = False
-    if adult_filter == "true":
-        is_adult = True
     return render(request,
                   'board/board_list.html',
-                  {
-                      'post_list': post_list,
-                      'board_list': board_list,
-                      'current_board': current_board,
-                      'is_adult': is_adult,
-                      'querystring': querystring,
-                      'paginator': paginator,
-                  })
+                  {'notice':  board_post_notice,
+                   'post_list': post_list.page(page),
+                   'board_list': board_list,
+                   'current_board': current_board,
+                   'pages': post_list.page_range,
+                   'querystring': querystring})
 
 
 @login_required(login_url='/session/login')

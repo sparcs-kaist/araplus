@@ -148,6 +148,9 @@ class BoardPost(models.Model):
                                        blank=True)
     modify_log = models.TextField(default='[]')
 
+    class Meta:
+        ordering = ['-id']
+
     def set_log(self, log):
         self.modify_log = json.dumps(log)
 
