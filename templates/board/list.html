@@ -45,7 +45,7 @@
                         >{{notice.0.board}}</a></p></td>
                 <td width=60><p align=center>{{notice.0.board_category.name}}
                 <td width=320><a style="font-weight: bold; color: black;"
-                        href="/board/{{current_board.url}}/{{notice.0.id}}"
+                        href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}"
                         >{{notice.0.title}}</a></td>
                 <td width=80><p
                     align=center>+{{notice.0.board_content.get_vote.up}}
