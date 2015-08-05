@@ -253,6 +253,7 @@ def _write_comment(request, post_id, is_modify=False):
         board_comment.board_content = content_form.save(
             author=user_profile,
             post=board_comment.board_post)
+    board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
     return board_comment.board_post.id
 

@@ -13,7 +13,7 @@
                             href="/board/all">All</a></li>
                         {% for board in board_list %}
                         <li role="presentation"><a role="menuitem" tabinedex="-1"
-                            href="/board/{{board.url}}">{{board}}</a></li>
+                            href="/board/{{board.url}}">{{board.kor_name}}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -27,7 +27,7 @@
             {% for notice in notice_list %}
             <tr>
                 {% if notice.1 %}
-                {% if notice.0.board_content.modified_time > notice.1.last_read %}
+                {% if notice.0.board_content.modified_time >= notice.1.last_read %}
                 <td width=5>U</td>
                 {% else %}
                 <td width=5></td>
@@ -41,10 +41,12 @@
                 <td width=90><p align=center>{{notice.0.author.nickname}}</p></td>
                 {% endif %}
                 <td width=70><p align=center><a
-                        href="/board/{{notice.board.0.url|default:'all'}}">{{notice.0.board}}</a></p></td>
+                        href="/board/{{notice.board.0.url|default:'all'}}"
+                        >{{notice.0.board}}</a></p></td>
                 <td width=60><p align=center>{{notice.0.board_category.name}}
                 <td width=320><a style="font-weight: bold; color: black;"
-                        href="{{notice.0.id}}">{{notice.0.title}}</a></td>
+                        href="/board/{{current_board.url}}/{{notice.0.id}}"
+                        >{{notice.0.title}}</a></td>
                 <td width=80><p
                     align=center>+{{notice.0.board_content.get_vote.up}}
                     / -{{notice.0.board_content.get_vote.down}}</p></td>
@@ -57,7 +59,7 @@
             {% for post in post_list %}
             <tr>
                 {% if post.1 %}
-                {% if post.0.board_content.modified_time > post.1.last_read %}
+                {% if post.0.board_content.modified_time >= post.1.last_read %}
                 <td width=5>U</td>
                 {% else %}
                 <td width=5></td>
@@ -73,11 +75,12 @@
                 <td width=70><p align=center><a
                         href="/board/{{post.0.board.url|default:'all'}}">{{post.0.board}}</a></p></td>
                 <td width=60><p align=center>{{post.0.board_category.name}}</p></td>
-                <td width=320><a href="{{post.0.id}}"
+                <td width=320><a
+                        href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}"
                         {% if post.0.is_best %} style="color: red;" {% endif %}>
                         {% if post.0.board_content.is_deleted %}--deleted--
                         {% else %}
-                        {{post.0.title}} [{{post.0.board_comment|length}}]{% endif %}</a></td>
+                        {{post.0.title}} [{{post.0.board_comment.count}}]{% endif %}</a></td>
                 <td width=80><p
                     align=center>+{{post.0.board_content.get_vote.up}}
                     / -{{post.0.board_content.get_vote.down}}</p></td>
@@ -97,9 +100,10 @@
         <ul class="pagination pagination-sm">
             {% for page in pages %}
             {% if page == current_page %}
-            <li class="active"><a href="?page={{page}}">{{page}} <span class="sr-only"></span></a></li>
+            <li class="active"><a href="/board/{{current_board.url|default:'all'}}/?page={{page}}"
+                >{{page}} <span class="sr-only"></span></a></li>
             {% else %}
-            <li><a href="?page={{page}}">{{page}}</a></li>
+            <li><a href="/board/{{current_board.url|default:'all'}}/?page={{page}}">{{page}}</a></li>
             {% endif %}
             {% endfor %}
         </ul>

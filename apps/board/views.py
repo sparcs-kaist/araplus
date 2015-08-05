@@ -71,10 +71,10 @@ def post_read(request, board_url, post_id):
     board_list = Board.objects.all()
     try:
         current_board = board_list.get(url=board_url)
+        print current_board
     except:
         current_board = None
     querystring = _get_querystring(request, 'best', 'page')
-    current_board = _get_current_board(request, board_url)
     # tested for report ########
     report_form = BoardReportForm()
     """return render(request,
