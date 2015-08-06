@@ -60,10 +60,12 @@ def post_write(request, board="All"):
             board = Board.objects.get(id=1)
         form_content = BoardContentForm()
         form_post = BoardPostForm(initial={'board': board.id})
+        form_attachment = BoardAttachmentForm()
     return render(request,
                   'board/board_write.html',
                   {'content_form': form_content,
-                   'post_form': form_post})
+                   'post_form': form_post,
+                   'attachment_form': form_attachment})
 
 
 @login_required(login_url='/session/login')

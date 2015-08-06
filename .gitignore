@@ -71,3 +71,4 @@ db.*
 .DS_Store
 
 *.orig
+upload/

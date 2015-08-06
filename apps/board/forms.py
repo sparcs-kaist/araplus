@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 from apps.board.models import *
-from django.forms import ModelForm, Textarea, BooleanField
+from django.forms import ModelForm, Textarea, BooleanField, FileField
 import random
 
 
@@ -98,6 +98,15 @@ class BoardReportForm(ModelForm):
         self.instance.board_content = kwargs.pop('content')
         return super(BoardReportForm, self).save(*args, **kwargs)
 
+class BoardAttachmentForm(ModelForm):
+    class Meta:
+        model = Attachment
+        fields = ['file', ]
+
+    def save(self, *args, **kwargs):
+        self.instance.file = kwargs.pop('file')
+        self.instance.board_content = kwargs.pop('content')
+        return super(BoardAttachmentForm, self).save(*args, **kwargs)
 
 def _is_anonymous_duplicate(board_post, name, cache):
     if not board_post:

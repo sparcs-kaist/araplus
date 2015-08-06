@@ -187,6 +187,11 @@ def _write_post(request, is_modify=False, post=None,
         hashs = board_content.get_hashtags()
         for tag in hashs:
             HashTag(tag_name=tag, board_content=board_content).save()
+            
+        form_attachment = BoardAttachmentForm(request.POST, request.FILES)
+        if form_attachment.is_valid():
+            form_attachment.save(file = request.FILES['file'],
+                                 content = board_content)
         return {'save': board_post}
     else:
         return {'failed': [form_content, form_post]}

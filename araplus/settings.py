@@ -110,3 +110,7 @@ STATIC_URL = '/media/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+# TO BE REFACTORED!
+UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
+

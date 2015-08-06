@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 import apps.session.models
+from araplus.settings import UPLOAD_DIR
 import json
 import re
 import cgi
-
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 
 
@@ -58,7 +58,7 @@ class BoardContent(models.Model):
 
 
 class Attachment(models.Model):
-    file = models.FileField(null=False)
+    file = models.FileField(null=False, upload_to=UPLOAD_DIR)
     board_content = models.ForeignKey('BoardContent',
                                       related_name="attachment",
                                       null=False)
