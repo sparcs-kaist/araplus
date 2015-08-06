@@ -5,7 +5,9 @@
             "kor_name": "가비지",
 			"eng_name": "Garbage",
             "url": "garbage",
-			"description": "Trash, Garbage, Non-recyclable"
+			"description": "Trash, Garbage, Non-recyclable",
+            "is_official": "True",
+            "is_public": "True"
 		},
 		"pk": 1
 	},
@@ -15,7 +17,9 @@
             "kor_name": "공지",
 			"eng_name": "Notice",
             "url": "notice",
-			"description": "Notices"
+			"description": "Notices",
+            "is_official": "True",
+            "is_public": "True"
 		},
 		"pk": 2
 	},
@@ -25,7 +29,9 @@
             "kor_name": "인포월드",
 			"eng_name": "Infoworld",
             "url": "infoworld",
-			"description": "Honey tips provided"
+			"description": "Honey tips provided",
+            "is_official": "True",
+            "is_public": "True"
 		},
 		"pk": 3
 	},
@@ -35,7 +41,9 @@
             "kor_name": "뜨거운 감자",
 			"eng_name": "Hot Potatoes",
             "url": "hot_potatoes",
-			"description": "political issues"
+			"description": "political issues",
+            "is_official": "True",
+            "is_public": "True"
 		},
 		"pk": 4
 	}

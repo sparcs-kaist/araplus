@@ -345,3 +345,11 @@ def _get_diff_match(before, after):  # get different match
                 diff_element[1][-5:]
         new_diff = new_diff + [diff_element]
     return new_diff
+
+
+def _create_board(request):
+    form_board = BoardForm(request.POST)
+    if form_board.is_valid():
+        board = form_board.save()
+        return {'save': board}
+    return {'failed': form_board}

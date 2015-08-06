@@ -12,6 +12,7 @@ from apps.board.backend import (
     _report,
     _vote,
     _write_comment,
+    _create_board,
 )
 from itertools import izip
 import json
@@ -21,6 +22,21 @@ from apps.board.forms import *
 
 def home(request):
     return redirect('all/')
+
+
+@login_required(login_url='/session/login')
+def create_board(request):
+    if request.method == 'POST':
+        result = _create_board(request)
+        if 'save' in result:
+            return redirect('../' + result['save'].url + '/')
+        else:
+            form_board = result['failed']
+    else:
+        form_board = BoardForm()
+    return render(request,
+                  'board/create_board.html',
+                  {'board_form' : form_board})
 
 
 @login_required(login_url='/session/login')
@@ -146,9 +162,9 @@ def comment_modify(request, post_id):
 @login_required(login_url='/session/login')
 def post_list(request, board_url):
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
-    board_list = Board.objects.all()
+    board_list = Board.objects.filter(is_official=True)
     try:
-        current_board = board_list.get(url=board_url)
+        current_board = Board.objects.get(url=board_url)
     except:
         current_board = None
     querystring = _get_querystring(request, 'best', 'page')

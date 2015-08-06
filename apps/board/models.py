@@ -118,6 +118,8 @@ class Board(models.Model):
     eng_name = models.CharField(max_length=45, null=False, unique=True)
     url = models.CharField(max_length=45, null=False, unique=True)
     description = models.CharField(max_length=100, null=False)
+    is_official = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.kor_name
