@@ -28,6 +28,10 @@ def post_write(request, board="All"):
     if request.method == 'POST':
         result = _write_post(request, board=board)
         if 'save' in result:
+            board_post_trace = BoardPostTrace(
+                board_post=result['save'],
+                userprofile=request.user.userprofile)
+            board_post_trace.save()
             return redirect('../' + str(result['save'].id) + '/')
         else:
             form_content, form_post = result['failed']
@@ -73,6 +77,12 @@ def post_read(request, board_url, post_id):
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     try:
+        board_post_trace = BoardPostTrace.objects.get(
+            userprofile=request.user.userprofile,
+            board_post__id=post_id)
+    except:
+        board_post_trace = None
+    try:
         current_board = board_list.get(url=board_url)
         print current_board
     except:
@@ -90,6 +100,7 @@ def post_read(request, board_url, post_id):
                       'querystring': querystring,
                       'post': post,  # post for post
                       'comment_list': comment_list,  # comment for post
+                      'board_post_trace': board_post_trace,
                       # Below,there are thing for postList.
                       'notice_list': notice_list,
                       'post_list': post_list,
@@ -190,3 +201,20 @@ def report(request):
     if request.method == 'POST':
         message = _report(request)
     return HttpResponse(json.dumps(message), content_type='application/json')
+
+
+@login_required(login_url='/session/login')
+def trace(request, post_id):
+    message = 'fail'
+    if request.method == 'POST':
+        try:
+            board_post_trace = BoardPostTrace.objects.get(
+                userprofile=request.user.userprofile,
+                board_post__id=post_id)
+            board_post_trace.is_trace = not(board_post_trace.is_trace)
+            print board_post_trace.is_trace
+            board_post_trace.save()
+            message = 'success'
+        except:
+            message = 'no post'
+    return HttpResponse(message)

@@ -1,9 +1,9 @@
 <div class="container">
-    <table class="table" width=700>
-        <tr>
+    <table class="table post-list" width=700>
+        <tr class="list" id="list-header">
             <td width=5></td>
             <td width=90><p align=center>User</p></td>
-            <td width=70><div style="text-align: center;"role="presentation" class="dropdown">
+            <td width=70 id="board-list-row"><div style="text-align: center;"role="presentation" class="dropdown">
                     <a id="board-list" class="dropdown-toggle" data-toggle="dropdown"
                         aria-haspopup="true" role="button" aria-expeanded="true">
                         {{current_board|default:'All'}}
@@ -19,13 +19,13 @@
                 </div>
             </td>
             <td width=60><p align=center>Category</p></td>
-            <td width=320><p>Title<p></td>
+            <td width=320 class="title"><p>Title<p></td>
             <td width=80><p align=center>+/-</p></td>
             <td width=80 style="text-align: center;"><span>date</span></td>
         </tr>
         <ul>
             {% for notice in notice_list %}
-            <tr>
+            <tr class="list list-notice" id="notice-row-{{notice.0.id}}">
                 {% if notice.1 %}
                 {% if notice.0.board_content.modified_time >= notice.1.last_read %}
                 <td width=5>U</td>
@@ -44,7 +44,8 @@
                         href="/board/{{notice.board.0.url|default:'all'}}"
                         >{{notice.0.board}}</a></p></td>
                 <td width=60><p align=center>{{notice.0.board_category.name}}
-                <td width=320><a style="font-weight: bold; color: black;"
+                    <td width=320 class="title title-notice"
+                        id="notice-title-{{notice.0.id}}"><a style="font-weight: bold; color: black;"
                         href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}"
                         >{{notice.0.title}}</a></td>
                 <td width=80><p
@@ -57,7 +58,7 @@
             </tr>
             {% endfor %}
             {% for post in post_list %}
-            <tr>
+            <tr class="list list-post" id="post-row-{{post.0.id}}"}>
                 {% if post.1 %}
                 {% if post.0.board_content.modified_time >= post.1.last_read %}
                 <td width=5>U</td>
@@ -75,8 +76,8 @@
                 <td width=70><p align=center><a
                         href="/board/{{post.0.board.url|default:'all'}}">{{post.0.board}}</a></p></td>
                 <td width=60><p align=center>{{post.0.board_category.name}}</p></td>
-                <td width=320><a
-                        href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}"
+                <td width=320 class="title title-post" id="post-title-{{post.0.id}}"
+                    id><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}"
                         {% if post.0.is_best %} style="color: red;" {% endif %}>
                         {% if post.0.board_content.is_deleted %}--deleted--
                         {% else %}
@@ -94,7 +95,8 @@
     </table>
     <div class="pull-right">
         <a class="btn btn-info" href="?best=true">Best</a>
-        <a class="btn btn-default" href="post">글 쓰기</a>
+        <a class="btn btn-default"
+            href="/board/{{current_board.url|default:'all'}}/post">글 쓰기</a>
     </div>
     <div style="text-align: center;">
         <ul class="pagination pagination-sm">

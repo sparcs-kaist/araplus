@@ -182,3 +182,13 @@ class BoardPostIs_read(models.Model):
 
     class Meta:
         unique_together = ('userprofile', 'board_post',)
+
+
+class BoardPostTrace(models.Model):
+    userprofile = models.ForeignKey('session.UserProfile',
+                                    related_name='board_post_trace')
+    board_post = models.ForeignKey('BoardPost',
+                                   related_name='board_post_trace')
+    is_trace = models.BooleanField(default=True)
+    is_notified = models.BooleanField(default=False)
+    last_created = models.DateTimeField(auto_now=True)

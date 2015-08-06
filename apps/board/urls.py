@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^[A-z]*/[1-9][0-9]*/delete/$', 'apps.board.views.delete'),
     url(r'^[A-z]*/[1-9][0-9]*/vote/$', 'apps.board.views.content_vote'),
     url(r'^[A-z]*/[1-9][0-9]*/report/$', 'apps.board.views.report'),
+    url(r'^[A-z]*/([1-9][0-9]*)/trace/$', 'apps.board.views.trace'),
 ]
