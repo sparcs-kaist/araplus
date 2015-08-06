@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block css %}
+<style>
+    .panel-heading{
+        height: 72px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <span class="col-md-10">{{ comment.0 }}</span>
+        </div>
+        <div class="panel-body">
+            {% autoescape off %}{{ comment.1 }}{% endautoescape %}
+        </div>
+    </div>
+</div>
+<div class="container">
+    <span class="col-md-10">현재 덧글은 총 {{ modify_log|length }} 번 수정되었습니다.(최근에 수정 된 순서대로 표시 됩니다.)</span>
+</div>
+<p>
+<div class="container">
+    {% for log in modify_log %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="col-md-10">{{ log.0 }}</span>
+        </div>
+        <div class="panel-body">
+            {% autoescape off %}{{ log.1 }}{% endautoescape %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</p>
+{% endblock %}

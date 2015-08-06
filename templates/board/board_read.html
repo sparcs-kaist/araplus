@@ -204,7 +204,7 @@
                         {%else %}
                          <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
                          {% endif %}
-                         <a class="btn btn-info col-md-1" href="./modify-log/?board={{post.board_id}}">Log</a>
+                         <a class="btn btn-info col-md-1" href="./post-log/?board={{post.board_id}}">Log</a>
                         {% if post.return %}			
                         <a class="btn btn-info col-md-1" href="./modify/?board={{post.board_id}}">Modify</a>
                         <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
@@ -256,9 +256,10 @@
                             {% if comment.vote.is_down %}
                             <button class="btn btn-warning col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
                             {%else %}
-                             <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
-                            {% endif %} 
-                            {% if comment.return %}			
+                            <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                            {% endif %}
+                            <a class="btn btn-info col-md-1 comment" id="log_{{comment.content_id}}" href="../{{comment.id}}/comment-log/?board={{post.board_id}}">Log</a>
+                            {% if comment.return %}		
 							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
                             <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
                             {% else %}

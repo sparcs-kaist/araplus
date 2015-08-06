@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 import diff_match_patch
 from django.db.models import Q
 from apps.board.forms import *
+from itertools import izip
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
@@ -350,6 +351,40 @@ def _get_diff_match(before, after):  # get different match
                 diff_element[1][-5:]
         new_diff = new_diff + [diff_element]
     return new_diff
+
+
+def _get_post_log(post_id):
+    diff_obj = diff_match_patch.diff_match_patch()
+    board_post = BoardPost.objects.filter(id=post_id)[0]
+    board_content = board_post.board_content
+    post = [board_post.title,
+            board_post.board.kor_name,
+            board_post.board_category,
+            board_content.modified_time,
+            board_content.content]
+    modify_log = []
+    for log_post, log_content in izip(board_post.get_log(),
+                                      board_content.get_log()):
+        modify_log = modify_log +\
+            [[diff_obj.diff_prettyHtml(log_post[0]),
+              diff_obj.diff_prettyHtml(log_post[1]),
+              diff_obj.diff_prettyHtml(log_post[2]),
+              log_content[0],
+              diff_obj.diff_prettyHtml(log_content[1])]]
+    return post, modify_log
+
+
+def _get_comment_log(comment_id):
+    diff_obj = diff_match_patch.diff_match_patch()
+    board_comment = BoardComment.objects.filter(id=comment_id)[0]
+    board_content = board_comment.board_content
+    comment = [board_content.modified_time,
+               board_content.content]
+    modify_log = []
+    for log_content in board_content.get_log():
+        modify_log = modify_log +\
+                [[log_content[0], diff_obj.diff_prettyHtml(log_content[1])]]
+    return comment, modify_log
 
 
 def _create_board(request):

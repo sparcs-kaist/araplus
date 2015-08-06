@@ -17,7 +17,7 @@
                 <span class="col-md2">Category: {{ post.2|default:"" }}</span>
             </div>
             <div>
-                <span class="col-md-10">{{ post.3}}</span>
+                <span class="col-md-10">{{ post.3 }}</span>
             </div>
         </div>
         <div class="panel-body">
@@ -28,6 +28,7 @@
 <div class="container">
     <span class="col-md-10">현재 게시글은 총 {{ modify_log|length }} 번 수정되었습니다.(최근에 수정 된 순서대로 표시 됩니다.)</span>
 </div>
+<p>
 <div class="container">
     {% for log in modify_log %}
     <div class="panel panel-default">
@@ -39,7 +40,7 @@
                 <span class="col-md2">Category: {% autoescape off %}{{ log.2 }}{% endautoescape %}</span>
             </div>
             <div>
-                <span class="col-md-10">{{ log.3}}</span>
+                <span class="col-md-10">{{ log.3 }}</span>
             </div>
         </div>
         <div class="panel-body">
@@ -48,4 +49,5 @@
     </div>
     {% endfor %}
 </div>
+</p>
 {% endblock %}

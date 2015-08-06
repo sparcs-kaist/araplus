@@ -13,6 +13,8 @@ from apps.board.backend import (
     _vote,
     _write_comment,
     _create_board,
+    _get_post_log,
+    _get_comment_log,
 )
 from itertools import izip
 import json
@@ -130,26 +132,20 @@ def post_read(request, board_url, post_id):
 
 @login_required(login_url='/session/login')
 def post_modify_log(request, board_url, post_id):
-    diff_obj = diff_match_patch.diff_match_patch()
-    board_post = BoardPost.objects.filter(id=post_id)[0]
-    board_content = board_post.board_content
-    post = [board_post.title,
-            board_post.board.kor_name,
-            board_post.board_category,
-            board_content.modified_time,
-            board_content.content]
-    modify_log = []
-    for log_post, log_content in izip(board_post.get_log(),
-                                      board_post.board_content.get_log()):
-        modify_log = modify_log +\
-            [[diff_obj.diff_prettyHtml(log_post[0]),
-              diff_obj.diff_prettyHtml(log_post[1]),
-              diff_obj.diff_prettyHtml(log_post[2]),
-              log_content[0],
-              diff_obj.diff_prettyHtml(log_content[1])]]
-    return render(request, "board/log.html",
+    post, modify_log = _get_post_log(post_id)
+    return render(request, "board/post_log.html",
                   {
                       'post': post,
+                      'modify_log': modify_log,
+                  })
+
+
+@login_required(login_url='/session/login')
+def comment_modify_log(request, board_url, comment_id):
+    comment, modify_log = _get_comment_log(comment_id)
+    return render(request, "board/comment_log.html",
+                  {
+                      'comment': comment,
                       'modify_log': modify_log,
                   })
 
