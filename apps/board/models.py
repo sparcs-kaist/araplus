@@ -34,9 +34,9 @@ class BoardContent(models.Model):
         down = 0
         for content_vote in self.board_content_vote.all():
             if content_vote.is_up:
-                up = up+1
+                up = up + 1
             else:
-                down = down+1
+                down = down + 1
         vote = {}
         vote['up'] = up
         vote['down'] = down
@@ -184,3 +184,10 @@ class BoardPostIs_read(models.Model):
 
     class Meta:
         unique_together = ('userprofile', 'board_post',)
+
+
+class HashTag(models.Model):
+    tag_name = is_anonymous = models.TextField(null=False, db_index=True)
+    board_content = models.ForeignKey('BoardContent',
+                                      related_name="hashtag",
+                                      null=False)
