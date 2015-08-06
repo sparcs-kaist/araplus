@@ -73,48 +73,12 @@
                 return false;
             }
         });
-        var isOpen = false;
-        var report_uid = 0;
         function toggle(obj,toclass,fromclass) {
             if(obj.hasClass(toclass)){
                 obj.removeClass(toclass);
                 obj.addClass(fromclass);
             }
         }
-        function showOverlayBox() {
-            if(isOpen==false) return;
-            $(".overlayBox").css({
-                display:"block",
-                left:($(window).width()-$(".overlayBox").width())/2,
-                top:($(window).height()-$(".overlayBox").height())/2-20,
-                position:'absolute'
-            });
-            $(".bgCover").css({
-                display:"block",
-                width:$(window).width(),
-                height:$(window).height()
-            });
-        }
-        function doOverlayOpen() {
-            isOpen = true;
-            showOverlayBox();
-            $('.bgCover').css({opacity:0}).animate( {opacity:0.5, backgroundColor:'#000'} );
-            return false;
-        }
-        function doOverlayClose() {
-            isOpen = false;
-            $('.overlayBox').css( 'display', 'none' );
-            $('.bgCover').animate( {opacity:0}, null, null, function() { $(this).hide(); } );
-        }
-        $(window).bind('resize',showOverlayBox);
-        $('a.report').click(function() {
-            $("#report_content").val("")
-            $("#report_reason").attr("value", 0);
-            $("#report_reason_dropdown").html("신고 이유 <span class='caret'></span>");
-            doOverlayOpen();
-            report_uid = $(this).attr("id").slice(7)
-        });
-        $("a.closeLink").click( doOverlayClose);
         $(".report_submit").click(function() {
             var report_reason = $("#report_reason").val()
             var report_content = $("#report_content").val()
