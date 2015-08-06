@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% block content %}
+<div class="container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="is_public">
+            {{ board_form.is_public|bootstrap }}
+        </div>
+        <div class="kor_name">
+            {{ board_form.kor_name|bootstrap }}
+        </div>
+        <div class="eng_name">
+            {{ board_form.eng_name|bootstrap }}
+        </div>
+        <div class="url">
+            {{ board_form.url|bootstrap }}
+        </div>
+        <div class="description">
+            {{ board_form.description|bootstrap }}
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+</div>
+{% endblock %}

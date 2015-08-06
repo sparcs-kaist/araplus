@@ -113,7 +113,7 @@ def _get_post(request, board_post, type):
         post['title'] = '--Deleted--'
         post['content'] = '--Deleted--'
     else:
-        post['content'] = board_content.content
+        post['content'] = board_content.replace_content_tags()
     post['id'] = board_post.id
     post['deleted'] = board_content.is_deleted
     post['content_id'] = board_content.id
@@ -163,7 +163,7 @@ def _write_post(request, is_modify=False, post=None,
             except:
                 category_after = ""
             content_diff = [[str(content.modified_time),
-                            _get_diff_match(content_before, content.content)]]
+                             _get_diff_match(content_before, content.content)]]
             if board_before == post.board.kor_name:
                 board_diff = [[0, board_before]]
             else:
@@ -181,6 +181,11 @@ def _write_post(request, is_modify=False, post=None,
             author=request.user.userprofile,
             content=form_content.save(author=request.user.userprofile,
                                       post=post))  # save
+        board_content = board_post.board_content
+        HashTag.objects.filter(board_content=board_content).delete()
+        hashs = board_content.get_hashtags()
+        for tag in hashs:
+            HashTag(tag_name=tag, board_content=board_content).save()
         return {'save': board_post}
     else:
         return {'failed': [form_content, form_post]}
@@ -345,3 +350,11 @@ def _get_diff_match(before, after):  # get different match
                 diff_element[1][-5:]
         new_diff = new_diff + [diff_element]
     return new_diff
+
+
+def _create_board(request):
+    form_board = BoardForm(request.POST)
+    if form_board.is_valid():
+        board = form_board.save()
+        return {'save': board}
+    return {'failed': form_board}

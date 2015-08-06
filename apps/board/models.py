@@ -2,6 +2,10 @@
 from django.db import models
 import apps.session.models
 import json
+import re
+import cgi
+
+hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 
 
 class BoardContent(models.Model):
@@ -34,13 +38,21 @@ class BoardContent(models.Model):
         down = 0
         for content_vote in self.board_content_vote.all():
             if content_vote.is_up:
-                up = up+1
+                up = up + 1
             else:
-                down = down+1
+                down = down + 1
         vote = {}
         vote['up'] = up
         vote['down'] = down
         return vote
+
+    def replace_content_tags(self):
+        result = cgi.escape(self.content)
+        result = result.replace("\n", "<br />")
+        return hashtag_regex.sub('<a href="#comment-\g<target>">#\g<target></a>', result)
+
+    def get_hashtags(self):
+        return [tag[1] for tag in hashtag_regex.findall(self.content)]
 
 
 class Attachment(models.Model):
@@ -118,6 +130,8 @@ class Board(models.Model):
     eng_name = models.CharField(max_length=45, null=False, unique=True)
     url = models.CharField(max_length=45, null=False, unique=True)
     description = models.CharField(max_length=100, null=False)
+    is_official = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.kor_name
@@ -192,3 +206,10 @@ class BoardPostTrace(models.Model):
     is_trace = models.BooleanField(default=True)
     is_notified = models.BooleanField(default=False)
     last_created = models.DateTimeField(auto_now=True)
+
+
+class HashTag(models.Model):
+    tag_name = models.TextField(null=False, db_index=True)
+    board_content = models.ForeignKey('BoardContent',
+                                      related_name="hashtag",
+                                      null=False)

@@ -8,6 +8,19 @@ prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
 name = [u'양아치', u'루저', u'외톨', u'올빼미', u'밤비']
 
 
+class BoardForm(ModelForm):
+    class Meta:
+        model = Board
+        fields = ['kor_name', 'eng_name', 'url', 'description', 'is_public',]
+
+    def __init__(self, *args, **kwargs):
+        super(BoardForm, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        super(BoardForm, self).save(*args, **kwargs)
+        return self.instance
+
+
 class BoardContentForm(ModelForm):
     class Meta:
         model = BoardContent
