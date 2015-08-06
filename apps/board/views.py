@@ -38,7 +38,7 @@ def create_board(request):
         form_board = BoardForm()
     return render(request,
                   'board/create_board.html',
-                  {'board_form' : form_board})
+                  {'board_form': form_board})
 
 
 @login_required(login_url='/session/login')

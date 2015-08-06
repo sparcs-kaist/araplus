@@ -11,7 +11,7 @@ name = [u'양아치', u'루저', u'외톨', u'올빼미', u'밤비']
 class BoardForm(ModelForm):
     class Meta:
         model = Board
-        fields = ['kor_name', 'eng_name', 'url', 'description', 'is_public',]
+        fields = ['kor_name', 'eng_name', 'url', 'description', 'is_public', ]
 
     def __init__(self, *args, **kwargs):
         super(BoardForm, self).__init__(*args, **kwargs)

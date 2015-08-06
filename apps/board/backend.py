@@ -383,7 +383,7 @@ def _get_comment_log(comment_id):
     modify_log = []
     for log_content in board_content.get_log():
         modify_log = modify_log +\
-                [[log_content[0], diff_obj.diff_prettyHtml(log_content[1])]]
+            [[log_content[0], diff_obj.diff_prettyHtml(log_content[1])]]
     return comment, modify_log
 
 

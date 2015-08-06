@@ -140,9 +140,17 @@
                 data: {
                     csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
                 },
-                dataType: 'json',
                 success: function(data){
-                    alert('adsfasdfasdf');
+                    trace_obj = $(".trace");
+                    if(trace_obj.attr('class').indexOf('tracing') != -1){
+                        trace_obj.removeClass('tracing');
+                        trace_obj.removeClass('glyphicon-star');
+                        trace_obj.addClass('glyphicon-star-empty');}
+                    else{
+                        trace_obj.removeClass('glyphicon-star-empty');
+                        trace_obj.addClass('tracing');
+                        trace_obj.addClass('glyphicon-star');
+                    }
                 }
             });
         });
@@ -165,10 +173,10 @@
                     <span class="col-md-2">Board:{{post.board}}</span>
                     <span class="col-md-2">Category:{{post.category}}</span>
                     {% if board_post_trace.is_trace %}
-                    <span class="glyphicon glyphicon-star pull-right trace true"
+                    <span class="glyphicon glyphicon-star pull-right trace tracing"
                         id="trace-{{post.id}}"></span>
                     {% else %}
-                    <span class="glyphicon glyphicon-star-empty pull-right trace false"
+                    <span class="glyphicon glyphicon-star-empty pull-right trace"
                         id="trace{{post.id}}"></span>
                     {% endif %}
                 </div>

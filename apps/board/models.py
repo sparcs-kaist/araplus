@@ -49,7 +49,9 @@ class BoardContent(models.Model):
     def replace_content_tags(self):
         result = cgi.escape(self.content)
         result = result.replace("\n", "<br />")
-        return hashtag_regex.sub('<a href="#comment-\g<target>">#\g<target></a>', result)
+        return hashtag_regex.sub(
+            '<a href="#comment-\g<target>">#\g<target></a>',
+            result)
 
     def get_hashtags(self):
         return [tag[1] for tag in hashtag_regex.findall(self.content)]
