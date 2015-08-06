@@ -113,7 +113,7 @@ def _get_post(request, board_post, type):
         post['title'] = '--Deleted--'
         post['content'] = '--Deleted--'
     else:
-        post['content'] = board_content.content
+        post['content'] = board_content.replace_content_tags()
     post['id'] = board_post.id
     post['deleted'] = board_content.is_deleted
     post['content_id'] = board_content.id

@@ -2,6 +2,10 @@
 from django.db import models
 import apps.session.models
 import json
+import re
+import cgi
+
+hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 
 
 class BoardContent(models.Model):
@@ -41,6 +45,11 @@ class BoardContent(models.Model):
         vote['up'] = up
         vote['down'] = down
         return vote
+
+    def replace_content_tags(self):
+        result = cgi.escape(self.content)
+        result = result.replace("\n", "<br />")
+        return hashtag_regex.sub('<a href="#comment-\g<target>">#\g<target></a>', result)
 
 
 class Attachment(models.Model):
@@ -187,7 +196,7 @@ class BoardPostIs_read(models.Model):
 
 
 class HashTag(models.Model):
-    tag_name = is_anonymous = models.TextField(null=False, db_index=True)
+    tag_name = models.TextField(null=False, db_index=True)
     board_content = models.ForeignKey('BoardContent',
                                       related_name="hashtag",
                                       null=False)

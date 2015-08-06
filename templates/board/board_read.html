@@ -184,7 +184,7 @@
                 </div>
             </div>
             <div class="panel-body">
-                {{post.content | force_escape | linebreaksbr}}
+                {{post.content | safe}}
 				<div class="col-md-12">
 					<div class="row">
 						<div class="col-md-6"></div>
@@ -237,7 +237,7 @@
             </div>
             <div class="panel-body">
                 <div id="comment_content{{ comment.id }}">
-                    <div id="comment{{comment.id}}">{{ comment.content | force_escape | linebreaksbr }}</div>
+                    <div id="comment{{comment.id}}">{{ comment.content | safe }}</div>
                     <div class="col-md-12">
 						<div class="row">
 						    <div class="col-md-7"></div>
