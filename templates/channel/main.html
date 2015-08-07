@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block js %}
+<script type="text/javascript"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="list-group">
+    {% for channel in channel_list %}
+        <a href="{{ channel.channel_url }}" class="list-group-item">{{ channel.name }}</a>
+    {% endfor %}
+</div>
+<div class="container buttons">
+    <a class="btn btn-default" href="register_channel">Register Channel</a>
+</div>
+{% endblock %}

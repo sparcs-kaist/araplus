@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block js %}
+<script type="text/javascript"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="container" id="post-container">
+	Channel Name: {{ channel.name }}
+    <div class="container" id="post-title-container">
+		{{ channel_post.title }} 
+    </div>
+	<div class="container" id="post-content-container">
+		{{ content | linebreaksbr }}
+	</div>
+</div>
+<div class="container buttons">
+	<a class="btn btn-default" href="../write">Write</a>
+	<a class="btn btn-primary" href="edit">Edit</a>
+	<a class="btn btn-danger" href="delete">Delete</a>
+</div>
+{% endblock %}

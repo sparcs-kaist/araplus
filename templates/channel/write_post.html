@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block js %}
+<script type="text/javascript"></script>
+{% endblock %}
+
+
+{% block content %}
+<div id="post-container">
+	<form method="POST">
+		{% csrf_token %}	
+		<div id="post-title-container">
+			<div>
+				<label for="post-title">Title</label>
+			</div>
+			<input type="text" name="post-title" value="{{ channel_post.title }}" id="post-title" size="80">
+		</div>
+		<div id="post-content-container">
+			<div>
+				<label for="post-content-textarea">Content</label>
+			</div>
+			<textarea name="post-content-textarea" id="post-content-textarea" rows="20" cols="80">{{ channel_post.channel_content.content }}</textarea>
+		</div>
+		<div>
+			<button type="submit">Write</button>
+		</div>
+	</form>
+</div>
+
+{% endblock %}

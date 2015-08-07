@@ -6,9 +6,8 @@ from apps.session.models import UserProfile
 
 class ChannelContent(models.Model):
     content = models.TextField(null=False)
-    created_time = models.DateTimeField(null=False)
+    created_time = models.DateTimeField(auto_now_add=True, null=False)
     is_deleted = models.BooleanField(default=False, null=False)
-    is_anonymous = models.BooleanField(default=False, null=False)
 
     def __str__(self):
         if(self.id % 10 == 1):
@@ -78,26 +77,27 @@ class ChannelReport(models.Model):
 
 
 class Channel(models.Model):
-    name = models.CharField(max_length=45, null=False)
+    name = models.CharField(max_length=45, null=False, unique=True)
+    channel_url = models.CharField(max_length=45, null=False, unique=True)
     description = models.CharField(max_length=100, null=False)
     author = models.ForeignKey(UserProfile, related_name="channel")
-    thumbnail = models.FileField(null=False)
+    thumbnail = models.FileField(blank=True, null=False)
     post_count = models.IntegerField(default=0)
 
-    def __str__(self):
+    def __unicode__(self):
         name = self.name
         author = self.author
-        return "channel %s, authored by %s" % (name, author)
+        return u"channel %s, authored by %s" % (name, author)
 
 
 class ChannelPost(models.Model):
-    title = models.CharField(max_length=45, null=False)
+    title = models.CharField(max_length=100, null=False)
     is_notice = models.BooleanField(default=False, null=False)
     channel = models.ForeignKey('Channel',
                                 related_name="channel_post",
                                 null=False)
     channel_content = models.OneToOneField('ChannelContent', null=False)
-    thumbnail = models.FileField()
+    thumbnail = models.FileField(blank=True)
 
     def __str__(self):
         title = self.title
