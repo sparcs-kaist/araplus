@@ -132,11 +132,27 @@ class Board(models.Model):
     eng_name = models.CharField(max_length=45, null=False, unique=True)
     url = models.CharField(max_length=45, null=False, unique=True)
     description = models.CharField(max_length=100, null=False)
+    admin = models.ForeignKey('session.UserProfile',
+                              related_name="board",
+                              null=False)
     is_official = models.BooleanField(default=False)
     is_public = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.kor_name
+
+
+class BoardMember(models.Model):
+    board = models.ForeignKey('Board',
+                              related_name='board_member',
+                              null=False)
+    member = models.ForeignKey('session.userprofile',
+                               related_name='board_member',
+                               null=False)
+
+    class Meta:
+        unique_together = ('board', 'member',)
 
 
 class BoardCategory(models.Model):

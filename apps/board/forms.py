@@ -11,14 +11,30 @@ name = [u'양아치', u'루저', u'외톨', u'올빼미', u'밤비']
 class BoardForm(ModelForm):
     class Meta:
         model = Board
-        fields = ['kor_name', 'eng_name', 'url', 'description', 'is_public', ]
+        fields = [
+                    'kor_name',
+                    'eng_name',
+                    'url',
+                    'description',
+                    'is_public',
+                 ]
 
     def __init__(self, *args, **kwargs):
         super(BoardForm, self).__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        self.instance.admin = kwargs.pop('admin')
         super(BoardForm, self).save(*args, **kwargs)
         return self.instance
+
+    def clean(self):
+        cleaned_data = super(BoardForm, self).clean()
+        if 'url' in cleaned_data:
+            url = cleaned_data['url']
+            if url == 'all':
+                msg = u"Invalid url"
+                self.add_error('url', msg)
+        return cleaned_data
 
 
 class BoardContentForm(ModelForm):
@@ -79,6 +95,9 @@ class BoardPostForm(ModelForm):
                     board_category.board != board):
                 msg = u"Invalid Selection"
                 self.add_error('board_category', msg)
+            if board.is_deleted:
+                msg = u"Deleted Board"
+                self.add_error('board', msg)
         else:
             msg = u"Select Board first"
             self.add_error('board_category', msg)

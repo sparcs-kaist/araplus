@@ -18,6 +18,7 @@ from django.conf.urls import include, url
 urlpatterns = [
     url(r'^$', 'apps.board.views.home'),
     url(r'^create_board/$', 'apps.board.views.create_board'),
+    url(r'^([A-z]*)/remove_board/$', 'apps.board.views.remove_board'),
     url(r'^([A-z]*)/$', 'apps.board.views.post_list', name='post_list'),
     url(r'^([A-z]*)/post/$', 'apps.board.views.post_write'),
     url(r'^([A-z]*)/([1-9][0-9]*)/$', 'apps.board.views.post_read'),

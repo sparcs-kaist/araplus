@@ -15,6 +15,7 @@ from apps.board.backend import (
     _create_board,
     _get_post_log,
     _get_comment_log,
+    _remove_board,
 )
 from itertools import izip
 import json
@@ -42,6 +43,11 @@ def create_board(request):
 
 
 @login_required(login_url='/session/login')
+def remove_board(request, board_url):
+    return HttpResponse(_remove_board(request, board_url))
+
+
+@login_required(login_url='/session/login')
 def post_write(request, board="All"):
     if request.method == 'POST':
         result = _write_post(request, board=board)
@@ -52,7 +58,7 @@ def post_write(request, board="All"):
             board_post_trace.save()
             return redirect('../' + str(result['save'].id) + '/')
         else:
-            form_content, form_post = result['failed']
+            form_content, form_post, form_attachment = result['failed']
     else:
         try:
             board = Board.objects.get(url=board)
@@ -173,7 +179,7 @@ def post_list(request, board_url):
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.filter(is_official=True)
     try:
-        current_board = Board.objects.get(url=board_url)
+        current_board = Board.objects.get(url=board_url, is_deleted=False)
     except:
         current_board = None
     querystring = _get_querystring(request, 'best', 'page')

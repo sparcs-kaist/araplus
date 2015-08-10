@@ -19,10 +19,13 @@ def _get_post_list(request, board_url='', item_per_page=15):
         try:
             board = Board.objects.get(url=board_url)
         except:
-            return  # Wrong board request
+            return ([], [], None, None)  # Wrong board request
+        if board.is_deleted:
+            return ([], [], None, None)
     if board_url == 'all':
-        board_post_notice = BoardPost.objects.filter(is_notice=True)
-        board_post = BoardPost.objects.all()
+        board_post_notice = BoardPost.objects.filter(is_notice=True,
+                                                     board__is_deleted=False)
+        board_post = BoardPost.objects.filter(board__is_deleted=False)
     else:
         board_post_notice = BoardPost.objects.filter(is_notice=True,
                                                      board=board)
@@ -67,6 +70,8 @@ def _get_content(request, post_id):
     try:
         board_post = BoardPost.objects.get(id=post_id)
     except ObjectDoesNotExist:
+        return ({}, [])
+    if board_post.board.is_deleted:
         return ({}, [])
     try:
         board_post_is_read = BoardPostIs_read.objects.get(
@@ -148,6 +153,7 @@ def _write_post(request, is_modify=False, post=None,
     form_post = BoardPostForm(
         request.POST,
         instance=post)  # get form from post and instance
+    form_attachment = BoardAttachmentForm(request.POST, request.FILES)
     try:  # for modify log, get title and content before modify.
         # modify log for content
         content_before = content.content
@@ -188,13 +194,12 @@ def _write_post(request, is_modify=False, post=None,
         for tag in hashs:
             HashTag(tag_name=tag, board_content=board_content).save()
             
-        form_attachment = BoardAttachmentForm(request.POST, request.FILES)
         if form_attachment.is_valid():
             form_attachment.save(file = request.FILES['file'],
                                  content = board_content)
         return {'save': board_post}
     else:
-        return {'failed': [form_content, form_post]}
+        return {'failed': [form_content, form_post, form_attachment]}
 
 
 def _write_comment(request, post_id, is_modify=False):
@@ -395,6 +400,20 @@ def _get_comment_log(comment_id):
 def _create_board(request):
     form_board = BoardForm(request.POST)
     if form_board.is_valid():
-        board = form_board.save()
+        board = form_board.save(admin=request.user.userprofile)
         return {'save': board}
     return {'failed': form_board}
+
+
+def _remove_board(request, board_url):
+    try:
+        board = Board.objects.get(url=board_url)
+        if board.is_deleted:
+            return "already deleted"
+        if board.admin == request.user.userprofile:
+            board.is_deleted = True
+            board.save()
+            return "success"
+        return "not allowed"
+    except:
+        return "invaid access"

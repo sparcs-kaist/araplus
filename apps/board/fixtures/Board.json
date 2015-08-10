@@ -7,7 +7,8 @@
             "url": "garbage",
 			"description": "Trash, Garbage, Non-recyclable",
             "is_official": "True",
-            "is_public": "True"
+            "is_public": "True",
+            "admin": 1
 		},
 		"pk": 1
 	},
@@ -19,7 +20,8 @@
             "url": "notice",
 			"description": "Notices",
             "is_official": "True",
-            "is_public": "True"
+            "is_public": "True",
+            "admin": 1
 		},
 		"pk": 2
 	},
@@ -31,7 +33,8 @@
             "url": "infoworld",
 			"description": "Honey tips provided",
             "is_official": "True",
-            "is_public": "True"
+            "is_public": "True",
+            "admin": 1
 		},
 		"pk": 3
 	},
@@ -43,7 +46,8 @@
             "url": "hot_potatoes",
 			"description": "political issues",
             "is_official": "True",
-            "is_public": "True"
+            "is_public": "True",
+            "admin": 1
 		},
 		"pk": 4
 	}
