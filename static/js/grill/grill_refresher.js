@@ -25,9 +25,9 @@ function csrfSafeMethod(method) {
 
 function refresh_comment (grill_id) {
     var current_index = 0
-    if ($($("#result_list>li")[0]).attr("id") != null)
+    if ($($("#comment-content-list>li")[0]).attr("id") != null)
     {
-        current_index = $($("#result_list>li")[0]).attr("id").split("_")[1];
+        current_index = $($("#comment-content-list>li")[0]).attr("id").split("-")[1];
     }
     $.ajax({
         type: 'POST',
@@ -47,7 +47,7 @@ function refresh_comment (grill_id) {
                 var target = json.new_votes[i]
                 var target_order = target.grill_comment
                 var target_new_like = target.new_count
-                var target_button = $($("#comment_"+target_order).find("button")[0])
+                var target_button = $($("#comment-"+target_order).find("button")[0])
                 target_new_like += target_button.text().trim().split('+')[1].slice(0, -1)*1;
                 target_button.text("추천 (+"+target_new_like+")")
             };
@@ -58,8 +58,6 @@ function refresh_comment (grill_id) {
 }
 
 function vote(grill_id, order, updown) {
-    console.log("grill_id : " + grill_id + "/"+typeof(grill_id))
-    console.log("order : " + order + "/"+typeof(order) )
     $.ajax({
         type: 'POST',
         url: '/grill/' + grill_id + '/vote_comment/',
@@ -70,30 +68,32 @@ function vote(grill_id, order, updown) {
         dataType: 'json',
         success: function(json){
             
-        }, error:function(request,status,error){
-            console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
+        }, error:function(request, status, error){
+            console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+        }
     });
 }
 
 
 var add_comment = function(grill_id, socket){
-        var form_content = $("#new_content").val().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        var form_content = $("#new-content").val().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
         if (!form_content) {
             return false;
         };
-        $("#new_content").val('');
-        $("#text_counter").text('0');
+        $("#new-content").val('');
+        $("#text-counter").text('0');
         $.ajax({
             type: 'POST',
             url: '/grill/'+grill_id+'/add_comment/',
-            data: { new_content : form_content,
-                },
+            data: {
+                new_content : form_content,
+            },
             dataType: 'json',
             success: function(json){
                 // emit
                 var new_comment_html = json.html;
-                $("#result_list").prepend(new_comment_html);
-                socket.emit('send_message',new_comment_html);
+                $("#comment-content-list").prepend(new_comment_html);
+                socket.emit('send_message', new_comment_html);
             },
             error:function(request,status,error){
             console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
@@ -112,51 +112,48 @@ $(document).ready(function(){
                 }
             });
 
-            $(document).on('click','button.vote_up',function(){
+            $(document).on('click','button.vote-up',function(){
                 $(this).attr('disabled',true);
-                $(this).parent().children("button.vote_down").attr('disabled',true);
-                vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, true);
+                $(this).parent().children("button.vote-down").attr('disabled', true);
+                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, true);
                 var target_new_like = $(this).text().trim().split('+')[1].slice(0, -1)*1 + 1;
                 $(this).text("추천 (+"+target_new_like+")")
             })
 
-            $(document).on('click','button.vote_down',function(){
+            $(document).on('click','button.vote-down',function(){
                 $(this).attr('disabled',true);
-                $(this).parent().children("button.vote_up").attr('disabled',true);
-                vote(grill_id, $($(this)).parentsUntil("#result_list")[3].id.split("_")[1]*1, false);
+                $(this).parent().children("button.vote-up").attr('disabled', true);
+                console.log($(this).parentsUntil("#comment-content-list"));
+                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, false);
                 var target_new_like = $(this).text().trim().split('-')[1].slice(0, -1)*1 + 1;
                 $(this).text("반대 (-"+target_new_like+")")
             })
 
-            $("#new_content").on('keyup',function(event){
-                $("#text_counter").text($($("#new_content")[0]).val().length);
+            $("#new-content").on('keyup',function(event){
+                $("#text-counter").text(140-$($("#new-content")[0]).val().length);
             })   
 
             // websocket Initialize
             var socket = io.connect('http://bit.sparcs.org:9779');
 
-            socket.emit('adduser',grill_id);
-            
+            socket.emit('adduser', grill_id);
+
             // Receive Message
             socket.on('message', function(message){
-                console.log("message : " + message);
-                $("#result_list").prepend(message);
+                $("#comment-content-list").prepend(message);
             });
 
             // Sending Message
-            $("#add_comment_button").click(function(event){
-                console.log("HI")
+            $("#btn-add-comment").click(function(event){
                 event.preventDefault();
                 add_comment(grill_id, socket);
             });     
 
             // 반대 많이 받은 댓글 다시 보여주기
-            $(".open_comment").click(function(event){
-                console.log("open!")
-                console.log($(this).parent().children("#hate_comment_content"))
-                $(this).parent().children("#hate_comment_content").css('display', 'block');
-                $(this).parent().children("#hate_content").css('display', 'none');
-                $(this).parent().children(".open_comment").css('display', 'none');
+            $(".open-comment").click(function(event){
                 event.preventDefault();
+                $(this).parent().children(".hate-comment-content").css('display', 'block');
+                $(this).parent().children(".hate-content").css('display', 'none');
+                $(this).parent().children(".open-comment").css('display', 'none');
             });
         });

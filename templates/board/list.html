@@ -1,4 +1,7 @@
 <div class="container">
+    {% if not pages %}
+    "Invalid access"
+    {% endif %}
     <table class="table post-list" width=700>
         <tr class="list" id="list-header">
             <td width=5></td>

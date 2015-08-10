@@ -4,12 +4,16 @@
     {% for message in messages %}
         <div class="bubblebox">
             <div class="bubble">
-                <div class="info">From {{ message.sender.nickname }}</div>
+                <div class="info">To {{ message.receiver.nickname }}</div>
                 {{ message.content }}
                 <div class="info">{{ message.created_time }}</div>
+                {% if message.is_read %}
+                    <div class="info">Read</div>
+                {% else %}
+                    <div class="info">Unread</div>
+                {% endif %}
             </div>
         </div>
     {% endfor %}
 </div>
 {% endblock %}
-

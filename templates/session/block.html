@@ -4,14 +4,10 @@
     <form method="POST">
         {% csrf_token %}
         <div class="form-group">
-            <label>to</label>
+            <label>nickname</label>
             <input type="text" class="form-control" name="nickname" placeholder="nickname">
+            <button type="submit" class="btn btn-default">Block</button>
         </div>
-        <div class="form-group">
-            <label>Content</label>
-            <input type="text" class="form-control" name="content" placeholder="hello!">
-        </div>
-        <button type="submit" class="btn btn-default">Send Message</button>
     </form>
     {{ error }}
     {{ success }}

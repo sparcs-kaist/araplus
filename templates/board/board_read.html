@@ -144,25 +144,36 @@
             }
         });
         <!-- for trace post -->
-        $(".trace").click(function(){
+        $(".trace, .alarm").click(function(){
             var post_id = $(this).attr("id").split("-")[1];
             $.ajax(
             {
                 url: "trace/",
                 type: "POST",
                 data: {
+                    type: $(this).attr("id").split("-")[0],
                     csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
                 },
                 success: function(data){
                     trace_obj = $(".trace");
-                    if(trace_obj.attr('class').indexOf('tracing') != -1){
-                        trace_obj.removeClass('tracing');
-                        trace_obj.removeClass('glyphicon-star');
-                        trace_obj.addClass('glyphicon-star-empty');}
-                    else{
+                    alarm_obj = $(".alarm");
+                    if(data.trace){
                         trace_obj.removeClass('glyphicon-star-empty');
                         trace_obj.addClass('tracing');
                         trace_obj.addClass('glyphicon-star');
+                    }
+                    else{
+                        trace_obj.removeClass('tracing');
+                        trace_obj.removeClass('glyphicon-star');
+                        trace_obj.addClass('glyphicon-star-empty');
+                    }
+                    if(data.alarm){
+                        alarm_obj.removeAttr('style');
+                        alarm_obj.addClass('activated');
+                    }
+                    else{
+                        alarm_obj.removeClass('activated');
+                        alarm_obj.css('color', "white");
                     }
                 }
             });
@@ -185,12 +196,20 @@
                     <span class="col-md-3">User:{{ post.username }}</span>
                     <span class="col-md-2">Board:{{post.board}}</span>
                     <span class="col-md-2">Category:{{post.category}}</span>
+
                     {% if board_post_trace.is_trace %}
                     <span class="glyphicon glyphicon-star pull-right trace tracing"
                         id="trace-{{post.id}}"></span>
                     {% else %}
                     <span class="glyphicon glyphicon-star-empty pull-right trace"
-                        id="trace{{post.id}}"></span>
+                        id="trace-{{post.id}}"></span>
+                    {% endif %}
+                    {% if board_post_trace.is_notified %}
+                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
+                        id="alarm-{{post.id}}"></span>
+                    {% else %}
+                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
+                        id="alarm-{{post.id}}" style="color:white;"></span>
                     {% endif %}
                 </div>
                 <div>
