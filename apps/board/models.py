@@ -49,6 +49,8 @@ class BoardContent(models.Model):
     def replace_content_tags(self):
         result = cgi.escape(self.content)
         result = result.replace("\n", "<br />")
+        result = re.sub(r'@(?P<target>\d+)',
+                        '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
         return hashtag_regex.sub(
             '<a href="#comment-\g<target>">#\g<target></a>',
             result)

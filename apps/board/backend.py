@@ -79,8 +79,11 @@ def _get_content(request, post_id):
     board_post_is_read.save()
     post = _get_post(request, board_post, 'Post')
     comment_list = []
+    order = 1
     for board_comment in board_post.board_comment.all():
         comment = _get_post(request, board_comment, 'Comment')
+        comment['order'] = order
+        order = order + 1
         comment_list.append(comment)
     best_comment = {}
     best_vote = 0
@@ -96,7 +99,7 @@ def _get_content(request, post_id):
 
 def _get_post(request, board_post, type):
     post = {}
-    if type == 'Comment' or type == 'Re-Comment':
+    if type == 'Comment':
         pass
     elif type == 'Post':
         post['title'] = board_post.title

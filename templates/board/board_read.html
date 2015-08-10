@@ -3,6 +3,7 @@
 <link rel="stylesheet" type="text/css" href="/media/css/board/list.css">
 {% endblock %}
 {% block js %}
+<script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
   jQuery(document).ready(function() {
@@ -130,6 +131,18 @@
             });
             return false
         });
+        var hoverHTMLDemoBasic = '<p class="comment_preview_content">' + '번 댓글 미리보기 입니다' + '</p>';
+        $(".comment_preview").hovercard({
+            detailsHTML : hoverHTMLDemoBasic,
+            width: 400,
+            onHoverIn: function() {
+                var order = $(this).children('a').attr('title').split('_')[1];
+                $(".comment_preview_content").prepend('<span class="comment_preview_order">' + order + '</span>');
+            },
+            onHoverOut: function() {
+                $(".comment_preview_order").remove();
+            }
+        });
         <!-- for trace post -->
         $(".trace").click(function(){
             var post_id = $(this).attr("id").split("-")[1];
@@ -230,6 +243,7 @@
         {% endif %}
             <div class="panel-heading">
                 <div>
+                    <span id=comment_order_{{comment.order}}> {{ comment.order }}</span>
                     <span> {{ comment.username }}</span>
                 </div>
                 <div> 
