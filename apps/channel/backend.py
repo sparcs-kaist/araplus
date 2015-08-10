@@ -1,5 +1,5 @@
 # -*- coding: utf-8
-from apps.channel.models import Channel
+from apps.channel.models import Channel, ChannelContentVote
 
 
 def _make_channel(request):
@@ -14,3 +14,16 @@ def _make_channel(request):
     channel.thumbnail = thumbnail
     channel.save()
     return channel.id
+
+
+def _give_rating_backend(channel_content, user_profile, rating):
+    rating = int(rating)
+    if 1 <= rating and rating <= 10:
+        votes = ChannelContentVote.objects.filter(channel_content=channel_content,
+                                                  userprofile=user_profile)
+        for vote in votes:
+            vote.delete()
+        vote = ChannelContentVote(channel_content=channel_content,
+                                  userprofile=user_profile,
+                                  rating=rating)
+        vote.save()

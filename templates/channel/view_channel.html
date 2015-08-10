@@ -11,7 +11,7 @@
         {% if post.channel_content.is_deleted %}
         <a href="#" class="list-group-item disabled">--deleted--</a>
         {% else %}
-        <a href="{{ post.id }}" class="list-group-item">{{ post.title }}</a>
+        <a href="{{ post.id }}" class="list-group-item">{{ post.title }} (별점 : {{ post.channel_content.get_vote }})</a>
         {% endif %}
     {% endfor %}
 </div>

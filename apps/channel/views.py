@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from apps.channel.models import Channel, ChannelPost, ChannelContent
+from apps.channel.backend import _give_rating_backend
 
 # Create your views here.
 
@@ -110,3 +111,12 @@ def delete_post(request, channel_url, channel_post_id):
     channel_content.save()
 
     return redirect('/channel/' + channel_url)
+
+
+@login_required(login_url='/session/login')
+def give_rating(request, channel_url, channel_post_id, rating):
+    user_profile = request.user.userprofile
+    channel_post = ChannelPost.objects.get(id=channel_post_id)
+    channel_content = channel_post.channel_content
+    _give_rating_backend(channel_content, user_profile, rating)
+    return redirect('/channel/' + channel_url + '/' + channel_post_id + '/')

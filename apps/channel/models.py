@@ -20,17 +20,15 @@ class ChannelContent(models.Model):
             return "%dth content created in %s" % (self.id, self.created_time)
 
     def get_vote(self):
-        up = 0
-        down = 0
+        rating_sum = 0
+        rating_people = 0
         for content_vote in self.channel_content_vote.all():
-            if content_vote.is_up:
-                up = up+1
-            else:
-                down = down+1
-        vote = {}
-        vote['up'] = up
-        vote['down'] = down
-        return vote
+            rating_people = rating_people + 1
+            rating_sum = rating_sum + content_vote.rating
+        if rating_people == 0:
+            return "No one rated yet"
+        else:
+            return float(rating_sum)/float(rating_people)
 
 
 class ChannelAttachment(models.Model):
@@ -62,7 +60,7 @@ class ChannelContentVote(models.Model):
                                         null=False)
     userprofile = models.ForeignKey(UserProfile,
                                     related_name="channel_content_vote")
-    is_up = models.BooleanField(null=False)
+    rating = models.IntegerField(null=False)
 
 
 class ChannelReport(models.Model):
@@ -93,6 +91,7 @@ class Channel(models.Model):
 class ChannelPost(models.Model):
     title = models.CharField(max_length=100, null=False)
     is_notice = models.BooleanField(default=False, null=False)
+    is_best = models.BooleanField(default=False, null=False)
     channel = models.ForeignKey('Channel',
                                 related_name="channel_post",
                                 null=False)
