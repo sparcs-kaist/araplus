@@ -1,0 +1,15 @@
+{% extends "session/group_base.html" %}
+{% block group_content %}
+<div class="container">
+    <ul>
+    {% for group in groups %}
+        <li>
+            <a href="{{ "message/"|add:group.name }}" class="btn btn-default"> {{group.name}} </a>
+        </li>
+    {% endfor %}
+    </ul>
+    <a href="make" class="btn btn-default"> Make new group </a>
+</div>
+{% endblock %}
+
+

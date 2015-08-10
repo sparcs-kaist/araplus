@@ -1,0 +1,30 @@
+{% extends "session/group_base.html" %}
+{% block group_content %}
+<div class="container">
+    {% if group != None %}
+        <h3>{{ group.name }}</h3>
+        <a href=".." class="btn btn-default">Back</a>
+        </br></br>
+        <ul>
+            {% for member in members %}
+                <li>{{ member.nickname }}</li>
+            {% endfor %}
+        </ul>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Invite</label>
+                <input type="text" class="form-control" name="nickname" placeholder="nickname">
+                <button type="submit" class="btn btn-default">Invite</button>
+            </div>
+        </form>
+        <form method="delete">
+            {% csrf_token %}
+            <div class="form-group">
+                <button type="submit" class="btn btn-default">Leave this group</button>
+            </div>
+        </form>
+    {% endif %}
+    {{ error }}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "session/message_base.html" %}
+{% block message_content %}
+<div class="container">
+    <ul>
+    {% for group in groups %}
+        <li>{{ group.name }}</li>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name='checkname' value={{ group.name }} >
+            <button type='submit'> Check message </button>
+        </form>
+    {% endfor %}
+    </ul>
+    {{ error }}
+</div>
+{% endblock %}

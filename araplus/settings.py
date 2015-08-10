@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'apps.session',
     'bootstrapform',
     # 'apps.main',
+    'bootstrapform',
 )
 
 MIDDLEWARE_CLASSES = (

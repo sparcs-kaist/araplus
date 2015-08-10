@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block css %}
+<style>
+    .bubblebox
+    {
+        margin: 2px 0px 2px 0px;
+        float: left;
+        clear: both;
+    }
+    .my.bubblebox
+    {
+        float: right;
+        text-align: right;
+    }
+    .bubble
+    {
+        margin: 0px 0px 3px 0px;
+        padding: 6px 16px 6px 16px;
+        background-color: #DDD;
+        border-radius: 11px;
+        float: left;
+        clear: both;
+    }
+    .my .bubble
+    {
+        color: #FFF;
+        background-color: #29F;
+        float: right;
+    }
+    .bubblebox .info
+    {
+        color: #666;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<li>
+    <a href="/session" class="btn btn-default"> Session main </a>
+    <a href="/session/message/send" class="btn btn-default"> Send message </a>
+    <a href="/session/message/" class="btn btn-default"> Check received message </a>
+    <a href="/session/message/sent/" class="btn btn-default"> Check sent message </a>
+    <a href="/session/message/thread" class="btn btn-default"> See thread </a>
+    <a href="/session/message/block/" class="btn btn-default"> Block message </a>
+    <a href="/session/message/blocklist/" class="btn btn-default"> See block lists </a>
+</li>
+</br>
+{% block message_content%}
+{% endblock %}
+{% endblock %}
