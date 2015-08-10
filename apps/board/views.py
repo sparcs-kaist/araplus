@@ -21,7 +21,7 @@ from itertools import izip
 import json
 import diff_match_patch
 from apps.board.forms import *
-
+from django.core.paginator import Paginator
 
 def home(request):
     return redirect('all/')
@@ -225,16 +225,49 @@ def report(request):
 
 @login_required(login_url='/session/login')
 def trace(request, post_id):
-    message = 'fail'
-    if request.method == 'POST':
-        try:
-            board_post_trace = BoardPostTrace.objects.get(
-                userprofile=request.user.userprofile,
-                board_post__id=post_id)
+    request_type = request.POST.get('type', '')
+    print request_type
+    try:
+        board_post_trace = BoardPostTrace.objects.get(
+            userprofile=request.user.userprofile,
+            board_post__id=post_id)
+        print board_post_trace.id
+        if request_type == 'trace':
             board_post_trace.is_trace = not(board_post_trace.is_trace)
-            print board_post_trace.is_trace
-            board_post_trace.save()
-            message = 'success'
-        except:
-            message = 'no post'
-    return HttpResponse(message)
+        elif request_type == 'alarm':
+            board_post_trace.is_notified = not(board_post_trace.is_notified)
+        else:
+            result = {'message': 'failed'}
+            return HttpResponse(json.dumps(result), content_type='application/json')
+        print board_post_trace.id
+    except:
+        board_post_trace = BoardPostTrace(
+            userprofile=request.user.userprofile,
+            board_post_id=post_id)
+        if request_type == 'alarm':
+            board_post_trace.is_notified = True
+    board_post_trace.save()
+    result = {
+        'message': 'success',
+        'alarm': board_post_trace.is_notified,
+        'trace': board_post_trace.is_trace}
+    return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@login_required(login_url='/session/login')
+def trace_list(request, item_per_page=20):
+    board_post = BoardPost.objects.filter(
+        board_post_trace__userprofile=request.user.userprofile,
+        board_post_trace__is_trace=True)
+    print board_post
+    page = int(request.GET.get('page', 1))
+    post_paginator = Paginator(board_post, item_per_page)
+    post_list = []
+    for post in post_paginator.page(page):
+        post_list += [[post, post.get_is_read(request)]]
+    return render(request,
+                  'board/board_list.html',
+                  {'post_list': post_list,
+                   'current_page': page,
+                   'pages': post_paginator.page_range})
+
