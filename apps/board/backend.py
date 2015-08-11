@@ -12,6 +12,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
     best_filter = bool(request.GET.get('best', False))
     page = int(request.GET.get('page', 1))
+    search_tag = request.GET.get('tag', '')
     search_title = request.GET.get('title', '')
     search_content = request.GET.get('content', '')  # title + content
     search_nickname = request.GET.get('nickname', '')
@@ -33,6 +34,8 @@ def _get_post_list(request, board_url='', item_per_page=15):
     # search
     if best_filter:
         board_post = board_post.filter(is_best=True)
+    if search_tag:
+        board_post = board_post.filter(hashtag__tag_name=search_tag)
     if search_title:
         board_post = board_post.filter(title__contains=search_title)
     if search_content:
@@ -192,10 +195,10 @@ def _write_post(request, is_modify=False, post=None,
             content=form_content.save(author=request.user.userprofile,
                                       post=post))  # save
         board_content = board_post.board_content
-        HashTag.objects.filter(board_content=board_content).delete()
+        HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
         for tag in hashs:
-            HashTag(tag_name=tag, board_content=board_content).save()
+            HashTag(tag_name=tag, board_post=board_post).save()
         form_attachment = BoardAttachmentForm(request.POST, request.FILES)
         if form_attachment.is_valid():
             form_attachment.save(file=request.FILES['file'],

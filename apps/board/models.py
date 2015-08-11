@@ -230,6 +230,6 @@ class BoardPostTrace(models.Model):
 
 class HashTag(models.Model):
     tag_name = models.TextField(null=False, db_index=True)
-    board_content = models.ForeignKey('BoardContent',
+    board_post = models.ForeignKey('BoardPost',
                                       related_name="hashtag",
                                       null=False)
