@@ -52,7 +52,7 @@ class BoardContent(models.Model):
         result = re.sub(r'@(?P<target>\d+)',
                         '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
         return hashtag_regex.sub(
-            '<a href="#comment-\g<target>">#\g<target></a>',
+            '\1<a href="../?tag=\g<target>">#\g<target></a>',
             result)
 
     def get_hashtags(self):
