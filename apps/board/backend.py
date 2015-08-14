@@ -199,8 +199,6 @@ def _write_post(request, is_modify=False, post=None,
         hashs = board_content.get_hashtags()
         for tag in hashs:
             HashTag(tag_name=tag, board_post=board_post).save()
-        form_attachment = BoardAttachmentForm(request.POST, request.FILES)
-            HashTag(tag_name=tag, board_content=board_content).save()
         if form_attachment.is_valid():
             attachments = form_attachment.save(commit=False)
             for attachment in attachments:
