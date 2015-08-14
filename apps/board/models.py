@@ -152,6 +152,7 @@ class BoardMember(models.Model):
     member = models.ForeignKey('session.userprofile',
                                related_name='board_member',
                                null=False)
+    write = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('board', 'member',)

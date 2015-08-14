@@ -21,12 +21,12 @@ def _get_post_list(request, board_url='', item_per_page=15):
             board = Board.objects.get(url=board_url)
         except:
             return ([], [], None, None)  # Wrong board request
-        if board.is_deleted:
-            return ([], [], None, None)
     if board_url == 'all':
         board_post_notice = BoardPost.objects.filter(is_notice=True,
-                                                     board__is_deleted=False)
-        board_post = BoardPost.objects.filter(board__is_deleted=False)
+                                                     board__is_deleted=False,
+                                                     board__is_official=True)
+        board_post = BoardPost.objects.filter(board__is_deleted=False,
+                                              board__is_official=True)
     else:
         board_post_notice = BoardPost.objects.filter(is_notice=True,
                                                      board=board)
@@ -274,7 +274,6 @@ def _delete_post(request):
 def _report(request):
     content_id = request.POST.get('id', 0)
     report_form = BoardReportForm(request.POST)
-    print report_form.errors
     if report_form.is_valid():
         try:
             board_content = BoardContent.objects.get(id=content_id)
@@ -415,11 +414,45 @@ def _remove_board(request, board_url):
     try:
         board = Board.objects.get(url=board_url)
         if board.is_deleted:
-            return "already deleted"
+            return 'already deleted'
         if board.admin == request.user.userprofile:
             board.is_deleted = True
             board.save()
-            return "success"
-        return "not allowed"
+            return 'success'
+        return 'not allowed'
     except:
-        return "invaid access"
+        return 'invaid access'
+
+
+def _add_member(request, board):
+    member_name = request.POST.get('member', '')
+    form_boardmember = BoardMemberForm(request.POST,
+                                       board=board)
+    if form_boardmember.is_valid():
+        boardmember = form_boardmember.save()
+        return {'save': boardmember}
+    return {'failed': form_boardmember}
+
+
+def _check_valid(request, board_url, write=False):
+    if board_url.lower() == 'all':
+        return True
+    try:
+        board = Board.objects.get(url=board_url)
+    except:
+        return False
+    if board.is_deleted:
+        return False
+    if board.is_public:
+        return True
+    if board.admin == request.user.userprofile:
+        return True
+    try:
+        board_member = BoardMember.objects.get(board=board,
+                                            member=request.user.userprofile)
+        if write and not board_member.write:
+            return False
+        return True
+    except:
+        pass
+    return False

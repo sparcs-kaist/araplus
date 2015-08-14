@@ -1,6 +1,7 @@
 # -*- coding: utf-8
 from apps.board.models import *
-from django.forms import ModelForm, Textarea, BooleanField, FileField
+from apps.session.models import UserProfile
+from django.forms import ModelForm, Textarea, BooleanField, FileField, CharField
 import random
 
 
@@ -32,8 +33,41 @@ class BoardForm(ModelForm):
         if 'url' in cleaned_data:
             url = cleaned_data['url']
             if url == 'all':
-                msg = u"Invalid url"
+                msg = u'Invalid url'
                 self.add_error('url', msg)
+        return cleaned_data
+
+
+class BoardMemberForm(ModelForm):
+    class Meta:
+        model = BoardMember
+        fields = {
+                    'member',
+                    'write',
+                 }
+
+    def __init__(self, *args, **kwargs):
+        self.board = kwargs.pop('board', None)
+        super(BoardMemberForm, self).__init__(*args, **kwargs)
+        self.fields['member'] = CharField(required=True)
+
+    def save(self, *args, **kwargs):
+        self.instance.board = self.board
+        super(BoardMemberForm, self).save(*args, **kwargs)
+        return self.instance
+
+    def clean(self):
+        cleaned_data = super(BoardMemberForm, self).clean()
+        if cleaned_data.get('member', ''):
+            try:
+                member = UserProfile.objects.get(nickname=cleaned_data['member'])
+                if BoardMember.objects.filter(board=self.board, member=member):
+                    msg = u'Aleady added'
+                    self.add_error('member', msg)
+                cleaned_data['member'] = member
+            except:
+                msg = u'User not exist'
+                self.add_error('member', msg)
         return cleaned_data
 
 
