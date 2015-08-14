@@ -318,8 +318,8 @@ def _vote(request):
             if BoardContentVoteAdult.objects.filter(
                     board_content=board_content,
                     userprofile=user_profile):
-                return {'success': 'Already voted' + vote_type,
-                        'vote': board_content.get_vote()}
+                return {'success': 'Already voted ' + vote_type,
+                        'vote': board_content.get_vote(), 'cancel': cancel}
             else:
                 vote = BoardContentVoteAdult()
         elif vote_type == 'political':
@@ -327,7 +327,7 @@ def _vote(request):
                     board_content=board_content,
                     userprofile=user_profile):
                 return {'success': 'Already voted ' + vote_type,
-                        'vote': board_content.get_vote()}
+                        'vote': board_content.get_vote(), 'cancel': cancel}
             else:
                 vote = BoardContentVotePolitical()
         else:
