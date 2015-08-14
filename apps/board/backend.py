@@ -159,7 +159,7 @@ def _write_post(request, is_modify=False, post=None,
     form_post = BoardPostForm(
         request.POST,
         instance=post)  # get form from post and instance
-    form_attachment = BoardAttachmentForm(request.POST, request.FILES)
+    form_attachment = AttachmentFormSet(request.POST, request.FILES)
     try:  # for modify log, get title and content before modify.
         # modify log for content
         content_before = content.content
@@ -200,9 +200,12 @@ def _write_post(request, is_modify=False, post=None,
         for tag in hashs:
             HashTag(tag_name=tag, board_post=board_post).save()
         form_attachment = BoardAttachmentForm(request.POST, request.FILES)
+            HashTag(tag_name=tag, board_content=board_content).save()
         if form_attachment.is_valid():
-            form_attachment.save(file=request.FILES['file'],
-                                 content=board_content)
+            attachments = form_attachment.save(commit=False)
+            for attachment in attachments:
+                attachment.board_content = board_content
+                attachment.save()
         return {'save': board_post}
     else:
         return {'failed': [form_content, form_post, form_attachment]}

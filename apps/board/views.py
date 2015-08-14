@@ -19,11 +19,10 @@ from apps.board.backend import (
     _add_member,
     _check_valid,
 )
-from itertools import izip
 import json
-import diff_match_patch
 from apps.board.forms import *
 from django.core.paginator import Paginator
+
 
 def home(request):
     return redirect('all/')
@@ -107,7 +106,7 @@ def post_write(request, board="All"):
             board = Board.objects.get(id=1)
         form_content = BoardContentForm()
         form_post = BoardPostForm(initial={'board': board.id})
-        form_attachment = BoardAttachmentForm()
+        form_attachment = AttachmentFormSet(queryset=Attachment.objects.none())
     return render(request,
                   'board/board_write.html',
                   {'content_form': form_content,
@@ -158,12 +157,7 @@ def post_read(request, board_url, post_id):
     except:
         current_board = None
     querystring = _get_querystring(request, 'best', 'page')
-    # tested for report ########
     report_form = BoardReportForm()
-    """return render(request,
-                  'board/modal_test.html',
-                  {'report_form': report_form})"""
-    #################################
     return render(request,
                   'board/board_read.html',
                   {
@@ -298,7 +292,8 @@ def trace(request, board_url, post_id):
             board_post_trace.is_notified = not(board_post_trace.is_notified)
         else:
             result = {'message': 'failed'}
-            return HttpResponse(json.dumps(result), content_type='application/json')
+            return HttpResponse(json.dumps(result),
+                                content_type='application/json')
     except:
         board_post_trace = BoardPostTrace(
             userprofile=request.user.userprofile,
@@ -330,4 +325,3 @@ def trace_list(request, board_url, item_per_page=20):
                   {'post_list': post_list,
                    'current_page': page,
                    'pages': post_paginator.page_range})
-

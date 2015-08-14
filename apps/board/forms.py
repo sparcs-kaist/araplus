@@ -1,8 +1,9 @@
 # -*- coding: utf-8
 from apps.board.models import *
 from apps.session.models import UserProfile
-from django.forms import ModelForm, Textarea, BooleanField, FileField, CharField
+from django.forms import ModelForm, Textarea, BooleanField, CharField
 import random
+from django.forms.models import modelformset_factory
 
 
 prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
@@ -13,12 +14,12 @@ class BoardForm(ModelForm):
     class Meta:
         model = Board
         fields = [
-                    'kor_name',
-                    'eng_name',
-                    'url',
-                    'description',
-                    'is_public',
-                 ]
+            'kor_name',
+            'eng_name',
+            'url',
+            'description',
+            'is_public',
+            ]
 
     def __init__(self, *args, **kwargs):
         super(BoardForm, self).__init__(*args, **kwargs)
@@ -151,15 +152,17 @@ class BoardReportForm(ModelForm):
         self.instance.board_content = kwargs.pop('content')
         return super(BoardReportForm, self).save(*args, **kwargs)
 
+
 class BoardAttachmentForm(ModelForm):
     class Meta:
         model = Attachment
         fields = ['file', ]
 
-    def save(self, *args, **kwargs):
-        self.instance.file = kwargs.pop('file')
-        self.instance.board_content = kwargs.pop('content')
-        return super(BoardAttachmentForm, self).save(*args, **kwargs)
+
+AttachmentFormSet = modelformset_factory(
+    model=Attachment,
+    form=BoardAttachmentForm)
+
 
 def _is_anonymous_duplicate(board_post, name, cache):
     if not board_post:
