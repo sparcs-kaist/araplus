@@ -1,34 +1,16 @@
 from django.contrib import admin
-from apps.channel.models import (
-    Channel,
-    ChannelPost,
-    ChannelContent,
-)
+from apps.channel.models import *
 
 # Register your models here.
-
-
-class ChannelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'author',
-                    'thumbnail', 'post_count')
-    list_filter = ('author',)
-
-
-admin.site.register(Channel, ChannelAdmin)
-
-
-class ChannelPostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'is_notice', 'channel',
-                    'channel_content', 'thumbnail')
-    list_filter = ('title', 'channel', 'channel_content')
-
-
-admin.site.register(ChannelPost, ChannelPostAdmin)
-
-
-class ChannelContentAdmin(admin.ModelAdmin):
-    list_display = ('content', 'created_time', 'is_deleted')
-    list_filter = ('is_deleted',)
-
-
-admin.site.register(ChannelContent, ChannelContentAdmin)
+admin.site.register(ChannelContent)
+admin.site.register(ChannelPost)
+admin.site.register(ChannelComment)
+admin.site.register(ChannelContentVote)
+admin.site.register(Channel)
+admin.site.register(ChannelReport)
+admin.site.register(ChannelCategory)
+admin.site.register(ChannelPostIs_read)
+admin.site.register(ChannelContentVoteAdult)
+admin.site.register(ChannelContentVotePolitical)
+admin.site.register(ChannelPostTrace)
+admin.site.register(HashTag)

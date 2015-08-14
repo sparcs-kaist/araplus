@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/channel/list.css">
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/media/js/channel/hover.js"></script>
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+     jQuery(document).ready(function() {
+         jQuery("span.timeago").timeago();
+     });
+</script>
+<script>
+    $(document).ready(function(){
+        <!-- 선택한 게시물 style 변경 -->
+        selected_post = location.href.split('/')[5];
+        $("#post-row-"+selected_post).addClass('selected');
+        <!-- --------------------- -->
+        $(".comment").click(function(){
+            var channel_comment_id=$(this).attr("id").slice(3);
+            var content = $("#comment"+channel_comment_id).html().replace(/<br\s*[\/]?>/gi,'\n');
+            var mod_comment = "<form action='./comment_mod/{{querystring}}' method='POST'>"+
+                "{% csrf_token %}"+
+                "<input type='hidden' name='channel_comment_id' value=" + channel_comment_id + ">"+ 
+                "<input type='hidden' name='channel_post_id' value={{post.id}}>"+
+                "<div class='form-group'>"+
+                    "<textarea class='form-control' rows='2' name='content'>"+
+                        content+
+                        "</textarea>"+
+                    "<div class='col-md-12'>"+
+                        "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
+                            "완료"+
+                            "</button></div></div></form>";
+            $(mod_comment).replaceAll("#comment_content"+channel_comment_id);
+        });
+        $(".vote").click(function() {
+            var vote_id = $(this).attr("id").split('_'); 
+            var vote_up = $("#up_"+vote_id[1]);
+            var vote_down = $("#down_"+vote_id[1]);
+            console.log(vote_id[0] + vote_id[1]);
+            $.ajax(
+            {
+                url : "vote/",
+                type : "POST",
+                data : { vote_type : vote_id[0], vote_id : vote_id[1], csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                dataType : 'json',
+                success : function(data){
+                    if(data.response == 'success'){
+                        $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
+                        if(data.cancel == 'no' || data.cancel == 'yes')
+                        {
+                            toggle(vote_up, 'btn-warning', 'btn-success');
+                            toggle(vote_down, 'btn-warning', 'btn-danger');
+                            if(vote_id[0] == 'up' && data.cancel == 'no') toggle(vote_up, 'btn-success', 'btn-warning');
+                            if(vote_id[0] == 'down' && data.cancel == 'no') toggle(vote_down, 'btn-danger', 'btn-warning');
+                        }
+                        alert(data.message);
+                    }
+                    else{
+                        alert('Failed');
+                    }
+                }
+            });
+        });
+        $(".delete").click(function() {
+            var yes=confirm("Do yo REALLY want to delete?");
+            if(yes == true){
+                var delete_uid=$(this).attr("id").slice(7);
+                $.ajax({
+                    url: "delete/",
+                    type : "POST",
+                    data:{id: delete_uid, csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                    success: function(data){
+                        console.log(data);
+                        location.reload();
+                    }
+                });
+                return true;
+            }
+            else{
+                return false;
+            }
+        });
+        function toggle(obj,toclass,fromclass) {
+            if(obj.hasClass(toclass)){
+                obj.removeClass(toclass);
+                obj.addClass(fromclass);
+            }
+        }
+        $(".report_submit").click(function() {
+            var report_reason = $("#report_reason").val()
+            var report_content = $("#report_content").val()
+            $.ajax({
+                url : "report/",
+                type : "POST",
+                data : { id : report_uid, report_reason : report_reason, report_content : report_content,csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                success : function(data){
+                    alert(data);
+                }
+            });
+            doOverlayClose();
+        });
+        $(".reason").click(function(){
+            var bid = $(this).attr("id");
+            var bname = $(this).text() + " <span class='caret'></span>";
+            $("#report_reason").attr("value", bid);
+            $("#report_reason_dropdown").html(bname);
+        });
+        $(".report").click(function(){
+            $("#modal-report").modal();
+            var content_id = $(this).attr('id').split('_')[1];
+            $("#content_id").attr("value", content_id);
+        });
+        var frm = $("#form_report");
+        frm.submit(function(){
+            $.ajax({
+                type: frm.attr('method'),
+                url: frm.attr('action'),
+                data: frm.serialize(),
+                success: function(data){
+                    if (data.message != 'Invalid form'){
+                        alert(data.message)
+                        $("#id_content").val('');
+                        $("#id_reason").val('기타');
+                        $("#modal-report").modal('hide');
+                    }
+                    else{
+                        alert(data.message)
+                    }
+                }
+            });
+            return false
+        });
+        var hoverHTMLDemoBasic = '<p class="comment_preview_content">' + '번 댓글 미리보기 입니다' + '</p>';
+        $(".comment_preview").hovercard({
+            detailsHTML : hoverHTMLDemoBasic,
+            width: 400,
+            onHoverIn: function() {
+                var order = $(this).children('a').attr('title').split('_')[1];
+                $(".comment_preview_content").prepend('<span class="comment_preview_order">' + order + '</span>');
+            },
+            onHoverOut: function() {
+                $(".comment_preview_order").remove();
+            }
+        });
+        <!-- for trace post -->
+        $(".trace, .alarm").click(function(){
+            var post_id = $(this).attr("id").split("-")[1];
+            $.ajax(
+            {
+                url: "trace/",
+                type: "POST",
+                data: {
+                    type: $(this).attr("id").split("-")[0],
+                    csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+                },
+                success: function(data){
+                    trace_obj = $(".trace");
+                    alarm_obj = $(".alarm");
+                    if(data.trace){
+                        trace_obj.removeClass('glyphicon-star-empty');
+                        trace_obj.addClass('tracing');
+                        trace_obj.addClass('glyphicon-star');
+                    }
+                    else{
+                        trace_obj.removeClass('tracing');
+                        trace_obj.removeClass('glyphicon-star');
+                        trace_obj.addClass('glyphicon-star-empty');
+                    }
+                    if(data.alarm){
+                        alarm_obj.removeAttr('style');
+                        alarm_obj.addClass('activated');
+                    }
+                    else{
+                        alarm_obj.removeClass('activated');
+                        alarm_obj.css('color', "white");
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="col-md-12">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <div>
+                    <label class="col-md-5">
+                        {% if post.adult %}
+                        <label style="color:red">+19</label>
+                        {% endif %}
+                        Title:{{ post.title }}
+                    </label>
+                    <span class="col-md-3">User:{{ post.username }}</span>
+                    <span class="col-md-2">channel:{{post.channel}}</span>
+                    <span class="col-md-2">Category:{{post.category}}</span>
+
+                    {% if channel_post_trace.is_trace %}
+                    <span class="glyphicon glyphicon-star pull-right trace tracing"
+                        id="trace-{{post.id}}"></span>
+                    {% else %}
+                    <span class="glyphicon glyphicon-star-empty pull-right trace"
+                        id="trace-{{post.id}}"></span>
+                    {% endif %}
+                    {% if channel_post_trace.is_notified %}
+                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
+                        id="alarm-{{post.id}}"></span>
+                    {% else %}
+                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
+                        id="alarm-{{post.id}}" style="color:white;"></span>
+                    {% endif %}
+                </div>
+                <div>
+                    <span class="col-md-10">{{post.created_time}}</span>
+                    <span id="vote_{{post.content_id}}">추천 +{{post.vote.up}}/-{{post.vote.down}}</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                {{post.content | safe}}
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        {% if not post.deleted %}
+                        <div class="dropdown col-md-1">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                Report
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                <li><a href="javascript:;" class="report" id="report_{{post.content_id}}">신고</a></li>
+                                <li><a href="javascript:;" class="vote adult" id="adult_{{post.content_id}}">가버렷</a></li>
+                                <li><a href="javascript:;" class="vote political" id="political_{{post.content_id}}">보내야한다</a></li>
+                            </ul>
+                        </div>
+                        {% if post.vote.is_up %}
+                        <button class="btn btn-warning col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        {% else %}
+                        <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
+                        {% endif %}
+                        {% if post.vote.is_down %}
+                        <button class="btn btn-warning col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+                        {%else %}
+                        <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
+                        {% endif %}
+                        <a class="btn btn-info col-md-1" href="./post-log/?channel={{post.channel_id}}">Log</a>
+                        {% if post.return %}
+                        <a class="btn btn-info col-md-1" href="./modify/?channel={{post.channel_id}}">Modify</a>
+                        <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% for comment in comment_list %}
+        {% if comment.best_comment %}
+        <div class="panel panel-danger">
+            {% else %}
+            <div class="panel panel-success">
+                {% endif %}
+                <div class="panel-heading">
+                    <div>
+                        <span id=comment_order_{{comment.order}}> {{ comment.order }}</span>
+                        <span> {{ comment.username }}</span>
+                    </div>
+                    <div> 
+                        <span class="col-md-10">{{comment.created_time}}</span>
+                        <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div id="comment_content{{ comment.id }}">
+                        <div id="comment{{comment.id}}">{{ comment.content | safe }}</div>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-7"></div>
+                                {% if not comment.deleted %}
+                                <div class="dropdown col-md-1">
+                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        Report
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                        <li><a href="#" class="report"
+                                            id="report_{{comment.content_id}}">신고</a></li>
+                                        <li><a href="#" class="vote adult" id="adult_{{comment.content_id}}">가버렷</a></li>
+                                        <li><a href="#" class="vote political" id="political_{{comment.content_id}}">보내야한다</a></li>
+                                    </ul>
+                                </div>
+                                {% if comment.vote.is_up %}
+                                <button class="btn btn-warning col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
+                                {% else %}
+                                <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
+                                {% endif %}
+                                {% if comment.vote.is_down %}
+                                <button class="btn btn-warning col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                                {%else %}
+                                <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
+                                {% endif %}
+                                <a class="btn btn-info col-md-1 comment" id="log_{{comment.content_id}}" href="../{{comment.id}}/comment-log/?channel={{post.channel_id}}">Log</a>
+                                {% if comment.return %}
+                                <button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
+                                <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
+                                {% else %}
+                                <div class="col-md-2"></div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if not post.deleted %}
+            <div>
+                <form action="./comment/{{querystring}}" method="POST">
+                    {%csrf_token%}
+                    <input type="hidden" name="channel_post_id" value="{{ post.id }}">
+                    <div class="form-group">
+                        <label>Anonymous</label>
+                        <input type="checkbox" name="is_anonymous">
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3" name="content"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>   
+    </div>
+
+    {% include "channel/list.html" %}
+    {% include "channel/modal.html" %}
+    {% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% block js %}
+<script>
+$(document).ready(function(){
+var selected_channel = $( "#id_channel option:selected");
+var valid_categories = $(".category-"+selected_channel.text());
+valid_categories.removeAttr("style");
+$("#id_channel").change(function(){
+selected_channel = $( "#id_channel option:selected");
+valid_categories = $(".category-"+selected_channel.text());
+$("#id_channel_category option:eq(0)").prop("selected", true);
+$("#id_channel_category .channel_category").css("display", "none");
+valid_categories.removeAttr("style");
+});
+});
+</script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="title">
+            {{ post_form.title|bootstrap }}
+        </div>
+        <div id="selecting" class="col-xs-12" style="padding-left: 0;">
+            <div id="channel" class="col-xs-3" style="padding-left: 0;">
+                {{ post_form.channel|bootstrap }}
+            </div>
+            <div id="category" class="col-xs-2">
+                {% if post_form.channel_category.errors %}
+                <div class="form-group has-error">
+                    {% else %}
+                    <div class="form-group">
+                        {% endif %}
+                        <label class="control-label"
+                            for="id_channel_category">Category</label>
+                        <div class=" ">
+                            <select class="form-control" id="id_channel_category"
+                                name="channel_category">
+                                <option value="">---------</option>
+                                {% for choice in post_form.channel_category.field.queryset %}
+                                <option class="category-{{ choice.channel }} channel_category"
+                                value="{{ choice.id }}" style="display:none;"
+                                {% if post_form.channel_category.value == choice.id %} selected {% endif %}
+                                >{{ choice.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if post_form.channel_category.errors %}
+                            <span
+                                class="help-block">{{ post_form.channel_category.errors|striptags }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="select">
+                    <div id="adult" class="col-xs-2">
+                        {{ content_form.is_adult|bootstrap }}
+                    </div>
+                    {% if content_form.is_anonymous %}
+                    <div id="anonymous" class="col-xs-3">
+                        {{ content_form.is_anonymous|bootstrap }}
+                    </div>
+                    {% endif %}
+                    {% if post_form.is_notice %}
+                    <div id="notice" class="col-xs-2"> 
+                        {{ post_form.is_notice|bootstrap }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div id="content">
+                {{ content_form.content|bootstrap }}
+            </div>
+            <div id="attachment">
+                {{ attachment_form.file|bootstrap }}
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+    </div>
+{% endblock %}

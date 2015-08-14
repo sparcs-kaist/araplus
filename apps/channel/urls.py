@@ -13,28 +13,26 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import url
-# from django.contrib import admin
+from django.conf.urls import include, url
 
 urlpatterns = [
-    url(r'^$', 'apps.channel.views.main'),
-    url(r'^register_channel/$', 'apps.channel.views.register_channel'),
-    url(r'^(?P<channel_url>[A-z0-9]*)/$',
-        'apps.channel.views.view_channel'),
-    url(r'^(?P<channel_url>[A-z0-9]*)/write/$',
-        'apps.channel.views.write_post'),
-    url(r'^(?P<channel_url>[A-z0-9]*)/(?P<channel_post_id>[1-9][0-9]*)/$',
-        'apps.channel.views.read_post'),
-    url(r'^(?P<channel_url>[A-z0-9]*)/(?P<channel_post_id>[1-9][0-9]*)/edit/$',
-        'apps.channel.views.edit_post'),
-    url(r'^(?P<channel_url>[A-z0-9]*)/(?P<channel_post_id>[1-9][0-9]*)/delete$',
-        'apps.channel.views.delete_post'),
-    url(r'^(?P<channel_url>[A-z0-9]*)/(?P<channel_post_id>[1-9][0-9]*)/rating/(?P<rating>[0-9]+)$', 'apps.channel.views.give_rating'),
-    # url(r'^([^/]+)/([1-9][0-9]*)/comment/$', 'apps.channel.views.comment'),
-    # url(r'^([^/]+)/([1-9][0-9]*)/comment_edit/$',
-    #     'apps.channel.views.edit_comment'),
-    # url(r'^up/$', 'apps.channel.views.up'),
-    # url(r'^down/$', 'apps.channel.views.down'),
-    # url(r'^delete/$', 'apps.channel.views.delete_channel'),
-    # url(r'^report/$', 'apps.channel.views.report'),
+    url(r'^$', 'apps.channel.views.home'),
+    url(r'^create_channel/$', 'apps.channel.views.create_channel'),
+    url(r'^([A-z]*)/remove_channel/$', 'apps.channel.views.remove_channel'),
+    url(r'^([A-z]*)/$', 'apps.channel.views.post_list', name='post_list'),
+    url(r'^([A-z]*)/post/$', 'apps.channel.views.post_write'),
+    url(r'^([A-z]*)/([1-9][0-9]*)/$', 'apps.channel.views.post_read'),
+    url(r'^[A-z]*/([1-9][0-9]*)/modify/$', 'apps.channel.views.post_modify'),
+    url(r'^([A-z]*)/([1-9][0-9]*)/post-log/$',
+        'apps.channel.views.post_modify_log'),
+    url(r'^([A-z]*)/([1-9][0-9]*)/comment-log/$',
+        'apps.channel.views.comment_modify_log'),
+    url(r'^[A-z]*/([1-9][0-9]*)/comment/$', 'apps.channel.views.comment_write'),
+    url(r'^[A-z]*/([1-9][0-9]*)/comment_mod/$',
+        'apps.channel.views.comment_modify'),
+    url(r'^[A-z]*/[1-9][0-9]*/delete/$', 'apps.channel.views.delete'),
+    url(r'^[A-z]*/[1-9][0-9]*/vote/$', 'apps.channel.views.content_vote'),
+    url(r'^[A-z]*/[1-9][0-9]*/report/$', 'apps.channel.views.report'),
+    url(r'^[A-z]*/([1-9][0-9]*)/trace/$', 'apps.channel.views.trace'),
+    url(r'^[A-z]*/trace/$', 'apps.channel.views.trace_list'),
 ]

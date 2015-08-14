@@ -1,0 +1,14 @@
+.list-notice:hover, .list-post:hover{
+    background-color: #E6E6FF;
+}
+
+.selected{
+    background-color: #EFE6FF;
+}
+
+a{
+    display: block;
+}
+
+.comment_preview{
+}
