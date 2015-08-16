@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^nickname-check/$', 'apps.session.views.nickname_check'),
     url(r'^message/', include('apps.session.message.urls')),
     url(r'^group/', include('apps.session.group.urls')),
+    url(r'^account/', include('apps.session.account.urls')),
 ]

@@ -139,9 +139,9 @@
                 <div id="comment_content{{ comment.id }}">
 					<div id="comment{{comment.id}}">
 						{% if comment.is_political %}
-						<a onclick-"this.nextSibling.stylde.display=(this.nextSibling.style.display=='none')?'block':'none';" href="javascript:void(0)">이건 정치글입니다.</a><div style="display:none"><div id="comment{{domment.id}}">{{ comment.content | force_escape | linebreaksbr }}</div></div>
+						<a onclick="this.nextSibling.style.display=(this.nextSibling.style.display=='none')?'block':'none';" href="javascript:void(0)">이건 정치글입니다.</a><div style="display:none"><div id="comment{{comment.id}}">{{ comment.content | force_escape | linebreaksbr }}</div></div>
 						{% else %}
-						<div id="comment{{domment.id}}">{{ comment.content | force_excape | linebreaksbr}} </div>
+						<div id="comment{{domment.id}}">{{ comment.content | force_escape | linebreaksbr}} </div>
 						{% endif %}
 					
 					<div class="col-md-12">

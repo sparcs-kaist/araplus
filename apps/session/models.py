@@ -21,6 +21,7 @@ class UserProfile(models.Model):
 
     nickname = models.TextField(max_length=12)
     points = models.IntegerField(default=0)
+    signiture = models.CharField(max_length=20)
 
     def __str__(self):
         return "User %s (%s)'s profile object" % (self.user, self.nickname)

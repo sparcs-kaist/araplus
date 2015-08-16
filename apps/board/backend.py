@@ -171,6 +171,7 @@ def _get_post(request, board_post, type, comment_nickname_list=[]):
     post['vote'] = board_content.get_vote()
     post['vote']['is_up'] = False
     post['vote']['is_down'] = False
+    post['signiture'] = request.user.userprofile.signiture 
     try:
         is_vote = BoardContentVote.objects.get(
             userprofile=userprofile, board_content=board_content)
@@ -430,17 +431,17 @@ def _vote(request):
         _make_best(board_content)
         if board_content.go_political():
             try:
-            board_post = BoardPost.objects.get(board_content=board_content)
-            board_political = Board.objects.get(eng_name='Political')
-            board_post.board = board_political
-            board_post.save()
-            except ObjectDoesNotExits:
-                board_comment = BoardComment.objects.get(board_content=board_content)
+                board_post = BoardPost.objects.get(board_content=board_content)
                 board_political = Board.objects.get(eng_name='Political')
+                board_post.board = board_political
+                board_post.save()
+            except ObjectDoesNotExist:
+                board_comment = BoardComment.objects.get(board_content=board_content)
+                board_comment.is_political = True
                 board_comment.save()
-            if board_content.go_adult():
-                board_content.is_adult = True
-                board_content.save()
+        if board_content.go_adult():
+            board_content.is_adult = True
+            board_content.save()
         return {'success': 'vote ' + vote_type,
                 'vote': board_content.get_vote(), 'cancel': cancel}
     except ObjectDoesNotExist:
