@@ -130,12 +130,6 @@
                 </div>
             </div>
             <div class="panel-body">
-<<<<<<< HEAD
-                <div id="comment_content{{ comment.order }}">
-                    <!-- id가 comment.id였으나 comment.order로 바꿈-->
-                    <div id="comment{{comment.order}}">{{ comment.content | safe }}</div>
-                    <div class="col-md-12">
-=======
                 <div id="comment_content{{ comment.id }}">
 					<div id="comment{{comment.id}}">
 						{% if comment.is_political %}
@@ -143,9 +137,9 @@
 						{% else %}
 						<div id="comment{{domment.id}}">{{ comment.content | force_escape | linebreaksbr}} </div>
 						{% endif %}
-					
-					<div class="col-md-12">
->>>>>>> 정치신고 댓글 접기/펼치기로 바꾸게 함
+					</div>
+				</div>	
+				<div class="col-md-12">
 						<div class="row">
 						    <div class="col-md-7"></div>
                             {% if not comment.deleted %}
