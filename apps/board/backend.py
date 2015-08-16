@@ -427,10 +427,19 @@ def _vote(request):
         vote.userprofile = user_profile
         vote.save()
         _make_best(board_content)
+        if board_content.go_political():
+            board_post = BoardPost.objects.get(board_content = board_content)
+            if board_post:
+                board_political = Board.objects.get(name = 'Political')
+                board_post.board = board_political
+                board_post.save()
+            if board_content.go_adult():
+                board_content.is_adult = True
+                board_content.save()
         return {'success': 'vote ' + vote_type,
                 'vote': board_content.get_vote(), 'cancel': cancel}
     except ObjectDoesNotExist:
-        return {'fail': 'Unvalid ontent id'}
+        return {'fail': 'Unvalid content id'}
 
 
 def _make_best(board_content):
