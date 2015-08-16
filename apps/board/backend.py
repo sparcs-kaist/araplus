@@ -105,6 +105,7 @@ def _get_content(request, post_id):
                             comment_nickname_list)
         comment['order'] = order
         order = order + 1
+        comment['is_political'] = board_comment.is_political
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
         username = comment['username']
@@ -428,11 +429,15 @@ def _vote(request):
         vote.save()
         _make_best(board_content)
         if board_content.go_political():
-            board_post = BoardPost.objects.get(board_content = board_content)
-            if board_post:
-                board_political = Board.objects.get(name = 'Political')
-                board_post.board = board_political
-                board_post.save()
+            try:
+            board_post = BoardPost.objects.get(board_content=board_content)
+            board_political = Board.objects.get(eng_name='Political')
+            board_post.board = board_political
+            board_post.save()
+            except ObjectDoesNotExits:
+                board_comment = BoardComment.objects.get(board_content=board_content)
+                board_political = Board.objects.get(eng_name='Political')
+                board_comment.save()
             if board_content.go_adult():
                 board_content.is_adult = True
                 board_content.save()

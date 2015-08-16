@@ -95,6 +95,7 @@ class BoardComment(models.Model):
                                    null=True)
     author = models.ForeignKey('session.UserProfile',
                                related_name="board_comment")
+    is_political = models.BooleanField(default=False, null=False)
 
     def __str__(self):
         created_time = self.board_content.created_time
