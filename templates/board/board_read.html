@@ -194,7 +194,15 @@
                         {% endif %}
                         Title:{{ post.title }}
                     </label>
-                    <span class="col-md-3">User:{{ post.username }}</span>
+                    <div class="dropdown col-md-3">
+                        <a class="dropdown-toggle" id="post_username" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            {{ post.username }}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="post_username">
+                            <li><a href="/session/message/send/?to={{ post.username }}">Send message</a></li>
+                            <li><a href="#">Block</a></li>
+                        </ul>
+                    </div>
                     <span class="col-md-2">Board:{{post.board}}</span>
                     <span class="col-md-2">Category:{{post.category}}</span>
 
@@ -263,8 +271,16 @@
         {% endif %}
             <div class="panel-heading">
                 <div>
-                    <span id=comment_order_{{comment.order}}> {{ comment.order }}</span>
-                    <span> {{ comment.username }}</span>
+                    <span class="col-md-3" id=comment_order_{{comment.order}}> {{ comment.order }}</span>
+                    <div class="dropdown col-md-9">
+                        <a class="dropdown-toggle" id="comment_username_{{ comment.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            {{ comment.username }}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="comment_username_{{ comment.id }}">
+                            <li><a href="/session/message/send/?to={{ comment.username }}">Send message</a></li>
+                            <li><a href="#">Block</a></li>
+                        </ul>
+                    </div>
                 </div>
                 <div> 
                     <span class="col-md-10">{{comment.created_time}}</span>
