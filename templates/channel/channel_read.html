@@ -195,7 +195,7 @@
                     </label>
                     <span class="col-md-3">User:{{ post.username }}</span>
                     <span class="col-md-2">channel:{{post.channel}}</span>
-                    <span class="col-md-2">Category:{{post.category}}</span>
+					<span class="col-md-2">.</span>
 
                     {% if channel_post_trace.is_trace %}
                     <span class="glyphicon glyphicon-star pull-right trace tracing"
@@ -221,19 +221,8 @@
                 {{post.content | safe}}
                 <div class="col-md-12">
                     <div class="row">
-                        <div class="col-md-6"></div>
+                        <div class="col-md-7"></div>
                         {% if not post.deleted %}
-                        <div class="dropdown col-md-1">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                Report
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                <li><a href="javascript:;" class="report" id="report_{{post.content_id}}">신고</a></li>
-                                <li><a href="javascript:;" class="vote adult" id="adult_{{post.content_id}}">가버렷</a></li>
-                                <li><a href="javascript:;" class="vote political" id="political_{{post.content_id}}">보내야한다</a></li>
-                            </ul>
-                        </div>
                         {% if post.vote.is_up %}
                         <button class="btn btn-warning col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
                         {% else %}

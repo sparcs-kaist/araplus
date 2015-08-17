@@ -106,10 +106,6 @@ def _get_post(request, channel_post, type):
         post['title'] = channel_post.title
         post['channel'] = channel_post.channel.kor_name
         post['channel_id'] = channel_post.channel.id
-        try:
-            post['category'] = channel_post.channel_category.name
-        except:
-            post['category'] = ''
     else:
         return post
     userprofile = channel_post.author
@@ -159,25 +155,14 @@ def _write_post(request, is_modify=False, post=None,
         # modify log for post
         title_before = post.title
         channel_before = post.channel.kor_name
-        category_before = post.channel_category.name
     except:  # no such a content : is not modify
-        category_before = ""
         if form_post.is_valid() and form_content.is_valid():
             if is_modify:
-                try:
-                    category_after = post.channel_category.name
-                except:
-                    category_after = ""
                 content_diff = [[str(content.modified_time),
                                  _get_diff_match(content_before, content.content)]]
                 channel_diff = [[0, channel_before]]
-                if category_before == category_after:
-                    category_diff = [[0, category_before]]
-                else:
-                    category_diff = [[-1, category_before], [1, category_after]]
                 post_diff = [[_get_diff_match(title_before, post.title),
-                              channel_diff,
-                              category_diff]]
+                              channel_diff]]
                 post.set_log(post_diff + post.get_log())
                 content.set_log(content_diff + content.get_log())
             channel_post = form_post.save(
@@ -332,17 +317,6 @@ def _vote(request):
         return {'fail': 'Unvalid ontent id'}
 
 
-def _make_best(channel_content):
-    if hasattr(channel_content, 'channel_post'):
-        channel_post = channel_content.channel_post
-        vote = channel_content.get_vote()
-        if vote['up'] > 0 and channel_post.is_best is False:
-            channel_post.is_best = True
-            channel_post.save()
-            return True
-    return False
-
-
 def _get_diff_match(before, after):  # get different match
     diff_obj = diff_match_patch.diff_match_patch()
     diff = diff_obj.diff_main(before, after)
@@ -365,7 +339,6 @@ def _get_post_log(post_id):
     channel_content = channel_post.channel_content
     post = [channel_post.title,
             channel_post.channel.kor_name,
-            channel_post.channel_category,
             channel_content.modified_time,
             channel_content.content]
     modify_log = []
@@ -391,25 +364,3 @@ def _get_comment_log(comment_id):
         modify_log = modify_log +\
             [[log_content[0], diff_obj.diff_prettyHtml(log_content[1])]]
     return comment, modify_log
-
-
-def _create_channel(request):
-    form_channel = ChannelForm(request.POST)
-    if form_channel.is_valid():
-        channel = form_channel.save(admin=request.user.userprofile)
-        return {'save': channel}
-    return {'failed': form_channel}
-
-
-def _remove_channel(request, channel_url):
-    try:
-        channel = Channel.objects.get(url=channel_url)
-        if channel.is_deleted:
-            return "already deleted"
-        if channel.admin == request.user.userprofile:
-            channel.is_deleted = True
-            channel.save()
-            return "success"
-        return "not allowed"
-    except:
-        return "invaid access"

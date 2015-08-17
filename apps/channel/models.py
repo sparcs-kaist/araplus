@@ -158,13 +158,6 @@ class ChannelMember(models.Model):
         unique_together = ('channel', 'member',)
 
 
-class ChannelCategory(models.Model):
-    name = models.CharField(max_length=10, null=False)
-    channel = models.ForeignKey('Channel',
-                              related_name='channel_category',
-                              null=False)
-
-
 class ChannelPost(models.Model):
     title = models.CharField(max_length=45, null=False)
     is_notice = models.BooleanField(default=False, null=False, db_index=True)
@@ -177,10 +170,6 @@ class ChannelPost(models.Model):
                                related_name='channel_post')
     channel_content = models.OneToOneField('ChannelContent', null=False,
                                          related_name='channel_post')
-    channel_category = models.ForeignKey('ChannelCategory',
-                                       related_name='channel_post',
-                                       null=True,
-                                       blank=True)
     modify_log = models.TextField(default='[]')
 
     class Meta:

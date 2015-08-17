@@ -12,10 +12,8 @@ from apps.channel.backend import (
     _report,
     _vote,
     _write_comment,
-    _create_channel,
     _get_post_log,
     _get_comment_log,
-    _remove_channel,
 )
 from itertools import izip
 import json
@@ -97,7 +95,7 @@ def post_read(request, channel_url, post_id):
         print current_channel
     except:
         current_channel = None
-    querystring = _get_querystring(request, 'best', 'page')
+    querystring = _get_querystring(request, 'page')
     # tested for report ########
     report_form = ChannelReportForm()
     """return render(request,
@@ -146,7 +144,7 @@ def comment_modify_log(request, channel_url, comment_id):
 def comment_write(request, post_id):
     if request.method == 'POST':
         post_id = _write_comment(request, post_id)
-    querystring = _get_querystring(request, 'bset', 'page')
+    querystring = _get_querystring(request, 'page')
     return redirect('../' + querystring)
 
 
@@ -154,7 +152,7 @@ def comment_write(request, post_id):
 def comment_modify(request, post_id):
     if request.method == 'POST':
         post_id = _write_comment(request, post_id, True)
-    querystring = _get_querystring(request, 'best', 'page')
+    querystring = _get_querystring(request, 'page')
     return redirect('../' + querystring)
 
 
@@ -166,7 +164,7 @@ def post_list(request, channel_url):
         current_channel = Channel.objects.get(url=channel_url, is_deleted=False)
     except:
         current_channel = None
-    querystring = _get_querystring(request, 'best', 'page')
+    querystring = _get_querystring(request, 'page')
     return render(request,
             'channel/channel_list.html',
             {'notice_list':  notice_list,

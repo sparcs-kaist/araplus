@@ -14,7 +14,6 @@ height: 72px;
                 <label class="col-md-5">Title: {{ post.0 }}</label>
                 <span class="col-md-3"></span>
                 <span class="col-md-2">Board: {{ post.1 }}</span>
-                <span class="col-md2">Category: {{ post.2|default:"" }}</span>
             </div>
             <div>
                 <span class="col-md-10">{{ post.3 }}</span>
@@ -37,7 +36,6 @@ height: 72px;
                 <label class="col-md-5">Title: {% autoescape off %}{{ log.0 }}{% endautoescape %}</label>
                 <span class="col-md-3"></span>
                 <span class="col-md-2">Board: {% autoescape off %}{{ log.1 }}{% endautoescape %}</span>
-                <span class="col-md2">Category: {% autoescape off %}{{ log.2 }}{% endautoescape %}</span>
             </div>
             <div>
                 <span class="col-md-10">{{ log.3 }}</span>

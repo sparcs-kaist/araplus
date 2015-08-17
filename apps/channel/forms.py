@@ -69,15 +69,11 @@ class ChannelContentForm(ModelForm):
 class ChannelPostForm(ModelForm):
     class Meta:
         model = ChannelPost
-        fields = ['title', 'channel', 'channel_category', 'is_notice', ]
-        labels = {
-            'channel_category': 'Category',
-        }
-
+        fields = ['title', 'channel', 'is_notice', ]
+        
     def __init__(self, *args, **kwargs):
         is_modify = kwargs.pop('is_modify', False)
         super(ChannelPostForm, self).__init__(*args, **kwargs)
-        self.fields['channel_category'].queryset = ChannelCategory.objects.all()
         if is_modify:
             del self.fields['is_notice']
 
@@ -90,17 +86,11 @@ class ChannelPostForm(ModelForm):
         cleaned_data = super(ChannelPostForm, self).clean()
         if 'channel' in cleaned_data:
             channel = cleaned_data['channel']
-            channel_category = cleaned_data['channel_category']
-            if (channel_category and
-                    channel_category.channel != channel):
-                msg = u"Invalid Selection"
-                self.add_error('channel_category', msg)
             if channel.is_deleted:
                 msg = u"Deleted Channel"
                 self.add_error('channel', msg)
         else:
             msg = u"Select Channel first"
-            self.add_error('channel_category', msg)
         return cleaned_data
 
 

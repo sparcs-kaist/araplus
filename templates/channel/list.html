@@ -6,7 +6,6 @@
     <tr class="list" id="list-header">
         <td width=5></td>
         <td width=90><p align=center>User</p></td>
-        <td width=60><p align=center>Category</p></td>
         <td width=320 class="title"><p>Title<p></td>
         <td width=80><p align=center>+/-</p></td>
         <td width=80 style="text-align: center;"><span>date</span></td>
@@ -28,7 +27,6 @@
             {% else %}
             <td width=90><p align=center>{{notice.0.author.nickname}}</p></td>
             {% endif %}
-            <td width=60><p align=center>{{notice.0.channel_category.name}}
                 <td width=320 class="title title-notice"
                     id="notice-title-{{notice.0.id}}"><a style="font-weight: bold; color: black;"
                         href="/channel/{{current_channel.url|default:'all'}}/{{notice.0.id}}"
@@ -58,7 +56,6 @@
                 {% else %}
                 <td width=90><p align=center>{{post.0.author.nickname}}</p></td>
                 {% endif %}
-                <td width=60><p align=center>{{post.0.channel_category.name}}</p></td>
                 <td width=320 class="title title-post" id="post-title-{{post.0.id}}"
                     id><a href="/channel/{{current_channel.url|default:'all'}}/{{post.0.id}}"
                         {% if post.0.is_best %} style="color: red;" {% endif %}>
@@ -77,7 +74,6 @@
         </ul>
     </table>
     <div class="pull-right">
-        <a class="btn btn-info" href="?best=true">Best</a>
         <a class="btn btn-default"
             href="/channel/{{current_channel.url|default:'all'}}/post">글 쓰기</a>
     </div>
