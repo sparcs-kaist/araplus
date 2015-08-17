@@ -87,12 +87,31 @@ def _get_content(request, post_id):
     board_post_is_read.save()
     post = _get_post(request, board_post, 'Post')
     comment_list = []
+    comment_nickname_list = []
     order = 1
     for board_comment in board_post.board_comment.all():
-        comment = _get_post(request, board_comment, 'Comment')
+        comment = _get_post(request, board_comment, 'Comment', comment_nickname_list)
         comment['order'] = order
         order = order + 1
         comment_list.append(comment)
+        
+        # 현재 글에 달린 댓글의 닉네임 리스트
+        username = comment['username']
+        if order == 2:
+            comment_nickname_list.append((username,1))
+        else:
+            n = len(comment_nickname_list)
+            x = n
+            y = n
+            for i in range(0, n):
+                if comment_nickname_list[i][0] == username:
+                    x = i
+                    y = i + 1
+                    break
+                if x == n and len(username) >= len(comment_nickname_list[i][0]):
+                    x = i
+                    y = i
+            comment_nickname_list = comment_nickname_list[0:x] + [(username,order-1)] + comment_nickname_list[y:]
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
@@ -105,7 +124,7 @@ def _get_content(request, post_id):
     return (post, comment_list)
 
 
-def _get_post(request, board_post, type):
+def _get_post(request, board_post, type, comment_nickname_list = []):
     post = {}
     if type == 'Comment':
         pass
@@ -125,7 +144,7 @@ def _get_post(request, board_post, type):
         post['title'] = '--Deleted--'
         post['content'] = '--Deleted--'
     else:
-        post['content'] = board_content.replace_content_tags()
+        post['content'] = board_content.replace_content_tags(type, comment_nickname_list)
     post['id'] = board_post.id
     post['deleted'] = board_content.is_deleted
     post['content_id'] = board_content.id

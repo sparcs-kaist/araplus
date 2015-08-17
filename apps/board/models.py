@@ -46,11 +46,17 @@ class BoardContent(models.Model):
         vote['down'] = down
         return vote
 
-    def replace_content_tags(self):
+    def replace_content_tags(self, type, comment_nickname_list):
         result = cgi.escape(self.content)
         result = result.replace("\n", "<br />")
-        result = re.sub(r'@(?P<target>\d+)',
-                        '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
+        if type == 'Comment':
+            # 댓글 숫자 태그
+            result = re.sub(r'@(?P<target>\d+)',
+                            '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
+            # 댓글 닉네임 태그
+            for nick in comment_nickname_list:
+                result = re.sub('@(?P<target>' + nick[0] + ')',
+                                '<a title=comment_' + str(nick[1]) + ' class="comment_preview" href="#comment_order_' + str(nick[1]) + '">\g<target></a>', result)
         return hashtag_regex.sub(
             '\1<a href="../?tag=\g<target>">#\g<target></a>',
             result)
