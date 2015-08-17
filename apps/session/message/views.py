@@ -7,7 +7,8 @@ from django.db.models import Q
 @login_required(login_url='/session/login/')
 def send_message(request):
     if request.method != "POST":
-        return render(request, 'session/write_message.html')
+        to = request.GET.get('to', '')
+        return render(request, 'session/write_message.html', {'to': to})
     sender = request.user.userprofile
     content = request.POST['content']
     try:
