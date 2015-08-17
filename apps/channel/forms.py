@@ -48,20 +48,10 @@ class ChannelContentForm(ModelForm):
     def __init__(self, *args, **kwargs):
         is_modify = kwargs.pop('is_modify', False)
         super(ChannelContentForm, self).__init__(*args, **kwargs)
-        self.fields['is_anonymous'] = BooleanField(required=False)
-        if is_modify:
-            del self.fields['is_anonymous']
 
     def save(self, *args, **kwargs):
         channel_post = kwargs.pop('post', None)
         author = kwargs.pop('author')
-        try:
-            if self.cleaned_data['is_anonymous']:
-                self.instance.is_anonymous = _get_name(author, channel_post)
-            else:
-                self.instance.is_anonymous = None
-        except:
-            self.cleaned_data['is_anonymous'] = self.instance.is_anonymous
         super(ChannelContentForm, self).save(*args, **kwargs)
         return self.instance
 
@@ -70,7 +60,7 @@ class ChannelPostForm(ModelForm):
     class Meta:
         model = ChannelPost
         fields = ['title', 'channel', 'is_notice', ]
-        
+
     def __init__(self, *args, **kwargs):
         is_modify = kwargs.pop('is_modify', False)
         super(ChannelPostForm, self).__init__(*args, **kwargs)
@@ -84,13 +74,6 @@ class ChannelPostForm(ModelForm):
 
     def clean(self):
         cleaned_data = super(ChannelPostForm, self).clean()
-        if 'channel' in cleaned_data:
-            channel = cleaned_data['channel']
-            if channel.is_deleted:
-                msg = u"Deleted Channel"
-                self.add_error('channel', msg)
-        else:
-            msg = u"Select Channel first"
         return cleaned_data
 
 
@@ -116,48 +99,3 @@ class ChannelAttachmentForm(ModelForm):
         self.instance.file = kwargs.pop('file')
         self.instance.channel_content = kwargs.pop('content')
         return super(ChannelAttachmentForm, self).save(*args, **kwargs)
-
-
-def _is_anonymous_duplicate(channel_post, name, cache):
-    if not channel_post:
-        return False, []
-    if cache:
-        return name in cache, cache
-    former_comments = channel_post.channel_comment.all()
-    names = [comment.channel_content.is_anonymous
-             for comment in former_comments
-             if comment.channel_content.is_anonymous]
-    names.append(channel_post.channel_content.is_anonymous)
-    if name in names:
-        return True, names
-    else:
-        return False, names
-
-
-def _generate_name(channel_post=None):
-    prefix_index = random.randint(0, 4)
-    name_index = random.randint(0, 4)
-    anonymous_name = prefix[prefix_index] + ' ' + name[name_index]
-    ret_val, cache = _is_anonymous_duplicate(channel_post, anonymous_name, [])
-    while ret_val:
-        prefix_index = random.randint(0, 4)
-        name_index = random.randint(0, 4)
-        anonymous_name = prefix[prefix_index] + ' ' + name[name_index]
-        ret_val, cache = _is_anonymous_duplicate(channel_post, anonymous_name,
-                                                 cache)
-    return anonymous_name
-
-
-def _get_name(author, channel_post=None):
-    if channel_post:
-        if (author == channel_post.author
-                and channel_post.channel_content.is_anonymous):
-            return channel_post.channel_content.is_anonymous
-        else:
-            former_comments = channel_post.channel_comment.filter(author=author)
-            for comment in former_comments:
-                if comment.channel_content.is_anonymous:
-                    return comment.channel_content.is_anonymous
-            return _generate_name(channel_post)
-    else:
-        return _generate_name(channel_post)

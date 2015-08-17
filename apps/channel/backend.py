@@ -140,7 +140,7 @@ def _get_post(request, channel_post, type):
 
 
 def _write_post(request, is_modify=False, post=None,
-                content=None, channel="All"):
+                content=None, channel=""):
     form_content = ChannelContentForm(
         request.POST,
         instance=content,
@@ -154,7 +154,7 @@ def _write_post(request, is_modify=False, post=None,
         content_before = content.content
         # modify log for post
         title_before = post.title
-        channel_before = post.channel.kor_name
+        channel_before = channel
     except:  # no such a content : is not modify
         if form_post.is_valid() and form_content.is_valid():
             if is_modify:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseForbidden
 from apps.channel.models import *
 from apps.channel.backend import (
     _get_post_list,
@@ -22,15 +22,23 @@ from apps.channel.forms import *
 from django.core.paginator import Paginator
 
 
+@login_required(login_url='/session/login')
 def home(request):
-    # Should be show the list of channels
-    return redirect('main/')
+    channel_list = Channel.objects.all()
+    return render(request, 'channel/main.html',
+            {'channel_list': channel_list})
 
 
 @login_required(login_url='/session/login')
-def post_write(request, channel):
+def post_write(request, channel_url):
+    try:
+        channel = Channel.objects.get(url=channel_url)
+    except:
+        raise Http404
+    if channel.admin.user != request.user:
+        return HttpResponseForbidden()
     if request.method == 'POST':
-        result = _write_post(request, channel=channel)
+        result = _write_post(request, channel=channel_url)
         if 'save' in result:
             channel_post_trace = ChannelPostTrace(
                 channel_post=result['save'],
@@ -40,10 +48,6 @@ def post_write(request, channel):
         else:
             form_content, form_post, form_attachment = result['failed']
     else:
-        try:
-            channel = Channel.objects.get(url=channel)
-        except:
-            channel = Channel.objects.get(id=1)
         form_content = ChannelContentForm()
         form_post = ChannelPostForm(initial={'channel': channel.id})
         form_attachment = ChannelAttachmentForm()
@@ -163,7 +167,7 @@ def post_list(request, channel_url):
     try:
         current_channel = Channel.objects.get(url=channel_url, is_deleted=False)
     except:
-        current_channel = None
+        raise Http404
     querystring = _get_querystring(request, 'page')
     return render(request,
             'channel/channel_list.html',
@@ -203,52 +207,3 @@ def report(request):
     if request.method == 'POST':
         message = _report(request)
     return HttpResponse(json.dumps(message), content_type='application/json')
-
-
-@login_required(login_url='/session/login')
-def trace(request, post_id):
-    request_type = request.POST.get('type', '')
-    print request_type
-    try:
-        channel_post_trace = ChannelPostTrace.objects.get(
-            userprofile=request.user.userprofile,
-            channel_post__id=post_id)
-        print channel_post_trace.id
-        if request_type == 'trace':
-            channel_post_trace.is_trace = not(channel_post_trace.is_trace)
-        elif request_type == 'alarm':
-            channel_post_trace.is_notified = not(channel_post_trace.is_notified)
-        else:
-            result = {'message': 'failed'}
-            return HttpResponse(json.dumps(result), content_type='application/json')
-        print channel_post_trace.id
-    except:
-        channel_post_trace = ChannelPostTrace(
-                userprofile=request.user.userprofile,
-                channel_post_id=post_id)
-        if request_type == 'alarm':
-            channel_post_trace.is_notified = True
-    channel_post_trace.save()
-    result = {
-        'message': 'success',
-        'alarm': channel_post_trace.is_notified,
-        'trace': channel_post_trace.is_trace}
-    return HttpResponse(json.dumps(result), content_type='application/json')
-
-
-@login_required(login_url='/session/login')
-def trace_list(request, item_per_page=20):
-    channel_post = ChannelPost.objects.filter(
-        channel_post_trace__userprofile=request.user.userprofile,
-        channel_post_trace__is_trace=True)
-    print channel_post
-    page = int(request.GET.get('page', 1))
-    post_paginator = Paginator(channel_post, item_per_page)
-    post_list = []
-    for post in post_paginator.page(page):
-        post_list += [[post, post.get_is_read(request)]]
-    return render(request,
-                  'channel/channel_list.html',
-                  {'post_list': post_list,
-                   'current_page': page,
-                   'pages': post_paginator.page_range})
