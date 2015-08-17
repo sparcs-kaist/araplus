@@ -30,26 +30,6 @@ def home(request):
 
 
 @login_required(login_url='/session/login')
-def create_channel(request):
-    if request.method == 'POST':
-        result = _create_channel(request)
-        if 'save' in result:
-            return redirect('../' + result['save'].url + '/')
-        else:
-            form_channel = result['failed']
-    else:
-        form_channel = ChannelForm()
-        return render(request,
-                      'channel/create_channel.html',
-                      {'channel_form': form_channel})
-
-
-@login_required(login_url='/session/login')
-def remove_channel(request, channel_url):
-    return HttpResponse(_remove_channel(request, channel_url))
-
-
-@login_required(login_url='/session/login')
 def post_write(request, channel):
     if request.method == 'POST':
         result = _write_post(request, channel=channel)
