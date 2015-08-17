@@ -131,16 +131,17 @@
             });
             return false
         });
-        var hoverHTMLDemoBasic = '<p class="comment_preview_content">' + '번 댓글 미리보기 입니다' + '</p>';
+        var hoverHTMLDemoBasic = '<p></p><p class="tempSpace"></p>';
         $(".comment_preview").hovercard({
             detailsHTML : hoverHTMLDemoBasic,
             width: 400,
             onHoverIn: function() {
                 var order = $(this).children('a').attr('title').split('_')[1];
-                $(".comment_preview_content").prepend('<span class="comment_preview_order">' + order + '</span>');
+                var content = document.getElementById('comment'+order).textContent;
+                $(".tempSpace").append('<span class="comment_preview_content">' + content + '</span>');
             },
             onHoverOut: function() {
-                $(".comment_preview_order").remove();
+                $(".comment_preview_content").remove();
             }
         });
         <!-- for trace post -->
@@ -272,7 +273,8 @@
             </div>
             <div class="panel-body">
                 <div id="comment_content{{ comment.id }}">
-                    <div id="comment{{comment.id}}">{{ comment.content | safe }}</div>
+                    <!-- id가 comment.id였으나 comment.order로 바꿈-->
+                    <div id="comment{{comment.order}}">{{ comment.content | safe }}</div>
                     <div class="col-md-12">
 						<div class="row">
 						    <div class="col-md-7"></div>
