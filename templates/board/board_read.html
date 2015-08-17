@@ -195,6 +195,9 @@
                         Title:{{ post.title }}
                     </label>
                     <div class="dropdown col-md-3">
+                        {% if post.is_anonymous %}
+                        {{ post.username }}
+                        {% else %}
                         <a class="dropdown-toggle" id="post_username" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             {{ post.username }}
                         </button>
@@ -202,6 +205,7 @@
                             <li><a href="/session/message/send/?to={{ post.username }}">Send message</a></li>
                             <li><a href="#">Block</a></li>
                         </ul>
+                        {% endif %}
                     </div>
                     <span class="col-md-2">Board:{{post.board}}</span>
                     <span class="col-md-2">Category:{{post.category}}</span>
@@ -273,6 +277,9 @@
                 <div>
                     <span class="col-md-3" id=comment_order_{{comment.order}}> {{ comment.order }}</span>
                     <div class="dropdown col-md-9">
+                        {% if comment.is_anonymous %}
+                        {{ comment.username }}
+                        {% else %}
                         <a class="dropdown-toggle" id="comment_username_{{ comment.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             {{ comment.username }}
                         </button>
@@ -280,6 +287,7 @@
                             <li><a href="/session/message/send/?to={{ comment.username }}">Send message</a></li>
                             <li><a href="#">Block</a></li>
                         </ul>
+                        {% endif %}
                     </div>
                 </div>
                 <div> 

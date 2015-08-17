@@ -134,6 +134,7 @@ def _get_post(request, board_post, type):
     if board_content.is_anonymous:
         post['username'] = board_content.is_anonymous
     post['return'] = (userprofile == request.user.userprofile)
+    post['is_anonymous'] = board_content.is_anonymous
     post['vote'] = board_content.get_vote()
     post['vote']['is_up'] = False
     post['vote']['is_down'] = False
