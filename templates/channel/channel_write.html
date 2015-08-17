@@ -22,11 +22,6 @@ var selected_channel = $( "#id_channel option:selected");
                     <div id="adult" class="col-xs-2">
                         {{ content_form.is_adult|bootstrap }}
                     </div>
-                    {% if content_form.is_anonymous %}
-                    <div id="anonymous" class="col-xs-3">
-                        {{ content_form.is_anonymous|bootstrap }}
-                    </div>
-                    {% endif %}
                     {% if post_form.is_notice %}
                     <div id="notice" class="col-xs-2"> 
                         {{ post_form.is_notice|bootstrap }}
