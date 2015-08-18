@@ -10,7 +10,6 @@ from itertools import izip
 
 def _get_post_list(request, channel_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
-    best_filter = bool(request.GET.get('best', False))
     page = int(request.GET.get('page', 1))
     search_tag = request.GET.get('tag', '')
     search_title = request.GET.get('title', '')
@@ -26,8 +25,6 @@ def _get_post_list(request, channel_url='', item_per_page=15):
                                                      channel=channel)
     channel_post = ChannelPost.objects.filter(channel=channel)
     # search
-    if best_filter:
-        channel_post = channel_post.filter(is_best=True)
     if search_tag:
         channel_post = channel_post.filter(hashtag__tag_name=search_tag)
     if search_title:
@@ -61,6 +58,7 @@ def _get_querystring(request, *args):
     if query_list:
         querystring = '?' + '&'.join(query_list)
     return querystring
+
 
 def _get_content(request, post_id):
     try:
@@ -120,8 +118,6 @@ def _get_post(request, channel_post, type):
     post['content_id'] = channel_content.id
     post['created_time'] = channel_content.created_time
     post['username'] = userprofile.nickname
-    if channel_content.is_anonymous:
-        post['username'] = channel_content.is_anonymous
     post['return'] = (userprofile == request.user.userprofile)
     post['vote'] = channel_content.get_vote()
     post['vote']['is_up'] = False
@@ -156,31 +152,34 @@ def _write_post(request, is_modify=False, post=None,
         title_before = post.title
         channel_before = channel
     except:  # no such a content : is not modify
-        if form_post.is_valid() and form_content.is_valid():
-            if is_modify:
-                content_diff = [[str(content.modified_time),
+        pass
+
+    if form_post.is_valid() and form_content.is_valid():
+        if is_modify:
+            content_diff = [[str(content.modified_time),
                                  _get_diff_match(content_before, content.content)]]
-                channel_diff = [[0, channel_before]]
-                post_diff = [[_get_diff_match(title_before, post.title),
+            channel_diff = [[0, channel_before]]
+            post_diff = [[_get_diff_match(title_before, post.title),
                               channel_diff]]
-                post.set_log(post_diff + post.get_log())
-                content.set_log(content_diff + content.get_log())
-            channel_post = form_post.save(
-                author=request.user.userprofile,
-                content=form_content.save(author=request.user.userprofile,
-                                          post=post))  # save
-            channel_content = channel_post.channel_content
-            HashTag.objects.filter(channel_post=channel_post).delete()
-            hashs = channel_content.get_hashtags()
-            for tag in hashs:
-                HashTag(tag_name=tag, channel_post=channel_post).save()
-            form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
-            if form_attachment.is_valid():
-                form_attachment.save(file=request.FILES['file'],
-                                     content=channel_content)
-            return {'save': channel_post}
-        else:
-            return {'failed': [form_content, form_post, form_attachment]}
+            post.set_log(post_diff + post.get_log())
+            content.set_log(content_diff + content.get_log())
+
+        channel_post = form_post.save(
+            author=request.user.userprofile,
+            content=form_content.save(author=request.user.userprofile,
+                                        post=post))  # save
+        channel_content = channel_post.channel_content
+        HashTag.objects.filter(channel_post=channel_post).delete()
+        hashs = channel_content.get_hashtags()
+        for tag in hashs:
+            HashTag(tag_name=tag, channel_post=channel_post).save()
+        form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
+        if form_attachment.is_valid():
+            form_attachment.save(file=request.FILES['file'],
+                                    content=channel_content)
+        return {'save': channel_post}
+    else:
+        return {'failed': [form_content, form_post, form_attachment]}
 
 
 def _write_comment(request, post_id, is_modify=False):
@@ -347,7 +346,6 @@ def _get_post_log(post_id):
         modify_log = modify_log +\
             [[diff_obj.diff_prettyHtml(log_post[0]),
               diff_obj.diff_prettyHtml(log_post[1]),
-              diff_obj.diff_prettyHtml(log_post[2]),
               log_content[0],
               diff_obj.diff_prettyHtml(log_content[1])]]
     return post, modify_log

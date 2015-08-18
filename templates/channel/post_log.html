@@ -12,15 +12,13 @@ height: 72px;
         <div class="panel-heading">
             <div>
                 <label class="col-md-5">Title: {{ post.0 }}</label>
-                <span class="col-md-3"></span>
-                <span class="col-md-2">Board: {{ post.1 }}</span>
             </div>
             <div>
-                <span class="col-md-10">{{ post.3 }}</span>
+                <span class="col-md-10">{{ post.2 }}</span>
             </div>
         </div>
         <div class="panel-body">
-            {% autoescape off %}{{ post.4 }}{% endautoescape %}
+            {% autoescape off %}{{ post.3 }}{% endautoescape %}
         </div>
     </div>
 </div>
@@ -34,15 +32,13 @@ height: 72px;
         <div class="panel-heading">
             <div>
                 <label class="col-md-5">Title: {% autoescape off %}{{ log.0 }}{% endautoescape %}</label>
-                <span class="col-md-3"></span>
-                <span class="col-md-2">Board: {% autoescape off %}{{ log.1 }}{% endautoescape %}</span>
             </div>
             <div>
-                <span class="col-md-10">{{ log.3 }}</span>
+                <span class="col-md-10">{{ log.2 }}</span>
             </div>
         </div>
         <div class="panel-body">
-            {% autoescape off %}{{ log.4 }}{% endautoescape %}
+            {% autoescape off %}{{ log.3 }}{% endautoescape %}
         </div>
     </div>
     {% endfor %}

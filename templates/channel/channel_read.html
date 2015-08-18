@@ -308,10 +308,6 @@
                     {%csrf_token%}
                     <input type="hidden" name="channel_post_id" value="{{ post.id }}">
                     <div class="form-group">
-                        <label>Anonymous</label>
-                        <input type="checkbox" name="is_anonymous">
-                    </div>
-                    <div class="form-group">
                         <textarea class="form-control" rows="3" name="content"></textarea>
                     </div>
                     <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>

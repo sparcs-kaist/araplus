@@ -16,7 +16,6 @@ class ChannelForm(ModelForm):
                     'eng_name',
                     'url',
                     'description',
-                    'is_public',
                  ]
 
     def __init__(self, *args, **kwargs):
@@ -89,6 +88,7 @@ class ChannelReportForm(ModelForm):
         self.instance.userprofile = kwargs.pop('user')
         self.instance.channel_content = kwargs.pop('content')
         return super(ChannelReportForm, self).save(*args, **kwargs)
+
 
 class ChannelAttachmentForm(ModelForm):
     class Meta:

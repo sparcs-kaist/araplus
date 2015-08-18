@@ -1,11 +1,6 @@
 {% extends "base.html" %}
 {% load bootstrap %}
 {% block js %}
-<script>
-$(document).ready(function(){
-var selected_channel = $( "#id_channel option:selected");
-});
-</script>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -16,7 +11,8 @@ var selected_channel = $( "#id_channel option:selected");
         </div>
         <div id="selecting" class="col-xs-12" style="padding-left: 0;">
             <div id="channel" class="col-xs-3" style="padding-left: 0;">
-            </div>
+				<input type="hidden" name="channel" value="{{ channel }}">
+			</div>
             <div class="select">
                     <div id="adult" class="col-xs-2">
                         {{ content_form.is_adult|bootstrap }}

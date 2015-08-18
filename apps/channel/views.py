@@ -35,9 +35,14 @@ def post_write(request, channel_url):
         channel = Channel.objects.get(url=channel_url)
     except:
         raise Http404
+  
     if channel.admin.user != request.user:
         return HttpResponseForbidden()
+    
     if request.method == 'POST':
+        if str(channel.id) != request.POST.get('channel', '-1'):
+            return HttpResponseForbidden()
+
         result = _write_post(request, channel=channel_url)
         if 'save' in result:
             channel_post_trace = ChannelPostTrace(
@@ -45,17 +50,19 @@ def post_write(request, channel_url):
                 userprofile=request.user.userprofile)
             channel_post_trace.save()
             return redirect('../' + str(result['save'].id) + '/')
-        else:
-            form_content, form_post, form_attachment = result['failed']
+        
+        form_content, form_post, form_attachment = result['failed']
     else:
         form_content = ChannelContentForm()
         form_post = ChannelPostForm(initial={'channel': channel.id})
         form_attachment = ChannelAttachmentForm()
+    
     return render(request,
             'channel/channel_write.html',
             {'content_form': form_content,
                 'post_form': form_post,
-                'attachment_form': form_attachment})
+                'attachment_form': form_attachment,
+                'channel': channel.id})
 
 
 @login_required(login_url='/session/login')
@@ -64,6 +71,9 @@ def post_modify(request, post_id=0):
     if post_instance.author != request.user.userprofile:
         return redirect('../')
     if request.method == "POST":
+        if str(post_instance.channel.id) != request.POST.get('channel', '-1'):
+            return HttpResponseForbidden()
+
         result = _write_post(request, True, post_instance,
                              post_instance.channel_content)
         if 'save' in result:  # success modify
@@ -80,7 +90,8 @@ def post_modify(request, post_id=0):
                   'channel/channel_write.html',
                   {'content_form': form_content,
                    'post_form': form_post,
-                   'attachment_form': form_attachment})
+                   'attachment_form': form_attachment,
+                   'channel': post_instance.channel.id})
 
 
 @login_required(login_url='/session/login')
@@ -163,7 +174,7 @@ def comment_modify(request, post_id):
 @login_required(login_url='/session/login')
 def post_list(request, channel_url):
     notice_list, post_list, pages, page = _get_post_list(request, channel_url)
-    channel_list = Channel.objects.filter(is_official=True)
+    channel_list = Channel.objects.filter()
     try:
         current_channel = Channel.objects.get(url=channel_url, is_deleted=False)
     except:

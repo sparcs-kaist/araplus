@@ -137,30 +137,15 @@ class Channel(models.Model):
                               related_name="channel",
                               null=False)
     thumbnail = models.TextField(null=False) # Should be changed
-    is_official = models.BooleanField(default=False)
-    is_public = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.kor_name
 
 
-class ChannelMember(models.Model):
-    channel = models.ForeignKey('channel',
-                              related_name='channel_member',
-                              null=False)
-    member = models.ForeignKey('session.userprofile',
-                               related_name='channel_member',
-                               null=False)
-
-    class Meta:
-        unique_together = ('channel', 'member',)
-
-
 class ChannelPost(models.Model):
     title = models.CharField(max_length=45, null=False)
     is_notice = models.BooleanField(default=False, null=False, db_index=True)
-    is_best = models.BooleanField(default=False, db_index=True)
     channel = models.ForeignKey('Channel',
                               related_name='channel',
                               null=False,
