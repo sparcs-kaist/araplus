@@ -268,7 +268,7 @@ def _vote(request):
     content_id = request.POST.get('vote_id', '')
     try:
         channel_content = ChannelContent.objects.get(id=content_id)
-        if vote_type == 'up' or vote_type == 'down':
+        if vote_type == 'rating':
             is_up_or_down = (False, True)[vote_type == 'up']
             try:
                 content_vote = ChannelContentVote.objects.get(
@@ -281,7 +281,6 @@ def _vote(request):
                 else:
                     content_vote.is_up = is_up_or_down
                     content_vote.save()
-                    _make_best(channel_content)
                     return {'success': 'changed to ' + vote_type,
                             'vote': channel_content.get_vote(), 'cancel': 'no'}
             except:
@@ -309,7 +308,6 @@ def _vote(request):
         vote.channel_content = channel_content
         vote.userprofile = user_profile
         vote.save()
-        _make_best(channel_content)
         return {'success': 'vote ' + vote_type,
                 'vote': channel_content.get_vote(), 'cancel': cancel}
     except ObjectDoesNotExist:

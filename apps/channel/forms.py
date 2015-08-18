@@ -1,39 +1,6 @@
 # -*- coding: utf-8
 from apps.channel.models import *
-from django.forms import ModelForm, Textarea, BooleanField, FileField
-import random
-
-
-prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
-name = [u'양아치', u'루저', u'외톨', u'올빼미', u'밤비']
-
-
-class ChannelForm(ModelForm):
-    class Meta:
-        model = Channel
-        fields = [
-                    'kor_name',
-                    'eng_name',
-                    'url',
-                    'description',
-                 ]
-
-    def __init__(self, *args, **kwargs):
-        super(ChannelForm, self).__init__(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        self.instance.admin = kwargs.pop('admin')
-        super(ChannelForm, self).save(*args, **kwargs)
-        return self.instance
-
-    def clean(self):
-        cleaned_data = super(ChannelForm, self).clean()
-        if 'url' in cleaned_data:
-            url = cleaned_data['url']
-            if url == 'all':
-                msg = u"Invalid url"
-                self.add_error('url', msg)
-        return cleaned_data
+from django.forms import ModelForm, Textarea
 
 
 class ChannelContentForm(ModelForm):

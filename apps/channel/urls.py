@@ -17,7 +17,7 @@ from django.conf.urls import include, url
 
 urlpatterns = [
     url(r'^$', 'apps.channel.views.home'),
-    url(r'^([A-z0-9]*)/$', 'apps.channel.views.post_list', name='post_list'),
+    url(r'^([A-z0-9]*)/$', 'apps.channel.views.post_list'),
     url(r'^([A-z0-9]*)/post/$', 'apps.channel.views.post_write'),
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/$', 'apps.channel.views.post_read'),
     url(r'^[A-z0-9]*/([1-9][0-9]*)/modify/$', 'apps.channel.views.post_modify'),
