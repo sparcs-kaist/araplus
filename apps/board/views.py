@@ -135,7 +135,7 @@ def post_modify(request, board_url, post_id=0):
         form_post = BoardPostForm(is_modify=True, instance=post_instance)
         form_attachment = AttachmentFormSet(
             queryset=Attachment.objects.filter(
-            board_content__board_post__id=post_id))
+                board_content__board_post__id=post_id))
     return render(request,
                   'board/board_write.html',
                   {'content_form': form_content,
@@ -150,7 +150,7 @@ def post_read(request, board_url, post_id):
     post, comment_list = _get_content(request, post_id)
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
-    search_category =request.GET.get('category', '')
+    search_category = request.GET.get('category', '')
     try:
         board_post_trace = BoardPostTrace.objects.get(
             userprofile=request.user.userprofile,

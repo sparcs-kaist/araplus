@@ -93,14 +93,15 @@ def _get_content(request, post_id):
     comment_nickname_list = []
     order = 1
     for board_comment in board_post.board_comment.all():
-        comment = _get_post(request, board_comment, 'Comment', comment_nickname_list)
+        comment = _get_post(request, board_comment, 'Comment',
+                            comment_nickname_list)
         comment['order'] = order
         order = order + 1
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
         username = comment['username']
         if order == 2:
-            comment_nickname_list.append((username,1))
+            comment_nickname_list.append((username, 1))
         else:
             n = len(comment_nickname_list)
             x = n
@@ -110,10 +111,11 @@ def _get_content(request, post_id):
                     x = i
                     y = i + 1
                     break
-                if x == n and len(username) >= len(comment_nickname_list[i][0]):
+                if (len(username) >= len(comment_nickname_list[i][0])
+                        and x == n):
                     x = i
                     y = i
-            comment_nickname_list = comment_nickname_list[0:x] + [(username,order-1)] + comment_nickname_list[y:]
+            comment_nickname_list = comment_nickname_list[0:x] + [(username, order-1)] + comment_nickname_list[y:]
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
@@ -126,7 +128,7 @@ def _get_content(request, post_id):
     return (post, comment_list)
 
 
-def _get_post(request, board_post, type, comment_nickname_list = []):
+def _get_post(request, board_post, type, comment_nickname_list=[]):
     post = {}
     if type == 'Comment':
         pass
@@ -146,7 +148,8 @@ def _get_post(request, board_post, type, comment_nickname_list = []):
         post['title'] = '--Deleted--'
         post['content'] = '--Deleted--'
     else:
-        post['content'] = board_content.replace_content_tags(type, comment_nickname_list)
+        post['content'] = board_content.replace_content_tags(
+            type, comment_nickname_list)
     post['id'] = board_post.id
     post['deleted'] = board_content.is_deleted
     post['content_id'] = board_content.id
@@ -182,7 +185,6 @@ def _write_post(request, is_modify=False, post=None,
         request.POST,
         instance=post)  # get form from post and instance
     form_attachment = AttachmentFormSet(request.POST, request.FILES)
-    print form_attachment.is_valid()
     try:  # for modify log, get title and content before modify.
         # modify log for content
         content_before = content.content
@@ -224,7 +226,7 @@ def _write_post(request, is_modify=False, post=None,
         for tag in hashs:
             HashTag(tag_name=tag, board_post=board_post).save()
         attachments = form_attachment.save(commit=False)
-        # 삭제 항목에 체크 된 항목들 삭제 
+        # 삭제 항목에 체크 된 항목들 삭제
         for attachment in form_attachment.deleted_objects:
             attachment.delete()
         for attachment in attachments:
@@ -232,7 +234,6 @@ def _write_post(request, is_modify=False, post=None,
             attachment.save()
         return {'save': board_post}
     else:
-        print form_attachment.non_form_errors()
         return {'failed': [form_content, form_post, form_attachment]}
 
 
@@ -476,8 +477,8 @@ def _check_valid(request, board_url, write=False):
     if board.admin == request.user.userprofile:
         return True
     try:
-        board_member = BoardMember.objects.get(board=board,
-                                            member=request.user.userprofile)
+        board_member = BoardMember.objects.get(
+            board=board, member=request.user.userprofile)
         if write and not board_member.write:
             return False
         return True

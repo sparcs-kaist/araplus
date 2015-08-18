@@ -43,9 +43,8 @@ class BoardMemberForm(ModelForm):
     class Meta:
         model = BoardMember
         fields = {
-                    'member',
-                    'write',
-                 }
+            'member',
+            'write', }
 
     def __init__(self, *args, **kwargs):
         self.board = kwargs.pop('board', None)
@@ -61,7 +60,8 @@ class BoardMemberForm(ModelForm):
         cleaned_data = super(BoardMemberForm, self).clean()
         if cleaned_data.get('member', ''):
             try:
-                member = UserProfile.objects.get(nickname=cleaned_data['member'])
+                member = UserProfile.objects.get(
+                    nickname=cleaned_data['member'])
                 if BoardMember.objects.filter(board=self.board, member=member):
                     msg = u'Aleady added'
                     self.add_error('member', msg)
