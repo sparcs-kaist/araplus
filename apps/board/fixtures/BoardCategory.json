@@ -9,15 +9,15 @@
 	{
 		"model": "board.BoardCategory",
 		"fields": {
-			"name": "\uCD1D\uD559",
-			"board": 2
-		}
-	},
-	{
-		"model": "board.BoardCategory",
-		"fields": {
 			"name": "Game",
 			"board": 1
 		}
-	}
+	},
+    {
+        "model": "board.BoardCategory",
+        "fields": {
+            "name": "Info",
+            "board": 1
+        }
+    }
 ]

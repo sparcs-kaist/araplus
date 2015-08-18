@@ -158,10 +158,17 @@ class BoardAttachmentForm(ModelForm):
         model = Attachment
         fields = ['file', ]
 
+#    def save(self, *args, **kwargs):
+#        self.instance.board_content = kwargs.pop('content')
+#        retsuper(BoardAttachmentForm
+
 
 AttachmentFormSet = modelformset_factory(
     model=Attachment,
-    form=BoardAttachmentForm)
+    form=BoardAttachmentForm,
+    can_delete=True,
+    max_num=5,
+    validate_max=True)
 
 
 def _is_anonymous_duplicate(board_post, name, cache):

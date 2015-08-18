@@ -16,6 +16,7 @@ def _get_post_list(request, board_url='', item_per_page=15):
     search_title = request.GET.get('title', '')
     search_content = request.GET.get('content', '')  # title + content
     search_nickname = request.GET.get('nickname', '')
+    search_category = request.GET.get('category', '')
     if board_url != 'all':
         try:
             board = Board.objects.get(url=board_url)
@@ -45,6 +46,8 @@ def _get_post_list(request, board_url='', item_per_page=15):
     if search_nickname:
         board_post = board_post.filter(author__nickname=search_nickname,
                                        board_content__is_anonymous=None)
+    if search_category:
+        board_post = board_post.filter(board_category__name=search_category)
     board_post_notice = board_post_notice[:5]
     post_paginator = Paginator(board_post, item_per_page)
     post_list = []
@@ -94,7 +97,6 @@ def _get_content(request, post_id):
         comment['order'] = order
         order = order + 1
         comment_list.append(comment)
-        
         # 현재 글에 달린 댓글의 닉네임 리스트
         username = comment['username']
         if order == 2:
@@ -180,6 +182,7 @@ def _write_post(request, is_modify=False, post=None,
         request.POST,
         instance=post)  # get form from post and instance
     form_attachment = AttachmentFormSet(request.POST, request.FILES)
+    print form_attachment.is_valid()
     try:  # for modify log, get title and content before modify.
         # modify log for content
         content_before = content.content
@@ -189,7 +192,8 @@ def _write_post(request, is_modify=False, post=None,
         category_before = post.board_category.name
     except:  # no such a content : is not modify
         category_before = ""
-    if form_post.is_valid() and form_content.is_valid():
+    if (form_post.is_valid() and form_content.is_valid()
+            and form_attachment.is_valid()):
         if is_modify:
             try:
                 category_after = post.board_category.name
@@ -219,13 +223,16 @@ def _write_post(request, is_modify=False, post=None,
         hashs = board_content.get_hashtags()
         for tag in hashs:
             HashTag(tag_name=tag, board_post=board_post).save()
-        if form_attachment.is_valid():
-            attachments = form_attachment.save(commit=False)
-            for attachment in attachments:
-                attachment.board_content = board_content
-                attachment.save()
+        attachments = form_attachment.save(commit=False)
+        # 삭제 항목에 체크 된 항목들 삭제 
+        for attachment in form_attachment.deleted_objects:
+            attachment.delete()
+        for attachment in attachments:
+            attachment.board_content = board_content
+            attachment.save()
         return {'save': board_post}
     else:
+        print form_attachment.non_form_errors()
         return {'failed': [form_content, form_post, form_attachment]}
 
 

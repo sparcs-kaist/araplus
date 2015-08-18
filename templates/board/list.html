@@ -21,7 +21,23 @@
                     </ul>
                 </div>
             </td>
-            <td width=60><p align=center>Category</p></td>
+            <td width=60><div style="text-align: center;" role="presentation"
+                    class="dropdown">
+                    <a id="category-list" class="dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" role="button" aria-expended="ture">
+                        {{ current_category.name|default:'All' }}
+                        <span class="caret"></span></a>
+                    <ul id="category-menu" class="dropdown-menu" role="menu"
+                        aria=labelledby="category-list">
+                        <li role="presentation"><a role="menuitem" tabindex="-1"
+                            href="">All</a></li>
+                        {% for category in current_board.board_category.all %}
+                        <li role="presentation"><A role="menuitem" tabindex="-1"
+                            href="?category={{category.name}}">{{category.name}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </td>
             <td width=320 class="title"><p>Title<p></td>
             <td width=80><p align=center>+/-</p></td>
             <td width=80 style="text-align: center;"><span>date</span></td>

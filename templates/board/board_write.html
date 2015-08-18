@@ -57,7 +57,8 @@
                 // element 추가.
                 if(formCount < 10 && index_of +1 == formCount){
                     //add new input element
-                    var row = $(".attachment:first").clone(true).get(0);
+                    var row = $(".attachment:last").clone(true).get(0);
+                    console.log(row);
                     hidden_input = $(row).children().get(0);
                     label_for_input = $(row).children().children().get(0);
                     file_input = $(row).children().children().children().get(0);
@@ -132,6 +133,11 @@
             {{ content_form.content|bootstrap }}
         </div>
         <div id="attachments">
+            {% if attachment_form.non_form_errors %}
+            <div class="form-group has-error">
+                <span class="help-block">{{ attachment_form.non_form_errors|striptags }}</span>
+            </div>
+            {% endif %}
             {{ attachment_form.management_form }}
             {% for form in attachment_form.forms %}
             <div class="attachment">
