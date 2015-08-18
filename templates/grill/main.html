@@ -26,7 +26,26 @@
         {% else %}
         <p>No Data.</p>
         {% endif %}
-    </table>
+	</table>
+	<div style="text-align: center;">
+		<ul class="pagination pagination-sm">
+			{% if page_left != 0 %}
+			<li><a href="/grill/?page={{page_left}}"">&laquo;</a></li>
+			{% endif %}
+			{% for page in pages %}
+			{% if page == current_page %}
+			<li class="active">
+			<a href="/grill/?page={{page}}">{{page}}<span class="sr-only"></span></a>
+			</li>
+			{% else %}
+			<li><a href="/grill/?page={{page}}">{{page}}</a></li>
+			{% endif %}
+			{% endfor %}
+			{% if page_right != 0 %}
+			<li><a href="/grill/?page={{page_right}}"">&raquo;</a></li>
+			{% endif %}
+		</ul>
+	</div>
     <div class="pull-right">
         <a class="btn btn-default" href="/grill/add_grill/">글쓰기</a>
     </div>

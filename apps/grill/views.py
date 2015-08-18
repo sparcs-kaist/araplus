@@ -9,14 +9,38 @@ from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 import json
 import datetime
+from django.core.paginator import Paginator
 
 
 @login_required(login_url='/session/login/')
-def home(request):
-    grills = Grill.objects.all().order_by('created_time')  # 나중에 업데이트 순서로 바꾸기?
+def home(request,item_per_page=10):
+    page = int(request.GET.get('page',1))
+    grills = Grill.objects.all().order_by('created_time').reverse()  # 나중에 업데이트 순서로 바꾸기?
+    grill_paginator = Paginator(grills,item_per_page)
+    grill_paged = grill_paginator.page(page)
+    current_page = page
+    page_range = grill_paginator.page_range
+    page_left = 0
+    page_right = 0
+    if len(page_range) > 10 :
+        last_page = len(page_range)
+        page_target = (current_page-1)/10 
+        page_range = []
+        page_left = page_target * 10
+        page_right = page_target * 10 + 11
+        for i in range(page_left+1,page_right):
+            if i>last_page:
+                page_right = 0
+                break
+            page_range.append(i)
+
     return render(request, 'grill/main.html',
                   {
-                      'grills': grills,
+                      'grills': grill_paged,
+                      'pages': page_range,
+                      'currnet_page': current_page,
+                      'page_left': page_left,
+                      'page_right': page_right,
                   })
 
 

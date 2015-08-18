@@ -147,7 +147,7 @@ def post_modify(request, board_url, post_id=0):
 def post_read(request, board_url, post_id):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
-    post, comment_list = _get_content(request, post_id)
+    post, comment_list, comment_page_range, comment_current_page, comment_page_left, comment_page_right = _get_content(request, post_id)
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     search_category = request.GET.get('category', '')
@@ -166,6 +166,10 @@ def post_read(request, board_url, post_id):
     except:
         current_category = None
     querystring = _get_querystring(request, 'best', 'page')
+    if querystring == '':
+        querystring = '?'
+    else:
+        querystring = querystring + '&'
     report_form = BoardReportForm()
     attachment_form = AttachmentFormSet(queryset=Attachment.objects.none())
     return render(request,
@@ -173,7 +177,6 @@ def post_read(request, board_url, post_id):
                   {
                       'querystring': querystring,
                       'post': post,  # post for post
-                      'comment_list': comment_list,  # comment for post
                       'board_post_trace': board_post_trace,
                       # Below,there are thing for postList.
                       'notice_list': notice_list,
@@ -183,9 +186,15 @@ def post_read(request, board_url, post_id):
                       'board_list': board_list,
                       'current_board': current_board,
                       'report_form': report_form,
-                      'current_category': current_category,
                       # Below thing is for attachment form for comment
                       'attachment_form': attachment_form
+                      'current_category': current_category
+                      # Below, there are things for comment_list
+                      'comment_list': comment_list,
+                      'comment_pages': comment_page_range,
+                      'comment_current_page': comment_current_page,
+                      'comment_page_left': comment_page_left,
+                      'comment_page_right': comment_page_right,
                   })
 
 
@@ -219,7 +228,7 @@ def comment_write(request, board_url, post_id):
         return HttpResponse('Invalid access')
     if request.method == 'POST':
         post_id = _write_comment(request, post_id)
-    querystring = _get_querystring(request, 'best', 'page')
+    querystring = _get_querystring(request, 'best', 'page', 'comment_page')
     return redirect('../' + querystring)
 
 
@@ -229,8 +238,7 @@ def comment_modify(request, board_url, post_id):
         return HttpResponse('Invalid access')
     if request.method == 'POST':
         post_id = _write_comment(request, post_id, True)
-        print post_id
-    querystring = _get_querystring(request, 'best', 'page')
+    querystring = _get_querystring(request, 'best', 'page', 'comment_page')
     return redirect('../' + querystring)
 
 

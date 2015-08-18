@@ -48,14 +48,14 @@ class BoardContent(models.Model):
 
     def go_adult(self):
         adult = 0 
-        adult = len(self.board_content_vote_adult.all())
+        adult = self.board_content_vote_adult.count()
         if adult > 0 :
             return True
         return False
     
     def go_political(self):
         political = 0
-        political = len(self.board_content_vote_political.all())
+        political = self.board_content_vote_political.count()
         if political > 0 :
             return True
         return False
