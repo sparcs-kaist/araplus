@@ -60,7 +60,7 @@ class BoardContent(models.Model):
             return True
         return False
 
-    def replace_content_tags(self):
+    def replace_content_tags(self, type, comment_nickname_list):
         result = cgi.escape(self.content)
         result = result.replace("\n", "<br />")
         if type == 'Comment':
