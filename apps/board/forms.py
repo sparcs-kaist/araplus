@@ -2,8 +2,10 @@
 from apps.board.models import *
 from apps.session.models import UserProfile
 from django.forms import ModelForm, Textarea, BooleanField, CharField
+from django.db.models import Q
 import random
 from django.forms.models import modelformset_factory
+import datetime
 
 
 prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
@@ -82,6 +84,7 @@ class BoardContentForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         is_modify = kwargs.pop('is_modify', False)
+        self.author = kwargs.pop('author', None)
         super(BoardContentForm, self).__init__(*args, **kwargs)
         self.fields['is_anonymous'] = BooleanField(required=False)
         if is_modify:
@@ -89,16 +92,30 @@ class BoardContentForm(ModelForm):
 
     def save(self, *args, **kwargs):
         board_post = kwargs.pop('post', None)
-        author = kwargs.pop('author')
         try:
             if self.cleaned_data['is_anonymous']:
-                self.instance.is_anonymous = _get_name(author, board_post)
+                self.instance.is_anonymous = _get_name(self.author,
+                                                       board_post)
             else:
                 self.instance.is_anonymous = None
         except:
             self.cleaned_data['is_anonymous'] = self.instance.is_anonymous
         super(BoardContentForm, self).save(*args, **kwargs)
         return self.instance
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super(BoardContentForm, self).clean()
+        if cleaned_data.get('is_anonymous', ''):
+            today = datetime.datetime.now().date()
+            tomorrow = today + datetime.timedelta(1)
+            if BoardContent.objects.filter(~Q(is_anonymous=None),
+                                      Q(board_post__author=self.author)
+                                      | Q(board_comment__author=self.author),
+                                      created_time__gte=today,
+                                      created_time__lt=tomorrow).count() > 4:
+                msg = u'exceed anonymous post limits'
+                self.add_error('is_anonymous', msg)
+        return cleaned_data
 
 
 class BoardPostForm(ModelForm):

@@ -216,7 +216,7 @@ def comment_write(request, board_url, post_id):
         return HttpResponse('Invalid access')
     if request.method == 'POST':
         post_id = _write_comment(request, post_id)
-    querystring = _get_querystring(request, 'bset', 'page')
+    querystring = _get_querystring(request, 'best', 'page')
     return redirect('../' + querystring)
 
 

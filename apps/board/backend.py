@@ -180,7 +180,8 @@ def _write_post(request, is_modify=False, post=None,
     form_content = BoardContentForm(
         request.POST,
         instance=content,
-        is_modify=is_modify)
+        is_modify=is_modify,
+        author=request.user.userprofile)
     form_post = BoardPostForm(
         request.POST,
         instance=post)  # get form from post and instance
@@ -218,8 +219,7 @@ def _write_post(request, is_modify=False, post=None,
             content.set_log(content_diff + content.get_log())
         board_post = form_post.save(
             author=request.user.userprofile,
-            content=form_content.save(author=request.user.userprofile,
-                                      post=post))  # save
+            content=form_content.save(post=post))  # save
         board_content = board_post.board_content
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
@@ -249,7 +249,8 @@ def _write_comment(request, post_id, is_modify=False):
             content_form = BoardContentForm(
                 request.POST,
                 instance=board_comment.board_content,
-                is_modify=True)
+                is_modify=True,
+                author=request.user.userprofile)
         except ObjectDoesNotExist:
             return  # no comment
     else:
@@ -257,7 +258,8 @@ def _write_comment(request, post_id, is_modify=False):
             board_comment = BoardComment(
                 author=user_profile,
                 board_post=BoardPost.objects.get(id=post_id))
-            content_form = BoardContentForm(request.POST)
+            content_form = BoardContentForm(request.POST,
+                                            author=request.user.userprofile)
         except:
             return  # no post
     if content_form.is_valid():
@@ -268,12 +270,10 @@ def _write_comment(request, post_id, is_modify=False):
                                   board_comment.board_content.content)]] +
                 board_comment.board_content.get_log())
         board_comment.board_content = content_form.save(
-            author=user_profile,
             post=board_comment.board_post)
     else:
         return  # Invalid form
         board_comment.board_content = content_form.save(
-            author=user_profile,
             post=board_comment.board_post)
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
