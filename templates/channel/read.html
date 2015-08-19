@@ -11,11 +11,10 @@
     $(document).ready(function(){
 		$("span.timeago").timeago();
 
-		<!-- 선택한 게시물 style 변경 -->
         selected_post = location.href.split('/')[5];
         $("#post-row-"+selected_post).addClass('selected');
-        <!-- --------------------- -->
-        $(".comment").click(function(){
+		
+		$(".comment").click(function(){
             var channel_comment_id=$(this).attr("id").slice(3);
             var content = $("#comment"+channel_comment_id).html().replace(/<br\s*[\/]?>/gi,'\n');
             var mod_comment = "<form action='./comment_mod/{{querystring}}' method='POST'>"+
@@ -141,41 +140,6 @@
             onHoverOut: function() {
                 $(".comment_preview_order").remove();
             }
-        });
-        <!-- for trace post -->
-        $(".trace, .alarm").click(function(){
-            var post_id = $(this).attr("id").split("-")[1];
-            $.ajax(
-            {
-                url: "trace/",
-                type: "POST",
-                data: {
-                    type: $(this).attr("id").split("-")[0],
-                    csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
-                },
-                success: function(data){
-                    trace_obj = $(".trace");
-                    alarm_obj = $(".alarm");
-                    if(data.trace){
-                        trace_obj.removeClass('glyphicon-star-empty');
-                        trace_obj.addClass('tracing');
-                        trace_obj.addClass('glyphicon-star');
-                    }
-                    else{
-                        trace_obj.removeClass('tracing');
-                        trace_obj.removeClass('glyphicon-star');
-                        trace_obj.addClass('glyphicon-star-empty');
-                    }
-                    if(data.alarm){
-                        alarm_obj.removeAttr('style');
-                        alarm_obj.addClass('activated');
-                    }
-                    else{
-                        alarm_obj.removeClass('activated');
-                        alarm_obj.css('color', "white");
-                    }
-                }
-            });
         });
     });
 </script>

@@ -82,8 +82,14 @@ def post_write(request, channel_url):
 
 @login_required(login_url='/session/login')
 def comment_write(request, channel_url, post_id):
-    if request.method == 'POST':
-        post_id = _write_comment(request, post_id)
+    if request.method != 'POST':
+        return redirect('../')
+
+    post = _get_post(post_id)
+    if not post:
+        raise Http404
+
+    _write_comment(request, post)
     querystring = _get_querystring(request, 'page')
     return redirect('../' + querystring)
 
@@ -120,7 +126,8 @@ def read(request, channel_url, post_id):
 
 
 @login_required(login_url='/session/login')
-def modify(request, post_id=0):
+def modify(request, content_id):
+    post = _get_post(content_id)
     post_instance = get_object_or_404(ChannelPost, id=post_id)
     if post_instance.author != request.user.userprofile:
         return redirect('../')

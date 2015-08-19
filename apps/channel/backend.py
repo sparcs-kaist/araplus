@@ -22,6 +22,13 @@ def _get_post(post_id):
         return None
     
 
+def _get_comment(comment_id):
+    try:
+        return ChannelComment.objects.get(id=comment_id)
+    except:
+        return None
+
+
 def _render_content(userprofile, post=None, comment=None):
     if not post and not comment:
         return None
@@ -152,12 +159,12 @@ def _get_comments(request, post):
     comment_list = []
     order = 1
     for comment in post.channel_comment.all():
-        comment = _render_content(comment=comment)
+        comment = _render_content(request.user.userprofile, comment=comment)
         comment['order'] = order
         order = order + 1
         comment_list.append(comment)
 
-    best_comment = {}
+    """best_comment = {}
     best_vote = 0
     for comment in comment_list:
         if comment['vote']['up'] > 5 and comment['vote']['up'] > best_vote:
@@ -166,7 +173,7 @@ def _get_comments(request, post):
 
     if best_comment:
         best_comment['best_comment'] = True
-        comment_list.insert(0, best_comment)
+        comment_list.insert(0, best_comment)"""
     return comment_list
 
 
@@ -181,49 +188,35 @@ def _mark_read(userprofile, post):
     is_read.save()
 
 
-def _write_comment(request, post_id, is_modify=False):
-    user_profile = request.user.userprofile
-    if is_modify:
-        comment_id = request.POST.get('channel_comment_id', 0)
-        try:
-            channel_comment = ChannelComment.objects.get(id=comment_id)
-            content_before = channel_comment.channel_content.content
-            if channel_comment.author != user_profile:
-                return  # wrong request
-            content_form = ChannelContentForm(
-                request.POST,
-                instance=channel_comment.channel_content,
-                is_modify=True)
-        except ObjectDoesNotExist:
-            return  # no comment
-    else:
-        try:
-            channel_comment = ChannelComment(
-                author=user_profile,
-                channel_post=ChannelPost.objects.get(id=post_id))
-            content_form = ChannelContentForm(request.POST)
-        except:
-            return  # no post
-    if content_form.is_valid():
-        if is_modify:
-            channel_comment.channel_content.set_log(
-                [[str(channel_comment.channel_content.modified_time),
-                  _get_diff_match(content_before,
-                                  channel_comment.channel_content.content)]] +
-                  channel_comment.channel_content.get_log())
-        channel_comment.channel_content = content_form.save(
-            author=user_profile,
-            post=channel_comment.channel_post)
-    else:
-        return  # Invalid form
-        channel_comment.channel_content = content_form.save(
-            author=user_profile,
-            post=channel_comment.channel_post)
-    channel_comment.channel_post.channel_content.save()  # update modified_time
-    channel_comment.save()
-    return channel_comment.channel_post.id
+def _write_comment(request, post=None, comment=None):
+    userprofile = request.user.userprofile
+    
+    if comment != None:
+        content_before = comment.channel_content.content
+        if comment.author != userprofile:
+            return
 
+        content_form = ChannelContentForm(request.POST,
+                instance=comment.channel_content)
+    else:
+        content_form = ChannelContentForm(request.POST)
+    
+    if not content_form.is_valid():
+        return
 
+    if comment != None:
+        comment.channel_content.set_log(
+            [[str(comment.channel_content.modified_time),
+              _get_diff_match(content_before,
+                              comment.channel_content.content)]] +
+             comment.channel_content.get_log())
+    else:
+        comment = ChannelComment(channel_post=post, author=userprofile)
+    
+    comment.channel_content = content_form.save()
+    comment.save()
+    
+   
 def _delete_post(request):
     # message = ''
     channel_content_id = request.POST.get('id', 0)
