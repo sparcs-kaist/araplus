@@ -5,11 +5,14 @@ from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
 from apps.channel.models import *
 from apps.channel.backend import (
+    _render_content,
     _get_channel,
+    _get_post,
     _get_querystring,
     _get_post_list,
-    _get_content,
     _write_post,
+    _get_comments,
+    _mark_read,
     _delete_post,
     _report,
     _vote,
@@ -87,35 +90,31 @@ def comment_write(request, channel_url, post_id):
 
 @login_required(login_url='/session/login')
 def read(request, channel_url, post_id):
-    post, comment_list = _get_content(request, post_id)
-    notice_list, post_list, pages, page = _get_post_list(request, channel_url)
     channel_list = Channel.objects.all()
-    try:
-        channel_post_trace = ChannelPostTrace.objects.get(
-            userprofile=request.user.userprofile,
-            channel_post__id=post_id)
-    except:
-        channel_post_trace = None
-    try:
-        current_channel = channel_list.get(url=channel_url)
-        print current_channel
-    except:
-        current_channel = None
+    channel = _get_channel(channel_url)
+    post = _get_post(post_id)
+    if not post or not channel:
+        raise Http404
+
+    post_rendered = _render_content(request.user.userprofile, post=post)
+    _mark_read(request.user.userprofile, post)
+    comments = _get_comments(request, post)
+    notice_list, post_list, pages, page = _get_post_list(request, channel)
+    report_form = ChannelReportForm()
+
+
     querystring = _get_querystring(request, 'page')
-    return render(request,
-                  'channel/channel_read.html',
+    return render(request, 'channel/read.html',
                   {
                       'querystring': querystring,
-                      'post': post,  # post for post
-                      'comment_list': comment_list,  # comment for post
-                      'channel_post_trace': channel_post_trace,
-                      # Below,there are thing for postList.
+                      'post': post_rendered,
+                      'comment_list': comments,
                       'notice_list': notice_list,
                       'post_list': post_list,
                       'pages': pages,
                       'current_page': page,
                       'channel_list': channel_list,
-                      'current_channel': current_channel,
+                      'current_channel': channel,
                       'report_form': report_form
                   })
 

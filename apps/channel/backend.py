@@ -10,10 +10,49 @@ from itertools import izip
 
 def _get_channel(channel_url):
     try:
-        channel = Channel.objects.get(url=channel_url, is_deleted=False)
-        return channel
+        return Channel.objects.get(url=channel_url, is_deleted=False)
     except:
         return None
+
+
+def _get_post(post_id):
+    try:
+        return ChannelPost.objects.get(id=post_id)
+    except:
+        return None
+    
+
+def _render_content(userprofile, post=None, comment=None):
+    if not post and not comment:
+        return None
+
+    if post:
+        raw_data = post
+    else:
+        raw_data = comment
+    
+    author = raw_data.author
+    content = raw_data.channel_content
+    
+    data = {}
+    if post:
+        data['title'] = raw_data.title
+    
+    if content.is_deleted:
+        data['title'] = '--Deleted--'
+        data['content'] = '--Deleted--'
+    else:
+        data['content'] = content.replace_content_tags()
+    
+    data['id'] = raw_data.id
+    data['deleted'] = content.is_deleted
+    data['content_id'] = content.id
+    data['created_time'] = content.created_time
+    data['username'] = author.nickname
+    data['is_adult'] = content.is_adult
+    data['auth'] = (userprofile == author)
+    print data
+    return data
 
 
 def _get_querystring(request, *args):
@@ -109,80 +148,37 @@ def _write_post(request, channel, is_modify=False, content=None, post=None):
         return {'failed': [form_content, form_post, form_attachment]}
 
 
-def _get_content(request, post_id):
-    try:
-        channel_post = ChannelPost.objects.get(id=post_id)
-    except ObjectDoesNotExist:
-        return ({}, [])
-    if channel_post.channel.is_deleted:
-        return ({}, [])
-    try:
-        channel_post_is_read = ChannelPostIs_read.objects.get(
-            channel_post=channel_post,
-            userprofile=request.user.userprofile)
-    except ObjectDoesNotExist:
-        channel_post_is_read = ChannelPostIs_read()
-        channel_post_is_read.channel_post = channel_post
-        channel_post_is_read.userprofile = request.user.userprofile
-    channel_post_is_read.save()
-    post = _get_post(request, channel_post, 'Post')
+def _get_comments(request, post):
     comment_list = []
     order = 1
-    for channel_comment in channel_post.channel_comment.all():
-        comment = _get_post(request, channel_comment, 'Comment')
+    for comment in post.channel_comment.all():
+        comment = _render_content(comment=comment)
         comment['order'] = order
         order = order + 1
         comment_list.append(comment)
+
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
         if comment['vote']['up'] > 5 and comment['vote']['up'] > best_vote:
             best_vote = comment['vote']['up']
             best_comment = comment
+
     if best_comment:
         best_comment['best_comment'] = True
         comment_list.insert(0, best_comment)
-    return (post, comment_list)
+    return comment_list
 
 
-def _get_post(request, channel_post, type):
-    post = {}
-    if type == 'Comment':
-        pass
-    elif type == 'Post':
-        post['title'] = channel_post.title
-        post['channel'] = channel_post.channel.kor_name
-        post['channel_id'] = channel_post.channel.id
-    else:
-        return post
-    userprofile = channel_post.author
-    channel_content = channel_post.channel_content
-    if channel_content.is_deleted:
-        post['title'] = '--Deleted--'
-        post['content'] = '--Deleted--'
-    else:
-        post['content'] = channel_content.replace_content_tags()
-    post['id'] = channel_post.id
-    post['deleted'] = channel_content.is_deleted
-    post['content_id'] = channel_content.id
-    post['created_time'] = channel_content.created_time
-    post['username'] = userprofile.nickname
-    post['return'] = (userprofile == request.user.userprofile)
-    post['vote'] = channel_content.get_vote()
-    post['vote']['is_up'] = False
-    post['vote']['is_down'] = False
+def _mark_read(userprofile, post):
     try:
-        is_vote = ChannelContentVote.objects.get(
-                userprofile=userprofile, channel_content=channel_content)
-        if is_vote.is_up:
-            post['vote']['is_up'] = True
-        else:
-            post['vote']['is_down'] = True
+        is_read = ChannelPostIsRead.objects.get(
+                channel_post=post, userprofile=userprofile)
     except ObjectDoesNotExist:
-        pass
-    post['adult'] = channel_content.is_adult
-    return post
-
+        is_read = ChannelPostIsRead()
+        is_read.channel_post = post
+        is_read.userprofile = userprofile
+    is_read.save()
 
 
 def _write_comment(request, post_id, is_modify=False):

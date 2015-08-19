@@ -1,18 +1,17 @@
 {% extends "base.html" %}
+
 {% block css %}
 <link rel="stylesheet" type="text/css" href="/media/css/channel/list.css">
 {% endblock %}
+
 {% block js %}
 <script type="text/javascript" src="/media/js/channel/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
-     jQuery(document).ready(function() {
-         jQuery("span.timeago").timeago();
-     });
-</script>
-<script>
     $(document).ready(function(){
-        <!-- 선택한 게시물 style 변경 -->
+		$("span.timeago").timeago();
+
+		<!-- 선택한 게시물 style 변경 -->
         selected_post = location.href.split('/')[5];
         $("#post-row-"+selected_post).addClass('selected');
         <!-- --------------------- -->
@@ -188,33 +187,16 @@
             <div class="panel-heading">
                 <div>
                     <label class="col-md-5">
-                        {% if post.adult %}
+                        {% if post.is_adult %}
                         <label style="color:red">+19</label>
                         {% endif %}
                         Title:{{ post.title }}
                     </label>
                     <span class="col-md-3">User:{{ post.username }}</span>
-                    <span class="col-md-2">channel:{{post.channel}}</span>
-					<span class="col-md-2">.</span>
-
-                    {% if channel_post_trace.is_trace %}
-                    <span class="glyphicon glyphicon-star pull-right trace tracing"
-                        id="trace-{{post.id}}"></span>
-                    {% else %}
-                    <span class="glyphicon glyphicon-star-empty pull-right trace"
-                        id="trace-{{post.id}}"></span>
-                    {% endif %}
-                    {% if channel_post_trace.is_notified %}
-                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
-                        id="alarm-{{post.id}}"></span>
-                    {% else %}
-                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
-                        id="alarm-{{post.id}}" style="color:white;"></span>
-                    {% endif %}
-                </div>
+             	</div>
                 <div>
                     <span class="col-md-10">{{post.created_time}}</span>
-                    <span id="vote_{{post.content_id}}">추천 +{{post.vote.up}}/-{{post.vote.down}}</span>
+                    <span>추천 +TBA</span>
                 </div>
             </div>
             <div class="panel-body">
@@ -223,19 +205,9 @@
                     <div class="row">
                         <div class="col-md-7"></div>
                         {% if not post.deleted %}
-                        {% if post.vote.is_up %}
-                        <button class="btn btn-warning col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
-                        {% else %}
-                        <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
-                        {% endif %}
-                        {% if post.vote.is_down %}
-                        <button class="btn btn-warning col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
-                        {%else %}
-                        <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
-                        {% endif %}
-                        <a class="btn btn-info col-md-1" href="./post-log/?channel={{post.channel_id}}">Log</a>
-                        {% if post.return %}
-                        <a class="btn btn-info col-md-1" href="./modify/?channel={{post.channel_id}}">Modify</a>
+                        <a class="btn btn-info col-md-1" href="./log/">Log</a>
+                        {% if post.auth %}
+                        <a class="btn btn-info col-md-1" href="./modify/">Modify</a>
                         <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
                         {% endif %}
                         {% endif %}
@@ -252,10 +224,10 @@
                 <div class="panel-heading">
                     <div>
                         <span id=comment_order_{{comment.order}}> {{ comment.order }}</span>
-                        <span> {{ comment.username }}</span>
+                        <span>{{ comment.author.nickname }}</span>
                     </div>
                     <div> 
-                        <span class="col-md-10">{{comment.created_time}}</span>
+                        <span class="col-md-10">{{comment.channel_content.created_time}}</span>
                         <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
                     </div>
                 </div>
@@ -317,6 +289,6 @@
         </div>   
     </div>
 
-    {% include "channel/list.html" %}
+    {% include "channel/list_core.html" %}
     {% include "channel/modal.html" %}
     {% endblock %}
