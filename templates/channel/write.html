@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% block js %}
+{% endblock %}
+{% block content %}
+<div class="container">
+    <form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
+		<div class="row">
+        	<div class="col-xs-9">
+            	{{ post_form.title|bootstrap }}
+        	</div>
+        	<div class="col-xs-3">
+            	<div class="col-xs-6">
+               		{{ content_form.is_adult|bootstrap }}
+                </div>
+                <div class="col-xs-6"> 
+                	{{ post_form.is_notice|bootstrap }}
+                </div>
+			</div>
+		</div>
+        <div id="content">
+        	{{ content_form.content|bootstrap }}
+       	</div>
+        <div id="attachment">
+            {{ attachment_form.file|bootstrap }}
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+</div>
+{% endblock %}

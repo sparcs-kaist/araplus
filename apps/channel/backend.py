@@ -1,52 +1,19 @@
 # -*- coding: utf-8
 from apps.channel.models import *
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 import diff_match_patch
 from django.db.models import Q
 from apps.channel.forms import *
 from itertools import izip
 
 
-def _get_post_list(request, channel_url='', item_per_page=15):
-    adult_filter = request.GET.get('adult_filter')
-    page = int(request.GET.get('page', 1))
-    search_tag = request.GET.get('tag', '')
-    search_title = request.GET.get('title', '')
-    search_content = request.GET.get('content', '')  # title + content
-    search_nickname = request.GET.get('nickname', '')
+def _get_channel(channel_url):
     try:
-        channel = Channel.objects.get(url=channel_url)
+        channel = Channel.objects.get(url=channel_url, is_deleted=False)
+        return channel
     except:
-        return ([], [], None, None)  # Wrong channel request
-    if channel.is_deleted:
-        return ([], [], None, None)
-    channel_post_notice = ChannelPost.objects.filter(is_notice=True,
-                                                     channel=channel)
-    channel_post = ChannelPost.objects.filter(channel=channel)
-    # search
-    if search_tag:
-        channel_post = channel_post.filter(hashtag__tag_name=search_tag)
-    if search_title:
-        channel_post = channel_post.filter(title__contains=search_title)
-    if search_content:
-        channel_post = channel_post.filter(
-            Q(channel_content__content__contains=search_content)
-            | Q(title__contains=search_content))
-    if search_nickname:
-        channel_post = channel_post.filter(author__nickname=search_nickname,
-                                           channel_content__is_anonymous=None)
-    channel_post_notice = channel_post_notice[:5]
-    post_paginator = Paginator(channel_post, item_per_page)
-    post_list = []
-    notice_list = []
-    post_paged = post_paginator.page(page)
-    current_page = post_paged.number
-    for post in post_paged:
-        post_list += [[post, post.get_is_read(request)]]
-    for notice in channel_post_notice:
-        notice_list += [[notice, notice.get_is_read(request)]]
-    return notice_list, post_list, post_paginator.page_range, current_page
+        return None
 
 
 def _get_querystring(request, *args):
@@ -55,9 +22,91 @@ def _get_querystring(request, *args):
     for field in args:
         if request.GET.get(field):
             query_list.append(field + '=' + request.GET[field])
+    
     if query_list:
         querystring = '?' + '&'.join(query_list)
     return querystring
+
+
+def _get_post_list(request, channel, item_per_page=15):
+    adult_filter = request.GET.get('adult_filter')
+    
+    page = int(request.GET.get('page', 1))
+    search_tag = request.GET.get('tag', '')
+    search_title = request.GET.get('title', '')
+    search_content = request.GET.get('content', '')  # title + content
+    search_nickname = request.GET.get('nickname', '')
+    
+    post_notice = ChannelPost.objects.filter(channel=channel, is_notice=True)[:5]
+    post = ChannelPost.objects.filter(channel=channel)
+
+    if search_tag:
+        post = post.filter(hashtag__tag_name=search_tag)
+    if search_title:
+        post = post.filter(title__contains=search_title)
+    if search_content:
+        post = post.filter(
+                Q(channel_content__content__contains=search_content)
+                | Q(title__contains=search_content))
+    if search_nickname:
+        post = post.filter(author__nickname=search_nickname,
+                channel_content__is_anonymous=None)
+    
+    paginator = Paginator(post, item_per_page)
+    try:
+        post_paged = paginator.page(page)
+    except EmptyPage:
+        post_paged = paginator.page(paginator.num_pages)
+    current_page = post_paged.number
+
+    post_list = []
+    notice_list = []
+    for notice in post_notice:
+        notice_list += [[notice, notice.get_is_read(request)]]
+    for post in post_paged:
+        post_list += [[post, post.get_is_read(request)]]
+
+    return notice_list, post_list, paginator.page_range, current_page
+
+
+def _write_post(request, channel, is_modify=False, content=None, post=None):
+    form_content = ChannelContentForm(request.POST, instance=content)
+    form_post = ChannelPostForm(request.POST, instance=post)
+    form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
+
+    try:
+        content_before = content.content
+        title_before = post.title
+    except:
+        pass
+
+    if form_post.is_valid() and form_content.is_valid():
+        if is_modify:
+            post_diff = [[_get_diff_match(title_before, post.title)]]
+            content_diff = [[str(content.modified_time),
+                _get_diff_match(content_before, content.content)]]
+
+            post.set_log(post_diff + post.get_log())
+            content.set_log(content_diff + content.get_log())
+        
+        channel_content = form_content.save()
+
+        channel_post = form_post.save(channel=channel, 
+                author=request.user.userprofile, 
+                content = channel_content)
+        
+        HashTag.objects.filter(channel_post=channel_post).delete()
+        hashs = channel_content.get_hashtags()
+        for tag in hashs:
+            HashTag(tag_name=tag, channel_post=channel_post).save()
+
+        form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
+        if form_attachment.is_valid():
+            form_attachment.save(file=request.FILES['file'],
+                                 content=channel_content)
+        return {'save': channel_post}
+    else:
+        return {'failed': [form_content, form_post, form_attachment]}
 
 
 def _get_content(request, post_id):
@@ -134,52 +183,6 @@ def _get_post(request, channel_post, type):
     post['adult'] = channel_content.is_adult
     return post
 
-
-def _write_post(request, is_modify=False, post=None,
-                content=None, channel=""):
-    form_content = ChannelContentForm(
-        request.POST,
-        instance=content,
-        is_modify=is_modify)
-    form_post = ChannelPostForm(
-        request.POST,
-        instance=post)  # get form from post and instance
-    form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
-    try:  # for modify log, get title and content before modify.
-        # modify log for content
-        content_before = content.content
-        # modify log for post
-        title_before = post.title
-        channel_before = channel
-    except:  # no such a content : is not modify
-        pass
-
-    if form_post.is_valid() and form_content.is_valid():
-        if is_modify:
-            content_diff = [[str(content.modified_time),
-                                 _get_diff_match(content_before, content.content)]]
-            channel_diff = [[0, channel_before]]
-            post_diff = [[_get_diff_match(title_before, post.title),
-                              channel_diff]]
-            post.set_log(post_diff + post.get_log())
-            content.set_log(content_diff + content.get_log())
-
-        channel_post = form_post.save(
-            author=request.user.userprofile,
-            content=form_content.save(author=request.user.userprofile,
-                                        post=post))  # save
-        channel_content = channel_post.channel_content
-        HashTag.objects.filter(channel_post=channel_post).delete()
-        hashs = channel_content.get_hashtags()
-        for tag in hashs:
-            HashTag(tag_name=tag, channel_post=channel_post).save()
-        form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
-        if form_attachment.is_valid():
-            form_attachment.save(file=request.FILES['file'],
-                                    content=channel_content)
-        return {'save': channel_post}
-    else:
-        return {'failed': [form_content, form_post, form_attachment]}
 
 
 def _write_comment(request, post_id, is_modify=False):

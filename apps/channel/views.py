@@ -2,10 +2,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404, HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 from apps.channel.models import *
 from apps.channel.backend import (
-    _get_post_list,
+    _get_channel,
     _get_querystring,
+    _get_post_list,
     _get_content,
     _write_post,
     _delete_post,
@@ -26,29 +28,40 @@ from django.core.paginator import Paginator
 def home(request):
     channel_list = Channel.objects.all()
     return render(request, 'channel/main.html',
-            {'channel_list': channel_list})
+                  {'channel_list': channel_list})
+
+
+@login_required(login_url='/session/login')
+def list(request, channel_url):
+    channel_list = Channel.objects.filter()
+    channel = _get_channel(channel_url)
+    if not channel:
+        raise Http404
+    
+    notice_list, post_list, pages, page = _get_post_list(request, channel)
+    querystring = _get_querystring(request, 'page')
+    return render(request, 'channel/list.html',
+                  {'notice_list': notice_list,
+                   'post_list': post_list,
+                   'channel_list': channel_list,
+                   'current_channel': channel,
+                   'pages': pages,
+                   'current_page': page,
+                   'querystring': querystring})
 
 
 @login_required(login_url='/session/login')
 def post_write(request, channel_url):
-    try:
-        channel = Channel.objects.get(url=channel_url)
-    except:
+    channel = _get_channel(channel_url)
+    if not channel:
         raise Http404
   
-    if channel.admin.user != request.user:
-        return HttpResponseForbidden()
+    if channel.admin.user != request.user and not request.user.is_staff:
+        raise PermissionDenied
     
     if request.method == 'POST':
-        if str(channel.id) != request.POST.get('channel', '-1'):
-            return HttpResponseForbidden()
-
-        result = _write_post(request, channel=channel_url)
+        result = _write_post(request, channel=channel)
         if 'save' in result:
-            channel_post_trace = ChannelPostTrace(
-                channel_post=result['save'],
-                userprofile=request.user.userprofile)
-            channel_post_trace.save()
             return redirect('../' + str(result['save'].id) + '/')
         
         form_content, form_post, form_attachment = result['failed']
@@ -57,16 +70,58 @@ def post_write(request, channel_url):
         form_post = ChannelPostForm(initial={'channel': channel.id})
         form_attachment = ChannelAttachmentForm()
     
-    return render(request,
-            'channel/channel_write.html',
-            {'content_form': form_content,
-                'post_form': form_post,
-                'attachment_form': form_attachment,
-                'channel': channel.id})
+    return render(request, 'channel/write.html',
+                  {'content_form': form_content,
+                   'post_form': form_post,
+                   'attachment_form': form_attachment,
+                   'channel': channel.id})
 
 
 @login_required(login_url='/session/login')
-def post_modify(request, post_id=0):
+def comment_write(request, channel_url, post_id):
+    if request.method == 'POST':
+        post_id = _write_comment(request, post_id)
+    querystring = _get_querystring(request, 'page')
+    return redirect('../' + querystring)
+
+
+@login_required(login_url='/session/login')
+def read(request, channel_url, post_id):
+    post, comment_list = _get_content(request, post_id)
+    notice_list, post_list, pages, page = _get_post_list(request, channel_url)
+    channel_list = Channel.objects.all()
+    try:
+        channel_post_trace = ChannelPostTrace.objects.get(
+            userprofile=request.user.userprofile,
+            channel_post__id=post_id)
+    except:
+        channel_post_trace = None
+    try:
+        current_channel = channel_list.get(url=channel_url)
+        print current_channel
+    except:
+        current_channel = None
+    querystring = _get_querystring(request, 'page')
+    return render(request,
+                  'channel/channel_read.html',
+                  {
+                      'querystring': querystring,
+                      'post': post,  # post for post
+                      'comment_list': comment_list,  # comment for post
+                      'channel_post_trace': channel_post_trace,
+                      # Below,there are thing for postList.
+                      'notice_list': notice_list,
+                      'post_list': post_list,
+                      'pages': pages,
+                      'current_page': page,
+                      'channel_list': channel_list,
+                      'current_channel': current_channel,
+                      'report_form': report_form
+                  })
+
+
+@login_required(login_url='/session/login')
+def modify(request, post_id=0):
     post_instance = get_object_or_404(ChannelPost, id=post_id)
     if post_instance.author != request.user.userprofile:
         return redirect('../')
@@ -95,48 +150,23 @@ def post_modify(request, post_id=0):
 
 
 @login_required(login_url='/session/login')
-def post_read(request, channel_url, post_id):
-    post, comment_list = _get_content(request, post_id)
-    notice_list, post_list, pages, page = _get_post_list(request, channel_url)
-    channel_list = Channel.objects.all()
-    try:
-        channel_post_trace = ChannelPostTrace.objects.get(
-            userprofile=request.user.userprofile,
-            channel_post__id=post_id)
-    except:
-        channel_post_trace = None
-    try:
-        current_channel = channel_list.get(url=channel_url)
-        print current_channel
-    except:
-        current_channel = None
+def comment_modify(request, post_id):
+    if request.method == 'POST':
+        post_id = _write_comment(request, post_id, True)
     querystring = _get_querystring(request, 'page')
-    # tested for report ########
-    report_form = ChannelReportForm()
-    """return render(request,
-                  'channel/modal_test.html',
-                  {'report_form': report_form})"""
-    #################################
-    return render(request,
-                  'channel/channel_read.html',
-                  {
-                      'querystring': querystring,
-                      'post': post,  # post for post
-                      'comment_list': comment_list,  # comment for post
-                      'channel_post_trace': channel_post_trace,
-                      # Below,there are thing for postList.
-                      'notice_list': notice_list,
-                      'post_list': post_list,
-                      'pages': pages,
-                      'current_page': page,
-                      'channel_list': channel_list,
-                      'current_channel': current_channel,
-                      'report_form': report_form
-                  })
+    return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')
-def post_modify_log(request, channel_url, post_id):
+def delete(request, channel_url, content_id):
+    message = 'invalid access'
+    if request.method == 'POST':
+        message = _delete_post(request)
+    return HttpResponse(message)
+
+
+@login_required(login_url='/session/login')
+def log(request, channel_url, post_id):
     post, modify_log = _get_post_log(post_id)
     return render(request, "channel/post_log.html",
                   {
@@ -156,43 +186,7 @@ def comment_modify_log(request, channel_url, comment_id):
 
 
 @login_required(login_url='/session/login')
-def comment_write(request, post_id):
-    if request.method == 'POST':
-        post_id = _write_comment(request, post_id)
-    querystring = _get_querystring(request, 'page')
-    return redirect('../' + querystring)
-
-
-@login_required(login_url='/session/login')
-def comment_modify(request, post_id):
-    if request.method == 'POST':
-        post_id = _write_comment(request, post_id, True)
-    querystring = _get_querystring(request, 'page')
-    return redirect('../' + querystring)
-
-
-@login_required(login_url='/session/login')
-def post_list(request, channel_url):
-    notice_list, post_list, pages, page = _get_post_list(request, channel_url)
-    channel_list = Channel.objects.filter()
-    try:
-        current_channel = Channel.objects.get(url=channel_url, is_deleted=False)
-    except:
-        raise Http404
-    querystring = _get_querystring(request, 'page')
-    return render(request,
-            'channel/channel_list.html',
-            {'notice_list':  notice_list,
-                'post_list': post_list,
-                'channel_list': channel_list,
-                'current_channel': current_channel,
-                'pages': pages,
-                'current_page': page,
-                'querystring': querystring})
-
-
-@login_required(login_url='/session/login')
-def content_vote(request):
+def vote(request, channel_url, content_id):
     result = {}
     result['response'] = 'fail'
     if request.method == 'POST':
@@ -206,15 +200,7 @@ def content_vote(request):
 
 
 @login_required(login_url='/session/login')
-def delete(request):
-    message = 'invalid access'
-    if request.method == 'POST':
-        message = _delete_post(request)
-    return HttpResponse(message)
-
-
-@login_required(login_url='/session/login')
-def report(request):
+def report(request, channel_url, content_id):
     if request.method == 'POST':
         message = _report(request)
     return HttpResponse(json.dumps(message), content_type='application/json')
