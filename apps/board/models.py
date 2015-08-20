@@ -6,6 +6,7 @@ import json
 import re
 import cgi
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
+numtag_regex = re.compile(r'@(?P<target>\d+)')
 
 
 class BoardContent(models.Model):
@@ -51,8 +52,8 @@ class BoardContent(models.Model):
         result = result.replace("\n", "<br />")
         if type == 'Comment':
             # 댓글 숫자 태그
-            result = re.sub(r'@(?P<target>\d+)',
-                            '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
+            result = numtag_regex.sub(
+                '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
             # 댓글 닉네임 태그
             for nick in comment_nickname_list:
                 result = re.sub('@(?P<target>' + nick[0] + ')',
@@ -63,6 +64,9 @@ class BoardContent(models.Model):
 
     def get_hashtags(self):
         return [tag[1] for tag in hashtag_regex.findall(self.content)]
+
+    def get_numtags(self):
+        return [int(tag) for tag in numtag_regex.findall(self.content)]
 
 
 class Attachment(models.Model):
@@ -212,6 +216,9 @@ class BoardPost(models.Model):
         return u"title: %s created in %s, authored by %s" % (title,
                                                              created_time,
                                                              author)
+
+    def get_notify_target(self):
+        return self.board_post_trace.filter(is_notified=True).select_related("userprofile").prefetch_related("userprofile__user")
 
 
 class BoardPostIs_read(models.Model):

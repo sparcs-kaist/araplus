@@ -128,7 +128,6 @@ def check_message(request):
 def view_notifications(request):
     user = request.user
     unread_noti = user.notifications.unread()
-    print "HI ",unread_noti.count()
     read_noti = user.notifications.read()
     return render(request,
                   'session/notification_view.html',

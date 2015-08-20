@@ -8,6 +8,7 @@ from apps.board.forms import *
 from itertools import izip
 from notifications import notify
 
+
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
     best_filter = bool(request.GET.get('best', False))
@@ -115,7 +116,8 @@ def _get_content(request, post_id):
                         and x == n):
                     x = i
                     y = i
-            comment_nickname_list = comment_nickname_list[0:x] + [(username, order-1)] + comment_nickname_list[y:]
+            comment_nickname_list = comment_nickname_list[
+                0:x] + [(username, order - 1)] + comment_nickname_list[y:]
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
@@ -277,10 +279,31 @@ def _write_comment(request, post_id, is_modify=False):
             post=board_comment.board_post)
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
-    if user_profile != board_comment.board_post.author:
-        notify.send(request.user,
-                    recipient=board_comment.board_post.author.user,
-                    verb='가 댓글을 달았습니다.'.decode('utf-8'))
+    notify_target = board_comment.board_post.get_notify_target()
+    
+    for target in notify_target:
+        target = target.userprofile.user
+        if request.user != target:
+            notify.send(request.user,
+                        recipient=target,
+                        verb='가 댓글을 달았습니다.'.decode('utf-8'))
+    numtags = board_comment.board_content.get_numtags()
+    if numtags:
+        comments = board_comment.board_post.board_comment.all()
+        comments = comments.order_by('id')
+        for num in numtags:
+            try:
+                if num == 0:
+                    notify.send(request.user,
+                                recipient=board_comment.board_post.author.user,
+                                verb='님이 태그했습니다.'.decode('utf-8'))
+                else:
+                    target = comments[num - 1].author.user
+                    notify.send(request.user,
+                                recipient=target,
+                                verb='님이 태그했습니다.'.decode('utf-8'))
+            except:
+                pass
     return board_comment.board_post.id
 
 
