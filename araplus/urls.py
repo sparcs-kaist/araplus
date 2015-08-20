@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from settings import BASE_DIR
 import os
+import notifications
 
 urlpatterns = [
     # Araplus Apps
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^main/', include('apps.main.urls')),
 
     url(r'^$', lambda x: HttpResponseRedirect('main/')),
+    url(r'^inbox/notifications/', include(notifications.urls)),
 
     # Admin Page
     url(r'^admin/', include(admin.site.urls)),
@@ -35,4 +37,3 @@ urlpatterns = [
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': os.path.join(BASE_DIR, 'static')}),
 ]
-

@@ -6,7 +6,7 @@ import diff_match_patch
 from django.db.models import Q
 from apps.board.forms import *
 from itertools import izip
-
+from notifications import notify
 
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
@@ -277,6 +277,10 @@ def _write_comment(request, post_id, is_modify=False):
             post=board_comment.board_post)
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
+    if user_profile != board_comment.board_post.author:
+        notify.send(request.user,
+                    recipient=board_comment.board_post.author.user,
+                    verb='가 댓글을 달았습니다.'.decode('utf-8'))
     return board_comment.board_post.id
 
 
