@@ -4,21 +4,22 @@ $(document).ready(function(){
     $("#post-row-"+selected_post).addClass('selected');
     /* <!-- --------------------- --> */
     $(".comment").click(function(){
-        var board_comment_id=$(this).attr("id").slice(3);
-        var content = $("#comment"+board_comment_id).html().replace(/<br\s*[\/]?>/gi,'\n');
-        var mod_comment = "<form action='./comment_mod/{{querystring}}' method='POST'>"+
-            "{% csrf_token %}"+
+        var board_comment_order = $(this).attr("id").split('-')[1];
+        var board_comment_id = $(this).attr("id").split('-')[2];
+        var content = $("#comment"+board_comment_order).text().replace(/<br\s*[\/]?>/gi,'\n');
+        var mod_comment = "<form action='./comment_mod/' method='POST' class='comment_modify_form' enctype='multipart/form-data'>"+
+            "<input type='hidden' name='csrfmiddlewaretoken' value=" + 
+                $("input[name=csrfmiddlewaretoken]").val() + ">" +
             "<input type='hidden' name='board_comment_id' value=" + board_comment_id + ">"+ 
-            "<input type='hidden' name='board_post_id' value={{post.id}}>"+
             "<div class='form-group'>"+
             "<textarea class='form-control' rows='2' name='content'>"+
             content+
             "</textarea>"+
             "<div class='col-md-12'>"+
-            "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
+            "<button type='Submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
             "완료"+
             "</button></div></div></form>";
-        $(mod_comment).replaceAll("#comment_content"+board_comment_id);
+        $(mod_comment).replaceAll("#comment_content"+board_comment_order);
     });
     $(".vote").click(function() {
         var vote_id = $(this).attr("id").split('_'); 
@@ -56,9 +57,9 @@ $(document).ready(function(){
             $.ajax({
                 url: "delete/",
                 type : "POST",
-                data:{id: delete_uid, csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
+                data:{id: delete_uid,
+                    csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
                 success: function(data){
-                    console.log(data);
                     location.reload();
                 }
             });
@@ -134,7 +135,7 @@ $(document).ready(function(){
             /*$(".comment_preview_content").remove();*/
         }
     });
-    <!-- for trace post -->
+    // for trace post
     $(".trace, .alarm").click(function(){
         var post_id = $(this).attr("id").split("-")[1];
         $.ajax(

@@ -244,6 +244,8 @@ def _write_comment(request, post_id, is_modify=False):
         try:
             board_comment = BoardComment.objects.get(id=comment_id)
             content_before = board_comment.board_content.content
+            form_attachment = AttachmentFormSet(
+                queryset=Attachment.objects.none())
             if board_comment.author != user_profile:
                 return  # wrong request
             content_form = BoardContentForm(
@@ -254,6 +256,7 @@ def _write_comment(request, post_id, is_modify=False):
         except ObjectDoesNotExist:
             return  # no comment
     else:
+        form_attachment = AttachmentFormSet(request.POST, request.FILES)
         try:
             board_comment = BoardComment(
                 author=user_profile,
@@ -275,8 +278,14 @@ def _write_comment(request, post_id, is_modify=False):
         return  # Invalid form
         board_comment.board_content = content_form.save(
             post=board_comment.board_post)
+    if form_attachment.is_valid():
+        attachments = form_attachment.save(commit=False)
+        for attachment in attachments:
+            attachment.board_content = board_comment.board_content
+            attachment.save()
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
+    print board_comment.board_post.id
     return board_comment.board_post.id
 
 

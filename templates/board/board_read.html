@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load bootstrap %}
 {% block css %}
 <link rel="stylesheet" type="text/css" href="/media/css/board/list.css">
 {% endblock %}
@@ -6,6 +7,7 @@
 <script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script type="text/javascript" src="/media/js/board/board.js"></script>
+<script type="text/javascript" src="/media/js/board/upload_handling.js"></script>
 <script>
   jQuery(document).ready(function() {
     jQuery("span.timeago").timeago();
@@ -126,7 +128,7 @@
                 </div>
             </div>
             <div class="panel-body">
-                <div id="comment_content{{ comment.id }}">
+                <div id="comment_content{{ comment.order }}">
                     <!-- id가 comment.id였으나 comment.order로 바꿈-->
                     <div id="comment{{comment.order}}">{{ comment.content | safe }}</div>
                     <div class="col-md-12">
@@ -157,7 +159,7 @@
                             {% endif %}
                             <a class="btn btn-info col-md-1 comment" id="log_{{comment.content_id}}" href="../{{comment.id}}/comment-log/?board={{post.board_id}}">Log</a>
                             {% if comment.return %}		
-							<button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
+                            <button type="submit" class="btn btn-info col-md-1 comment" id="btn-{{comment.order}}-{{comment.id}}">Modify</button>
                             <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
                             {% else %}
                             <div class="col-md-2"></div>
@@ -171,7 +173,7 @@
         {% endfor %}
         {% if not post.deleted %}
         <div>
-            <form action="./comment/{{querystring}}" method="POST">
+            <form action="./comment/{{querystring}}" method="POST" enctype="multipart/form-data">
                 {%csrf_token%}
                 <input type="hidden" name="board_post_id" value="{{ post.id }}">
                 <div class="form-group">
@@ -180,6 +182,14 @@
                 </div>
                 <div class="form-group">
                     <textarea class="form-control" rows="3" name="content"></textarea>
+                    <div id="attachment_handling">
+                        {{ attachment_form.management_form }}
+                        {% for form in attachment_form.forms %}
+                        <div class="attachment">
+                            {{ form|bootstrap }}
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
             </form>

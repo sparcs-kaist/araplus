@@ -167,6 +167,7 @@ def post_read(request, board_url, post_id):
         current_category = None
     querystring = _get_querystring(request, 'best', 'page')
     report_form = BoardReportForm()
+    attachment_form = AttachmentFormSet(queryset=Attachment.objects.none())
     return render(request,
                   'board/board_read.html',
                   {
@@ -182,7 +183,9 @@ def post_read(request, board_url, post_id):
                       'board_list': board_list,
                       'current_board': current_board,
                       'report_form': report_form,
-                      'current_category': current_category
+                      'current_category': current_category,
+                      # Below thing is for attachment form for comment
+                      'attachment_form': attachment_form
                   })
 
 
@@ -226,6 +229,7 @@ def comment_modify(request, board_url, post_id):
         return HttpResponse('Invalid access')
     if request.method == 'POST':
         post_id = _write_comment(request, post_id, True)
+        print post_id
     querystring = _get_querystring(request, 'best', 'page')
     return redirect('../' + querystring)
 
