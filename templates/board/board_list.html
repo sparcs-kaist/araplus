@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% block css %}
 <link rel="stylesheet" type="text/css" href="/media/css/board/list.css"> 
+<!--
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+-->
 {% endblock %}
 {% block js %}
+<!--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--!>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
     jQuery(document).ready(function(){
@@ -11,11 +16,13 @@
 </script>
 {% endblock %}
 {% block content %}
+<!--
 <div class="container">
     <div class="pull-right">
         <a class="btn btn-default" href="../create_board/">소모임 만들기</a>
         <a class="btn btn_default" href="./add_member/">멤버 추가</a>
     </div>
 </div>
+-->
 {% include "board/list.html" %}
 {% endblock %}

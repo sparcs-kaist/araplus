@@ -1,134 +1,118 @@
-<div class="container">
+<div id="content-wrapper">
     {% if not pages %}
     "Invalid access"
     {% endif %}
-    <table class="table post-list" width=700>
-        <tr class="list" id="list-header">
-            <td width=5></td>
-            <td width=90><p align=center>User</p></td>
-            <td width=70 id="board-list-row"><div style="text-align: center;"role="presentation" class="dropdown">
-                    <a id="board-list" class="dropdown-toggle" data-toggle="dropdown"
-                        aria-haspopup="true" role="button" aria-expeanded="true">
-                        {{current_board|default:'All'}}
-                        <span class="caret"></span></a>
-                    <ul id="board-menu" class="dropdown-menu" role="menu" aria-labelledby="board-list">
-                        <li role="presentation"><a role="menuitem" tabindex="-1"
-                            href="/board/all">All</a></li>
-                        {% for board in board_list %}
-                        <li role="presentation"><a role="menuitem" tabinedex="-1"
-                            href="/board/{{board.url}}">{{board.kor_name}}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </td>
-            <td width=60><div style="text-align: center;" role="presentation"
-                    class="dropdown">
-                    <a id="category-list" class="dropdown-toggle" data-toggle="dropdown"
-                        aria-haspopup="true" role="button" aria-expended="ture">
-                        {{ current_category.name|default:'All' }}
-                        <span class="caret"></span></a>
-                    <ul id="category-menu" class="dropdown-menu" role="menu"
-                        aria=labelledby="category-list">
-                        <li role="presentation"><a role="menuitem" tabindex="-1"
-                            href="">All</a></li>
-                        {% for category in current_board.board_category.all %}
-                        <li role="presentation"><A role="menuitem" tabindex="-1"
-                            href="?category={{category.name}}">{{category.name}}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </td>
-            <td width=320 class="title"><p>Title<p></td>
-            <td width=80><p align=center>+/-</p></td>
-            <td width=80 style="text-align: center;"><span>date</span></td>
+    <div id="board-title">
+        {{current_board|default:'All'}} | ㅁㄴㅇㄹ
+    </div>
+    <table id="post-list-wrapper">
+        <tr id="list-header" class="list">
+            <th width=90>카테고리</th>
+            <th width=550>제목</th>
+            <th width=215>글쓴이</th>
+            <th width=60>작성일</th>
+            <th width=50>조회</th>
+            <th width=60>추천/반대</th>
         </tr>
-        <ul>
-            {% for notice in notice_list %}
+        {% for notice in notice_list %}
             <tr class="list list-notice" id="notice-row-{{notice.0.id}}">
+                <td width=90 style="padding-left: 25px">공지</td>
                 {% if notice.1 %}
+                <span style="display: inline; color: 00ff00">
                 {% if notice.0.board_content.modified_time >= notice.1.last_read %}
-                <td width=5>U</td>
+                <td width=5><span style="display: inline; color: #000">U</span></td>
                 {% else %}
                 <td width=5> </td>
                 {% endif %}
                 {% else %}
-                <td width=5>N</td>
+                <td width=5><span style="display: inline; color: #000">N</span></td>
                 {% endif %}
+                </span>
+                <td width=545 id="notice-title-{{notice.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}">{{notice.0.title}}</a></td>
                 {% if notice.0.board_content.is_anonymous %}
-                <td width=90><p align=center>{{notice.0.board_content.is_anonymous}}</p></td>
+                <td width=215 style="padding-left: 20px">{{notice.0.board_content.is_anonymous}}</td>
                 {% else %}
-                <td width=90><p align=center>{{notice.0.author.nickname}}</p></td>
+                <td width=215 style="padding-left: 20px">{{notice.0.author.nickname}}</td>
                 {% endif %}
-                <td width=70><p align=center><a
-                        href="/board/{{notice.board.0.url|default:'all'}}"
-                        >{{notice.0.board}}</a></p></td>
-                <td width=60><p align=center>{{notice.0.board_category.name}}
-                    <td width=320 class="title title-notice"
-                        id="notice-title-{{notice.0.id}}"><a style="font-weight: bold; color: black;"
-                        href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}"
-                        >{{notice.0.title}}</a></td>
-                <td width=80><p
-                    align=center>+{{notice.0.board_content.get_vote.up}}
-                    / -{{notice.0.board_content.get_vote.down}}</p></td>
-                <td width=80 style="text-align: center;">
+                <td width=60 align=center>
                     <span class="timeago" timeago="{{notice.0.board_content.created_time|date:"c"}}"
                         title="{{notice.0.board_content.created_time}}"></span>
                 </td>
+                <td width=50 align=center> </td>
+                <td width=60 align=center>
+                    {% if notice.0.board_content.get_vote.up > 0 %}
+                    <span id="post-vote-up">{{notice.0.board_content.get_vote.up}}</span>
+                    {% else %}
+                    {{notice.0.board_content.get_vote.up}}
+                    {% endif %}
+                    /
+                    {% if notice.0.board_content.get_vote.down > 0 %}
+                    <span id="post-vote-down">{{notice.0.board_content.get_vote.down}}</span>
+                    {% else %}
+                    {{notice.0.board_content.get_vote.down}}
+                    {% endif %}
+                </td>
             </tr>
-            {% endfor %}
-            {% for post in post_list %}
-            <tr class="list list-post" id="post-row-{{post.0.id}}"}>
+        {% endfor %}
+        {% for post in post_list %}
+            <tr class="list list-post" id="post-row-{{post.0.id}}">
+                <td width=90 style="padding-left: 25px">{{post.0.board_category.name}}</td>
                 {% if post.1 %}
+                <span style="display: inline; color: 00ff00">
                 {% if post.0.board_content.modified_time >= post.1.last_read %}
-                <td width=5>U</td>
+                <td width=5><span style="display: inline; color: #000">U</span></td>
                 {% else %}
                 <td width=5> </td>
                 {% endif %}
                 {% else %}
-                <td width=5>N</td>
+                <td width=5><span style="display: inline; color: #000">N</span></td>
                 {% endif %}
+                </span>
+                <td width=545 id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">{{post.0.title}}</a></td>
                 {% if post.0.board_content.is_anonymous %}
-                <td width=90><p align=center>{{post.0.board_content.is_anonymous}}</p></td>
+                <td width=215 style="padding-left: 20px">{{post.0.board_content.is_anonymous}}</td>
                 {% else %}
-                <td width=90><p align=center>{{post.0.author.nickname}}</p></td>
+                <td width=215 style="padding-left: 20px">{{post.0.author.nickname}}</td>
                 {% endif %}
-                <td width=70><p align=center><a
-                        href="/board/{{post.0.board.url|default:'all'}}">{{post.0.board}}</a></p></td>
-                <td width=60><p align=center>{{post.0.board_category.name}}</p></td>
-                <td width=320 class="title title-post" id="post-title-{{post.0.id}}"
-                    id><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}"
-                        {% if post.0.is_best %} style="color: red;" {% endif %}>
-                        {% if post.0.board_content.is_deleted %}--deleted--
-                        {% else %}
-                        {{post.0.title}} [{{post.0.board_comment.count}}]{% endif %}</a></td>
-                <td width=80><p
-                    align=center>+{{post.0.board_content.get_vote.up}}
-                    / -{{post.0.board_content.get_vote.down}}</p></td>
-                <td width=80 style="text-align: center;">
+                <td width=60 align=center>
                     <span class="timeago" timeago="{{post.0.board_content.created_time|date:"c"}}"
                         title="{{post.0.board_content.created_time}}"></span>
                 </td>
+                <td width=50 align=center> </td>
+                <td width=60 align=center>
+                    {% if post.0.board_content.get_vote.up > 0 %}
+                    <span id="post-vote-up">{{post.0.board_content.get_vote.up}}</span>
+                    {% else %}
+                    {{post.0.board_content.get_vote.up}}
+                    {% endif %}
+                    /
+                    {% if post.0.board_content.get_vote.down > 0 %}
+                    <span id="post-vote-down">{{post.0.board_content.get_vote.down}}</span>
+                    {% else %}
+                    {{post.0.board_content.get_vote.down}}
+                    {% endif %}
+                </td>
             </tr>
-            {% endfor %}
-        </ul>
+        {% endfor %}
     </table>
-    <div style="text-align: center;">
-        <ul class="pagination pagination-sm">
+    <div id="board-pagination">
+        <ul id="board-pagination-number">
             {% for page in pages %}
             {% if page == current_page %}
-            <li class="active"><a href="/board/{{current_board.url|default:'all'}}/?page={{page}}"
-                >{{page}} <span class="sr-only"></span></a></li>
+            <li class="active">{{page}}</li>
             {% else %}
             <li><a href="/board/{{current_board.url|default:'all'}}/?page={{page}}">{{page}}</a></li>
             {% endif %}
             {% endfor %}
         </ul>
     </div>
+<div>
+
+<!--
     <div class="pull-right btn-group" role="group">
         <a class="btn btn-default" href="?best=true">Best</a>
         <a class="btn btn-default"
             href="/board/{{current_board.url|default:'all'}}/post">글 쓰기</a>
     </div>
 </div>
-          
-
+-->

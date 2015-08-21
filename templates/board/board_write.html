@@ -1,6 +1,10 @@
-{% extends "base.html" %}
 {% load bootstrap %}
+{% block css %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+{% endblock %}
 {% block js %}
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="/media/js/board/upload_handling.js"></script>
 <script>
     $(document).ready(function(){
