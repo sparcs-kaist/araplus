@@ -8,6 +8,14 @@ from apps.board.forms import *
 from itertools import izip
 
 
+POINTS_POST_WRITE = 5
+POINTS_COMMENT_WRITE = 3
+POINTS_POST_DELETE = -5
+POINTS_VOTED_UP = 3
+POINTS_VOTE_DOWN = -1
+POINTS_VOTED_DOWN = -2
+
+
 def _get_post_list(request, board_url='', item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
     best_filter = bool(request.GET.get('best', False))
@@ -217,6 +225,9 @@ def _write_post(request, is_modify=False, post=None,
                           category_diff]]
             post.set_log(post_diff + post.get_log())
             content.set_log(content_diff + content.get_log())
+        else:
+            request.user.userprofile.points += POINTS_POST_WRITE
+            request.user.userprofile.save()
         board_post = form_post.save(
             author=request.user.userprofile,
             content=form_content.save(post=post))  # save
@@ -272,6 +283,9 @@ def _write_comment(request, post_id, is_modify=False):
                   _get_diff_match(content_before,
                                   board_comment.board_content.content)]] +
                 board_comment.board_content.get_log())
+        else:
+            request.user.userprofile.points += POINTS_COMMENT_WRITE
+            request.user.userprofile.save()
         board_comment.board_content = content_form.save(
             post=board_comment.board_post)
     else:
@@ -306,6 +320,8 @@ def _delete_post(request):
         return 'not allowed'
     board_content.is_deleted = True
     board_content.save()
+    request.user.userprofile.points += POINTS_POST_DELETE
+    request.user.userprofile.save()
     return 'success'
 
 
@@ -339,18 +355,56 @@ def _vote(request):
                     userprofile=user_profile)
                 if content_vote.is_up == is_up_or_down:
                     content_vote.delete()
+                    if is_up_or_down:
+                        points = POINTS_VOTED_UP
+                    else:
+                        points = POINTS_VOTED_DOWN
+                        user_profile.points -= POINTS_VOTE_DOWN
+                        user_profile.save()
+                    if hasattr(board_content, 'board_post'):
+                        board_content.board_post.author.points -= points
+                        board_content.board_post.author.save()
+                    else:
+                        board_content.board_comment.author.points -= points
+                        board_content.board_comment.author.save()
                     return {'success': vote_type + ' canceled',
                             'vote': board_content.get_vote(), 'cancel': 'yes'}
                 else:
                     content_vote.is_up = is_up_or_down
                     content_vote.save()
                     _make_best(board_content)
+                    if is_up_or_down:
+                        points = POINTS_VOTED_UP - POINTS_VOTED_DOWN
+                        user_profile.points -= POINTS_VOTE_DOWN
+                        user_profile.save()
+                    else:
+                        points = POINTS_VOTED_DOWN - POINTS_VOTED_UP
+                        user_profile.points += POINTS_VOTE_DOWN
+                        user_profile.save()
+                    if hasattr(board_content, 'board_post'):
+                        board_content.board_post.author.points += points
+                        board_content.board_post.author.save()
+                    else:
+                        board_content.board_comment.author.points += points
+                        board_content.board_comment.author.save()
                     return {'success': 'changed to ' + vote_type,
                             'vote': board_content.get_vote(), 'cancel': 'no'}
             except:
                 cancel = 'no'
                 vote = BoardContentVote()
                 vote.is_up = is_up_or_down
+                if is_up_or_down:
+                    points = POINTS_VOTED_UP
+                else:
+                    points = POINTS_VOTED_DOWN
+                    user_profile.points += POINTS_VOTE_DOWN
+                    user_profile.save()
+                if hasattr(board_content, 'board_post'):
+                    board_content.board_post.author.points += points
+                    board_content.board_post.author.save()
+                else:
+                    board_content.board_comment.author.points += points
+                    board_content.board_comment.author.save()
         elif vote_type == 'adult':
             if BoardContentVoteAdult.objects.filter(
                     board_content=board_content,
