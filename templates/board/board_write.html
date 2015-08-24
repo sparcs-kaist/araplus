@@ -75,9 +75,12 @@
                 {% endif %}
             </div>
         </div>
-        <div id="content">
+		<div id="content">
             {{ content_form.content|bootstrap }}
-        </div>
+		</div>
+		<div id="use_signiture" class="col-xs-12">
+            {{ content_form.use_signiture|bootstrap }}
+		</div>
         <div id="attachments">
             {% if attachment_form.non_form_errors %}
             <div class="form-group has-error">

@@ -259,14 +259,16 @@ def post_list(request, board_url):
     querystring = _get_querystring(request, 'best', 'page')
     return render(request,
                   'board/board_list.html',
-                  {'notice_list':  notice_list,
-                   'post_list': post_list,
-                   'board_list': board_list,
-                   'current_board': current_board,
-                   'pages': pages,
-                   'current_page': page,
-                   'querystring': querystring,
-                   'current_category': current_category})
+                  {
+                      'notice_list':  notice_list,
+                      'post_list': post_list,
+                      'board_list': board_list,
+                      'current_board': current_board,
+                      'pages': pages,
+                      'current_page': page,
+                      'querystring': querystring,
+                      'current_category': current_category,
+                      })
 
 
 @login_required(login_url='/session/login')

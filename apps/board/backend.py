@@ -193,7 +193,10 @@ def _get_post(request, board_post, type, comment_nickname_list=[]):
     post['vote'] = board_content.get_vote()
     post['vote']['is_up'] = False
     post['vote']['is_down'] = False
-    post['signiture'] = request.user.userprofile.signiture 
+    if board_content.use_signiture:
+        post['signiture'] = request.user.userprofile.signiture
+    else:
+        post['signiture'] = ''
     try:
         is_vote = BoardContentVote.objects.get(
             userprofile=userprofile, board_content=board_content)
