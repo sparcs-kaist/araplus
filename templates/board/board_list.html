@@ -25,4 +25,9 @@
 </div>
 -->
 {% include "board/list.html" %}
+{% if request.user.userprofile.adult_filter %}
+<a href="set_adult_filter/">성인글 필터링 해제</a>
+{% else %}
+<a href="set_adult_filter/">성인글 필터링</a>
+{% endif %}
 {% endblock %}

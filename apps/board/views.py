@@ -355,3 +355,11 @@ def trace_list(request, board_url, item_per_page=20):
                   {'post_list': post_list,
                    'current_page': page,
                    'pages': post_paginator.page_range})
+
+
+@login_required(login_url='/session/login')
+def set_adult_filter(request):
+    userprofile = request.user.userprofile
+    userprofile.adult_filter = not userprofile.adult_filter
+    userprofile.save()
+    return redirect('../')
