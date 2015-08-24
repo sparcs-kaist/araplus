@@ -13,7 +13,7 @@ nicktag_regex = re.compile(ur'@(?P<target>\w+)', re.UNICODE)
 def nick_to_order(nick, comment_nickname_list):
     orders = [item[1] for item in comment_nickname_list if item[0] == nick]
     if orders:
-        return str(orders[0])
+        return str(orders[-1])
     else:
         return False
 

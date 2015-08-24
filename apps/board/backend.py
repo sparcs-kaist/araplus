@@ -101,6 +101,7 @@ def _get_content(request, post_id):
         # 현재 글에 달린 댓글의 닉네임 리스트
         username = comment['username']
         comment_nickname_list.append((username, order))
+        order = order + 1
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
