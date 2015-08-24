@@ -1,4 +1,8 @@
 {% load bootstrap %}
+{% block js %}
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/media/js/board/delete_member.js"></script>
+{% endblock %}
 {% block content %}
 <div class="container">
     <form method="POST">
@@ -11,27 +15,28 @@
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
     </form>
-    <table class="table">
-        {% for member in members %}
-        <tr class="list">
-            <td>{{ member.member.nickname }}</td>
-            <td>
-                {% if member.write %}
-                O
-                {% else %}
-                X
-                {% endif %}
-            </td>
-            <td>
-                <form method="POST" action="delete_member/">
-                    {% csrf_token %}
-                    <input type='hidden' name='member_name' value={{ member.member.nickname }}>
-                    <button type="submit" class="btn btn-default">삭제</button>
-                </form>
-            </td>
-                    
-        </tr>
-        {% endfor %}
-    </table>
+    <form method="POST" action="change_permission/">
+        <button type="submit">Change permissions</button>
+        {% csrf_token %}
+        <table class="table">
+            {% for member in members %}
+            <tr class="list">
+                <td>{{ member.member.nickname }}</td>
+                <td>
+                    <input type="hidden" name={{ member.member.nickname }} value="off">
+                    {% if member.write %}
+                    <input type="checkbox" name={{ member.member.nickname }} checked="checked">
+                    {% else %}
+                    <input type="checkbox" name={{ member.member.nickname }}>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href='javascipt:void()' class="delete_member {{member.member.nickname}}" value={{member.member.nickname}}>삭제</a>
+                </td>
+                        
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
 </div>
 {% endblock %}

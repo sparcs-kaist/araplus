@@ -17,6 +17,7 @@ from apps.board.backend import (
     _get_comment_log,
     _remove_board,
     _add_member,
+    _change_permission,
     _check_valid,
 )
 import json
@@ -68,6 +69,17 @@ def add_member(request, board_url):
                   {'boardmember_form': form_boardmember, 'members': members})
 
 
+def change_permission(request, board_url):
+    try:
+        board = Board.objects.get(url=board_url,
+                                  admin=request.user.userprofile)
+    except:
+        return HttpResponse('Invalid access')
+    if request.method == 'POST':
+        _change_permission(request, board)
+    return redirect('../')
+
+
 def delete_member(request, board_url):
     try:
         board = Board.objects.get(url=board_url,
@@ -82,7 +94,7 @@ def delete_member(request, board_url):
             member.delete()
         except:
             pass
-    return redirect('../')
+    return HttpResponse('done')
 
 
 @login_required(login_url='/session/login')
@@ -229,7 +241,6 @@ def comment_modify(request, board_url, post_id):
         return HttpResponse('Invalid access')
     if request.method == 'POST':
         post_id = _write_comment(request, post_id, True)
-        print post_id
     querystring = _get_querystring(request, 'best', 'page')
     return redirect('../' + querystring)
 

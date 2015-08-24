@@ -299,7 +299,6 @@ def _write_comment(request, post_id, is_modify=False):
             attachment.save()
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
-    print board_comment.board_post.id
     return board_comment.board_post.id
 
 
@@ -524,6 +523,21 @@ def _add_member(request, board):
         boardmember = form_boardmember.save()
         return {'save': boardmember}
     return {'failed': form_boardmember}
+
+
+def _change_permission(request, board):
+    for nickname, permission in request.POST.iteritems():
+        try:
+            member = BoardMember.objects.get(board=board,
+                                             member__nickname=nickname)
+        except:
+            continue
+        write = False
+        if permission == 'on':
+            write = True
+        if member.write != write:
+            member.write = write
+            member.save()
 
 
 def _check_valid(request, board_url, write=False):
