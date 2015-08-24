@@ -97,27 +97,10 @@ def _get_content(request, post_id):
         comment = _get_post(request, board_comment, 'Comment',
                             comment_nickname_list)
         comment['order'] = order
-        order = order + 1
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
         username = comment['username']
-        if order == 2:
-            comment_nickname_list.append((username, 1))
-        else:
-            n = len(comment_nickname_list)
-            x = n
-            y = n
-            for i in range(0, n):
-                if comment_nickname_list[i][0] == username:
-                    x = i
-                    y = i + 1
-                    break
-                if (len(username) >= len(comment_nickname_list[i][0])
-                        and x == n):
-                    x = i
-                    y = i
-            comment_nickname_list = comment_nickname_list[
-                0:x] + [(username, order - 1)] + comment_nickname_list[y:]
+        comment_nickname_list.append((username, order))
     best_comment = {}
     best_vote = 0
     for comment in comment_list:

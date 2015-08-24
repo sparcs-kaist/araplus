@@ -7,6 +7,24 @@ import re
 import cgi
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 numtag_regex = re.compile(r'@(?P<target>\d+)')
+nicktag_regex = re.compile(ur'@(?P<target>\w+)', re.UNICODE)
+
+
+def nick_to_order(nick, comment_nickname_list):
+    orders = [item[1] for item in comment_nickname_list if item[0] == nick]
+    if orders:
+        return str(orders[0])
+    else:
+        return False
+
+
+def nicksub_regex_helper(match, comment_nickname_list):
+    nick = match.group(1)
+    order = nick_to_order(nick, comment_nickname_list)
+    if order:
+        return '<a title="comment_' + order + '" class="comment_preview" href="#comment_order_' + order + '">'+match.group()+'</a>'
+    else:
+        return match.group()
 
 
 class BoardContent(models.Model):
@@ -55,9 +73,10 @@ class BoardContent(models.Model):
             result = numtag_regex.sub(
                 '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
             # 댓글 닉네임 태그
-            for nick in comment_nickname_list:
-                result = re.sub('@(?P<target>' + nick[0] + ')',
-                                '<a title=comment_' + str(nick[1]) + ' class="comment_preview" href="#comment_order_' + str(nick[1]) + '">\g<target></a>', result)
+            result = nicktag_regex.sub(lambda match:
+                                       nicksub_regex_helper(
+                                           match, comment_nickname_list),
+                                       result)
         return hashtag_regex.sub(
             '\1<a href="../?tag=\g<target>">#\g<target></a>',
             result)
