@@ -1,5 +1,6 @@
 # -*- coding: utf-8
 from apps.channel.models import *
+from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage
 import diff_match_patch
@@ -24,35 +25,33 @@ def _parse_channel(channel_url):
     try:
         return Channel.objects.get(url=channel_url)
     except:
-        return None
+        raise Http404
 
 
 def _parse_post(channel_url, post_order, live_only=True):
     channel = _parse_channel(channel_url)
-    if channel is None:
-        return None, None
 
     try: 
         post = ChannelPost.objects.get(channel=channel, order=post_order)
         if live_only and post.is_deleted:
-            return channel, None
+            raise Http404
+
         return channel, post
     except:
-        return channel, None
+        raise Http404
 
 
 def _parse_comment(channel_url, post_order, comment_order, live_only=True):
     channel, post = _parse_post(channel_url, post_order, live_only)
-    if post is None:
-        return channel, None, None
 
     try:
         comment = ChannelComment.objects.get(channel_post=post, order=comment_order)
         if live_only and comment.is_deleted:
-            return channel, post, None
+            raise Http404
+
         return channel, post, comment
     except:
-        return channel, post, None
+        raise Http404
 
 
 def _render_content(userprofile, post=None, comment=None):
@@ -129,6 +128,39 @@ def _get_post_list(request, channel, item_per_page=15):
     return notice_list, post_list, paginator.page_range, current_page
 
 
+def _get_comment_list(request, post):
+    comment_list = []
+    order = 1
+    for comment in post.channel_comment.all():
+        comment = _render_content(request.user.userprofile, comment=comment)
+        comment['order'] = order
+        order = order + 1
+        comment_list.append(comment)
+
+    """best_comment = {}
+    best_vote = 0
+    for comment in comment_list:
+        if comment['vote']['up'] > 5 and comment['vote']['up'] > best_vote:
+            best_vote = comment['vote']['up']
+            best_comment = comment
+
+    if best_comment:
+        best_comment['best_comment'] = True
+        comment_list.insert(0, best_comment)"""
+    return comment_list
+
+
+def _mark_read(userprofile, post):
+    try:
+        is_read = ChannelPostIsRead.objects.get(
+                channel_post=post, userprofile=userprofile)
+    except ObjectDoesNotExist:
+        is_read = ChannelPostIsRead()
+        is_read.channel_post = post
+        is_read.userprofile = userprofile
+    is_read.save()
+
+
 def _write_post(request, channel, post=None):
     content = None
     if post:
@@ -166,39 +198,6 @@ def _write_post(request, channel, post=None):
         return {'success': post}
     else:
         return {'fail': [form_content, form_post, form_attachment]}
-
-
-def _get_comments(request, post):
-    comment_list = []
-    order = 1
-    for comment in post.channel_comment.all():
-        comment = _render_content(request.user.userprofile, comment=comment)
-        comment['order'] = order
-        order = order + 1
-        comment_list.append(comment)
-
-    """best_comment = {}
-    best_vote = 0
-    for comment in comment_list:
-        if comment['vote']['up'] > 5 and comment['vote']['up'] > best_vote:
-            best_vote = comment['vote']['up']
-            best_comment = comment
-
-    if best_comment:
-        best_comment['best_comment'] = True
-        comment_list.insert(0, best_comment)"""
-    return comment_list
-
-
-def _mark_read(userprofile, post):
-    try:
-        is_read = ChannelPostIsRead.objects.get(
-                channel_post=post, userprofile=userprofile)
-    except ObjectDoesNotExist:
-        is_read = ChannelPostIsRead()
-        is_read.channel_post = post
-        is_read.userprofile = userprofile
-    is_read.save()
 
 
 def _write_comment(request, post=None, comment=None):
@@ -268,22 +267,6 @@ def _vote_comment(userprofile, comment, is_up):
     vote.save()
 
 
-def _report(request):
-    content_id = request.POST.get('id', 0)
-    report_form = ChannelReportForm(request.POST)
-    print report_form.errors
-    if report_form.is_valid():
-        try:
-            channel_content = ChannelContent.objects.get(id=content_id)
-        except:
-            return {'message': 'No content'}
-        report_form.save(user=request.user.userprofile,
-                         content=channel_content)
-        return {'message': 'Success'}
-    else:
-        return {'message': 'Invalid form'}
-
-
 def _get_diff_match(before, after):  # get different match
     diff_obj = diff_match_patch.diff_match_patch()
     diff = diff_obj.diff_main(before, after)
@@ -322,3 +305,19 @@ def _get_comment_log(comment):
         modify_log = modify_log +\
             [[log_content[0], diff_obj.diff_prettyHtml(log_content[1])]]
     return comment, modify_log
+
+
+def _report(request):
+    content_id = request.POST.get('id', 0)
+    report_form = ChannelReportForm(request.POST)
+    print report_form.errors
+    if report_form.is_valid():
+        try:
+            channel_content = ChannelContent.objects.get(id=content_id)
+        except:
+            return {'message': 'No content'}
+        report_form.save(user=request.user.userprofile,
+                         content=channel_content)
+        return {'message': 'Success'}
+    else:
+        return {'message': 'Invalid form'}
