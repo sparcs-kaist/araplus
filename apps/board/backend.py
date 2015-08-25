@@ -91,7 +91,7 @@ def _get_content(request, post_id):
     board_post_is_read.save()
     post = _get_post(request, board_post, 'Post')
     comment_list = []
-    comment_nickname_list = []
+    comment_nickname_list = [(board_post.author.nickname, 0)]
     order = 1
     for board_comment in board_post.board_comment.all():
         comment = _get_post(request, board_comment, 'Comment',
@@ -289,7 +289,7 @@ def _write_comment(request, post_id, is_modify=False):
             except:
                 pass
     comment_list = []
-    comment_nickname_list = []
+    comment_nickname_list = [(board_comment.board_post.author.nickname, 0)]
     order = 1
     for board_comment in board_comment.board_post.board_comment.all():
         comment = _get_post(request, board_comment, 'Comment',
@@ -302,7 +302,10 @@ def _write_comment(request, post_id, is_modify=False):
     orders = board_comment.board_content.get_taged_order(comment_nickname_list)
     for order in orders:
         order = order - 1
-        target = comment_list[order].author.user
+        if order == -1:
+            target = board_comment.board_post.author.user
+        else:
+            target = comment_list[order].author.user
         if request.user != target:
             notify.send(request.user,
                         recipient=target,
