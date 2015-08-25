@@ -264,7 +264,7 @@ def _write_comment(request, post_id, is_modify=False):
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
     notify_target = board_comment.board_post.get_notify_target()
-    
+
     for target in notify_target:
         target = target.userprofile.user
         if request.user != target:
@@ -288,6 +288,25 @@ def _write_comment(request, post_id, is_modify=False):
                                 verb='님이 태그했습니다.'.decode('utf-8'))
             except:
                 pass
+    comment_list = []
+    comment_nickname_list = []
+    order = 1
+    for board_comment in board_comment.board_post.board_comment.all():
+        comment = _get_post(request, board_comment, 'Comment',
+                            comment_nickname_list)
+        comment_list.append(board_comment)
+        # 현재 글에 달린 댓글의 닉네임 리스트
+        username = comment['username']
+        comment_nickname_list.append((username, order))
+        order = order + 1
+    orders = board_comment.board_content.get_taged_order(comment_nickname_list)
+    for order in orders:
+        order = order - 1
+        target = comment_list[order].author.user
+        if request.user != target:
+            notify.send(request.user,
+                        recipient=target,
+                        verb='님이 태그했습니다.'.decode('utf-8'))
     return board_comment.board_post.id
 
 

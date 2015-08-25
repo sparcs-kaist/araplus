@@ -22,7 +22,7 @@ def nicksub_regex_helper(match, comment_nickname_list):
     nick = match.group(1)
     order = nick_to_order(nick, comment_nickname_list)
     if order:
-        return '<a title="comment_' + order + '" class="comment_preview" href="#comment_order_' + order + '">'+match.group()+'</a>'
+        return '<a title="comment_' + order + '" class="comment_preview" href="#comment_order_' + order + '">' + match.group() + '</a>'
     else:
         return match.group()
 
@@ -86,6 +86,14 @@ class BoardContent(models.Model):
 
     def get_numtags(self):
         return [int(tag) for tag in numtag_regex.findall(self.content)]
+
+    def get_taged_order(self, comment_nickname_list):
+        tag_list = [tag for tag in nicktag_regex.findall(self.content)]
+        tag_list = set(tag_list)
+        comment_nickname_list = dict(comment_nickname_list)
+        order = [comment_nickname_list[item]
+                 for item in comment_nickname_list if item in tag_list]
+        return order
 
 
 class Attachment(models.Model):
