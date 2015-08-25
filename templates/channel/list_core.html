@@ -22,55 +22,42 @@
             {% else %}
             <td width=5>N</td>
             {% endif %}
-            {% if notice.0.channel_content.is_anonymous %}
-            <td width=90><p align=center>{{notice.0.channel_content.is_anonymous}}</p></td>
-            {% else %}
             <td width=90><p align=center>{{notice.0.author.nickname}}</p></td>
-            {% endif %}
-                <td width=320 class="title title-notice"
-                    id="notice-title-{{notice.0.id}}"><a style="font-weight: bold; color: black;"
-                        href="/channel/{{current_channel.url|default:'all'}}/{{notice.0.id}}"
-                        >{{notice.0.title}}</a></td>
-                <td width=80><p
-                    align=center>+{{notice.0.channel_content.get_vote.up}}
+            <td width=320 class="title title-notice" id="notice-title-{{notice.0.content_id}}">
+                <a style="font-weight: bold; color: black;" href="/channel/{{current_channel.url|default:'all'}}/{{notice.0.content_id}}">{{notice.0.title}}</a>
+            </td>
+            <td width=80><p align=center>+{{notice.0.channel_content.get_vote.up}}
                     / -{{notice.0.channel_content.get_vote.down}}</p></td>
-                <td width=80 style="text-align: center;">
-                    <span class="timeago" timeago="{{notice.0.channel_content.created_time|date:"c"}}"
-                        title="{{notice.0.channel_content.created_time}}"></span>
-                </td>
-            </tr>
-            {% endfor %}
-            {% for post in post_list %}
-            <tr class="list list-post" id="post-row-{{post.0.id}}"}>
-                {% if post.1 %}
-                {% if post.0.channel_content.modified_time >= post.1.last_read %}
-                <td width=5>U</td>
+            <td width=80 style="text-align: center;">
+                <span class="timeago" timeago="{{notice.0.channel_content.created_time|date:"c"}}" title="{{notice.0.channel_content.created_time}}"></span>
+            </td>
+        </tr>
+        {% endfor %}
+        {% for post in post_list %}
+        <tr class="list list-post" id="post-row-{{post.0.content_id}}"}>
+            {% if post.1 %}
+            {% if post.0.channel_content.modified_time >= post.1.last_read %}
+            <td width=5>U</td>
+            {% else %}
+            <td width=5> </td>
+            {% endif %}
+            {% else %}
+            <td width=5>N</td>
+            {% endif %}
+            <td width=90><p align=center>{{post.0.author.nickname}}</p></td>
+            <td width=320 class="title title-post" id="post-title-{{post.0.content_id}}"><a href="/channel/{{current_channel.url|default:'all'}}/{{post.0.content_id}}" {% if post.0.is_best %} style="color: red;" {% endif %}>
+                {% if post.0.channel_content.is_deleted %}
+                --deleted--
                 {% else %}
-                <td width=5> </td>
-                {% endif %}
-                {% else %}
-                <td width=5>N</td>
-                {% endif %}
-                {% if post.0.channel_content.is_anonymous %}
-                <td width=90><p align=center>{{post.0.channel_content.is_anonymous}}</p></td>
-                {% else %}
-                <td width=90><p align=center>{{post.0.author.nickname}}</p></td>
-                {% endif %}
-                <td width=320 class="title title-post" id="post-title-{{post.0.id}}"
-                    id><a href="/channel/{{current_channel.url|default:'all'}}/{{post.0.id}}"
-                        {% if post.0.is_best %} style="color: red;" {% endif %}>
-                        {% if post.0.channel_content.is_deleted %}--deleted--
-                        {% else %}
-                        {{post.0.title}} [{{post.0.channel_comment.count}}]{% endif %}</a></td>
-                <td width=80><p
-                    align=center>+{{post.0.channel_content.get_vote.up}}
+                {{post.0.title}} [{{post.0.channel_comment.count}}]{% endif %}</a>
+            </td>
+            <td width=80><p align=center>+{{post.0.channel_content.get_vote.up}}
                     / -{{post.0.channel_content.get_vote.down}}</p></td>
-                <td width=80 style="text-align: center;">
-                    <span class="timeago" timeago="{{post.0.channel_content.created_time|date:"c"}}"
-                        title="{{post.0.channel_content.created_time}}"></span>
-                </td>
-            </tr>
-            {% endfor %}
+            <td width=80 style="text-align: center;">
+                <span class="timeago" timeago="{{post.0.channel_content.created_time|date:"c"}}" title="{{post.0.channel_content.created_time}}"></span>
+            </td>
+        </tr>
+        {% endfor %}
         </ul>
     </table>
     <div class="pull-right">

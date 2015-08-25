@@ -15,16 +15,23 @@ def _get_channel(channel_url):
         return None
 
 
-def _get_post(post_id):
+def _get_content(content_id):
     try:
-        return ChannelPost.objects.get(id=post_id)
+        return ChannelContent.objects.get(id=content_id)
     except:
         return None
-    
+
+
+def _get_post(post_id):
+    try:
+        return ChannelPost.objects.get(channel_content__id=post_id)
+    except:
+        return None
+
 
 def _get_comment(comment_id):
     try:
-        return ChannelComment.objects.get(id=comment_id)
+        return ChannelComment.objects.get(channel_content__id=comment_id)
     except:
         return None
 
@@ -37,20 +44,20 @@ def _render_content(userprofile, post=None, comment=None):
         raw_data = post
     else:
         raw_data = comment
-    
+
     author = raw_data.author
     content = raw_data.channel_content
-    
+
     data = {}
     if post:
         data['title'] = raw_data.title
-    
+
     if content.is_deleted:
         data['title'] = '--Deleted--'
         data['content'] = '--Deleted--'
     else:
         data['content'] = content.replace_content_tags()
-    
+
     data['id'] = raw_data.id
     data['deleted'] = content.is_deleted
     data['content_id'] = content.id
@@ -58,7 +65,6 @@ def _render_content(userprofile, post=None, comment=None):
     data['username'] = author.nickname
     data['is_adult'] = content.is_adult
     data['auth'] = (userprofile == author)
-    print data
     return data
 
 
@@ -68,7 +74,7 @@ def _get_querystring(request, *args):
     for field in args:
         if request.GET.get(field):
             query_list.append(field + '=' + request.GET[field])
-    
+
     if query_list:
         querystring = '?' + '&'.join(query_list)
     return querystring
@@ -76,13 +82,13 @@ def _get_querystring(request, *args):
 
 def _get_post_list(request, channel, item_per_page=15):
     adult_filter = request.GET.get('adult_filter')
-    
+
     page = int(request.GET.get('page', 1))
     search_tag = request.GET.get('tag', '')
     search_title = request.GET.get('title', '')
     search_content = request.GET.get('content', '')  # title + content
     search_nickname = request.GET.get('nickname', '')
-    
+
     post_notice = ChannelPost.objects.filter(channel=channel, is_notice=True)[:5]
     post = ChannelPost.objects.filter(channel=channel)
 
@@ -96,8 +102,8 @@ def _get_post_list(request, channel, item_per_page=15):
                 | Q(title__contains=search_content))
     if search_nickname:
         post = post.filter(author__nickname=search_nickname,
-                channel_content__is_anonymous=None)
-    
+                           channel_content__is_anonymous=None)
+
     paginator = Paginator(post, item_per_page)
     try:
         post_paged = paginator.page(page)
@@ -110,49 +116,49 @@ def _get_post_list(request, channel, item_per_page=15):
     for notice in post_notice:
         notice_list += [[notice, notice.get_is_read(request)]]
     for post in post_paged:
+        post.content_id = post.channel_content.id
         post_list += [[post, post.get_is_read(request)]]
 
     return notice_list, post_list, paginator.page_range, current_page
 
 
-def _write_post(request, channel, is_modify=False, content=None, post=None):
+def _write_post(request, channel, post=None):
+    content = None
+    if post:
+        content = post.channel_content
+        content_before = content.content
+        title_before = post.title
+
     form_content = ChannelContentForm(request.POST, instance=content)
     form_post = ChannelPostForm(request.POST, instance=post)
     form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
 
-    try:
-        content_before = content.content
-        title_before = post.title
-    except:
-        pass
-
     if form_post.is_valid() and form_content.is_valid():
-        if is_modify:
+        if post:
             post_diff = [[_get_diff_match(title_before, post.title)]]
             content_diff = [[str(content.modified_time),
                 _get_diff_match(content_before, content.content)]]
 
             post.set_log(post_diff + post.get_log())
             content.set_log(content_diff + content.get_log())
-        
-        channel_content = form_content.save()
 
-        channel_post = form_post.save(channel=channel, 
-                author=request.user.userprofile, 
-                content = channel_content)
-        
-        HashTag.objects.filter(channel_post=channel_post).delete()
-        hashs = channel_content.get_hashtags()
+        content = form_content.save()
+        post = form_post.save(channel=channel,
+                author=request.user.userprofile,
+                content=content)
+
+        HashTag.objects.filter(channel_post=post).delete()
+        hashs = content.get_hashtags()
         for tag in hashs:
-            HashTag(tag_name=tag, channel_post=channel_post).save()
+            HashTag(tag_name=tag, channel_post=post).save()
 
         form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
         if form_attachment.is_valid():
             form_attachment.save(file=request.FILES['file'],
-                                 content=channel_content)
-        return {'save': channel_post}
+                                 content=content)
+        return {'success': post}
     else:
-        return {'failed': [form_content, form_post, form_attachment]}
+        return {'fail': [form_content, form_post, form_attachment]}
 
 
 def _get_comments(request, post):
@@ -190,21 +196,21 @@ def _mark_read(userprofile, post):
 
 def _write_comment(request, post=None, comment=None):
     userprofile = request.user.userprofile
-    
-    if comment != None:
+
+    if comment is not None:
         content_before = comment.channel_content.content
         if comment.author != userprofile:
-            return
+            return False
 
         content_form = ChannelContentForm(request.POST,
                 instance=comment.channel_content)
     else:
         content_form = ChannelContentForm(request.POST)
-    
-    if not content_form.is_valid():
-        return
 
-    if comment != None:
+    if not content_form.is_valid():
+        return False
+
+    if comment is not None:
         comment.channel_content.set_log(
             [[str(comment.channel_content.modified_time),
               _get_diff_match(content_before,
@@ -212,29 +218,47 @@ def _write_comment(request, post=None, comment=None):
              comment.channel_content.get_log())
     else:
         comment = ChannelComment(channel_post=post, author=userprofile)
-    
+
     comment.channel_content = content_form.save()
     comment.save()
-    
-   
-def _delete_post(request):
-    # message = ''
-    channel_content_id = request.POST.get('id', 0)
+    return True
+
+
+def _delete_content(content):
+    content.is_deleted = True
+    content.save()
+
+
+def _mark_adult(userprofile, content):
     try:
-        channel_content = ChannelContent.objects.get(id=channel_content_id)
-    except ObjectDoesNotExist:
-        return 'no post or comment'
-    if hasattr(channel_content, 'channel_post'):
-        author = channel_content.channel_post.author
-    elif hasattr(channel_content, 'channel_comment'):
-        author = channel_content.channel_comment.author
-    else:
-        return 'invalid content'
-    if author != request.user.userprofile:
-        return 'not allowed'
-    channel_content.is_deleted = True
-    channel_content.save()
-    return 'success'
+        marker = ChannelMarkAdult.objects.get(channel_content=content,
+                userprofile=userprofile)
+        return False
+    except:
+        marker = ChannelMarkAdult(channel_content=content,
+                userprofile=userprofile)
+        marker.save()
+        return True
+
+
+def _vote_post(userprofile, post, rating):
+    try:
+        vote = ChannelPostVote.objects.get(channel_post=post, userprofile=userprofile)
+    except:
+        vote = ChannelPostVote(channel_post=post, userprofile=userprofile)
+    vote.rating = int(rating)
+    vote.save()
+
+
+def _vote_comment(userprofile, comment, is_up):
+    try:
+        vote = ChannelCommentVote.objects.get(channel_comment=comment,
+                userprofile=userprofile)
+    except:
+        vote = ChannelCommentVote(channel_comment=comment,
+                userprofile=userprofile)
+    vote.is_up = is_up == '0'
+    vote.save()
 
 
 def _report(request):
@@ -253,59 +277,6 @@ def _report(request):
         return {'message': 'Invalid form'}
 
 
-def _vote(request):
-    cancel = ''
-    user_profile = request.user.userprofile
-    vote_type = request.POST.get('vote_type', '')
-    content_id = request.POST.get('vote_id', '')
-    try:
-        channel_content = ChannelContent.objects.get(id=content_id)
-        if vote_type == 'rating':
-            is_up_or_down = (False, True)[vote_type == 'up']
-            try:
-                content_vote = ChannelContentVote.objects.get(
-                    channel_content=channel_content,
-                    userprofile=user_profile)
-                if content_vote.is_up == is_up_or_down:
-                    content_vote.delete()
-                    return {'success': vote_type + ' canceled',
-                            'vote': channel_content.get_vote(), 'cancel': 'yes'}
-                else:
-                    content_vote.is_up = is_up_or_down
-                    content_vote.save()
-                    return {'success': 'changed to ' + vote_type,
-                            'vote': channel_content.get_vote(), 'cancel': 'no'}
-            except:
-                cancel = 'no'
-                vote = ChannelContentVote()
-                vote.is_up = is_up_or_down
-        elif vote_type == 'adult':
-            if ChannelContentVoteAdult.objects.filter(
-                    channel_content=channel_content,
-                    userprofile=user_profile):
-                return {'success': 'Already voted' + vote_type,
-                        'vote': channel_content.get_vote()}
-            else:
-                vote = ChannelContentVoteAdult()
-        elif vote_type == 'political':
-            if ChannelContentVotePolitical.objects.filter(
-                    channel_content=channel_content,
-                    userprofile=user_profile):
-                return {'success': 'Already voted ' + vote_type,
-                        'vote': channel_content.get_vote()}
-            else:
-                vote = ChannelContentVotePolitical()
-        else:
-            return {'fail': 'Wrong request'}
-        vote.channel_content = channel_content
-        vote.userprofile = user_profile
-        vote.save()
-        return {'success': 'vote ' + vote_type,
-                'vote': channel_content.get_vote(), 'cancel': cancel}
-    except ObjectDoesNotExist:
-        return {'fail': 'Unvalid ontent id'}
-
-
 def _get_diff_match(before, after):  # get different match
     diff_obj = diff_match_patch.diff_match_patch()
     diff = diff_obj.diff_main(before, after)
@@ -322,33 +293,25 @@ def _get_diff_match(before, after):  # get different match
     return new_diff
 
 
-def _get_post_log(post_id):
+def _get_post_log(post):
     diff_obj = diff_match_patch.diff_match_patch()
-    channel_post = ChannelPost.objects.filter(id=post_id)[0]
-    channel_content = channel_post.channel_content
-    post = [channel_post.title,
-            channel_post.channel.kor_name,
-            channel_content.modified_time,
-            channel_content.content]
+    content = post.channel_content
+    post_rendered = [post.title, content.modified_time, content.content]
     modify_log = []
-    for log_post, log_content in izip(channel_post.get_log(),
-                                      channel_content.get_log()):
+    for log_post, log_content in izip(post.get_log(), content.get_log()):
         modify_log = modify_log +\
             [[diff_obj.diff_prettyHtml(log_post[0]),
-              diff_obj.diff_prettyHtml(log_post[1]),
               log_content[0],
               diff_obj.diff_prettyHtml(log_content[1])]]
-    return post, modify_log
+    return post_rendered, modify_log
 
 
-def _get_comment_log(comment_id):
+def _get_comment_log(comment):
     diff_obj = diff_match_patch.diff_match_patch()
-    channel_comment = ChannelComment.objects.filter(id=comment_id)[0]
-    channel_content = channel_comment.channel_content
-    comment = [channel_content.modified_time,
-               channel_content.content]
+    content = comment.channel_content
+    comment = [content.modified_time, content.content]
     modify_log = []
-    for log_content in channel_content.get_log():
+    for log_content in content.get_log():
         modify_log = modify_log +\
             [[log_content[0], diff_obj.diff_prettyHtml(log_content[1])]]
     return comment, modify_log

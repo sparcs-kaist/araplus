@@ -66,15 +66,15 @@ class Attachment(models.Model):
 
 
 class ChannelPostVote(models.Model):
-    channel_content = models.ForeignKey('ChannelPost',
-                                        related_name="channel_post_vote")
+    channel_post = models.ForeignKey('ChannelPost',
+                                     related_name="channel_post_vote")
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="channel_post_vote")
     rating = models.IntegerField()
 
 
 class ChannelCommentVote(models.Model):
-    channel_content = models.ForeignKey('ChannelComment',
+    channel_comment = models.ForeignKey('ChannelComment',
                                         related_name="channel_comment_vote")
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="channel_comment_vote")

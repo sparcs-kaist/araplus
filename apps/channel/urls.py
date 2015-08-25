@@ -18,14 +18,15 @@ from django.conf.urls import include, url
 urlpatterns = [
     url(r'^$', 'apps.channel.views.home'),
     url(r'^([A-z0-9]*)/$', 'apps.channel.views.list'),
-    url(r'^([A-z0-9]*)/post/$', 'apps.channel.views.post_write'),    
+    url(r'^([A-z0-9]*)/post/$', 'apps.channel.views.post_write'),
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/comment/$', 'apps.channel.views.comment_write'),
 
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/$', 'apps.channel.views.read'),
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/modify/$', 'apps.channel.views.modify'),
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/delete/$', 'apps.channel.views.delete'),
-    
+
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/log/$', 'apps.channel.views.log'),
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/vote/$', 'apps.channel.views.vote'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/mark19/$', 'apps.channel.views.mark19'),
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/report/$', 'apps.channel.views.report'),
 ]

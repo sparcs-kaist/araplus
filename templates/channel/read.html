@@ -17,7 +17,7 @@
 		$(".comment").click(function(){
             var channel_comment_id=$(this).attr("id").slice(3);
             var content = $("#comment"+channel_comment_id).html().replace(/<br\s*[\/]?>/gi,'\n');
-            var mod_comment = "<form action='./comment_mod/{{querystring}}' method='POST'>"+
+            var mod_comment = "<form action='../" + channel_comment_id + "/modify/{{querystring}}' method='POST'>"+
                 "{% csrf_token %}"+
                 "<input type='hidden' name='channel_comment_id' value=" + channel_comment_id + ">"+ 
                 "<input type='hidden' name='channel_post_id' value={{post.id}}>"+
@@ -182,23 +182,23 @@
         {% for comment in comment_list %}
         {% if comment.best_comment %}
         <div class="panel panel-danger">
-            {% else %}
-            <div class="panel panel-success">
-                {% endif %}
-                <div class="panel-heading">
-                    <div>
-                        <span id=comment_order_{{comment.order}}> {{ comment.order }}</span>
-                        <span>{{ comment.author.nickname }}</span>
-                    </div>
-                    <div> 
-                        <span class="col-md-10">{{comment.channel_content.created_time}}</span>
-                        <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
-                    </div>
+        {% else %}
+        <div class="panel panel-success">
+        {% endif %}
+        	<div class="panel-heading">
+            	<div>
+                	<span id=comment_order_{{comment.order}}> {{ comment.order }}</span>
+                    <span>{{ comment.author.nickname }}</span>
                 </div>
-                <div class="panel-body">
-                    <div id="comment_content{{ comment.id }}">
-                        <div id="comment{{comment.id}}">{{ comment.content | safe }}</div>
-                        <div class="col-md-12">
+                <div> 
+                    <span class="col-md-10">{{comment.channel_content.created_time}}</span>
+                    <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
+                </div>
+            </div>
+            <div class="panel-body">
+            	<div id="comment_content{{ comment.content_id }}">
+                	<div id="comment{{comment.content_id}}">{{ comment.content | safe }}</div>
+                    	<div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-7"></div>
                                 {% if not comment.deleted %}
@@ -224,9 +224,9 @@
                                 {%else %}
                                 <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
                                 {% endif %}
-                                <a class="btn btn-info col-md-1 comment" id="log_{{comment.content_id}}" href="../{{comment.id}}/comment-log/?channel={{post.channel_id}}">Log</a>
-                                {% if comment.return %}
-                                <button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.id}}">Modify</button>
+                                <a class="btn btn-info col-md-1 comment" id="log_{{comment.content_id}}" href="../{{comment.content_id}}/log/">Log</a>
+                                {% if comment.auth %}
+                                <button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.content_id}}">Modify</button>
                                 <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
                                 {% else %}
                                 <div class="col-md-2"></div>

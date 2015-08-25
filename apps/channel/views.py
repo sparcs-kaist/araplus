@@ -1,30 +1,31 @@
 # -*- coding: utf-8
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404, HttpResponseForbidden
+from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from apps.channel.models import *
 from apps.channel.backend import (
     _render_content,
+    _get_content,
     _get_channel,
     _get_post,
+    _get_comment,
     _get_querystring,
     _get_post_list,
     _write_post,
     _get_comments,
     _mark_read,
-    _delete_post,
+    _mark_adult,
+    _delete_content,
     _report,
-    _vote,
+    _vote_post,
+    _vote_comment,
     _write_comment,
     _get_post_log,
     _get_comment_log,
 )
-from itertools import izip
 import json
-import diff_match_patch
 from apps.channel.forms import *
-from django.core.paginator import Paginator
 
 
 @login_required(login_url='/session/login')
@@ -40,7 +41,7 @@ def list(request, channel_url):
     channel = _get_channel(channel_url)
     if not channel:
         raise Http404
-    
+
     notice_list, post_list, pages, page = _get_post_list(request, channel)
     querystring = _get_querystring(request, 'page')
     return render(request, 'channel/list.html',
@@ -58,21 +59,21 @@ def post_write(request, channel_url):
     channel = _get_channel(channel_url)
     if not channel:
         raise Http404
-  
-    if channel.admin.user != request.user and not request.user.is_staff:
+
+    if channel.admin.user != request.user:
         raise PermissionDenied
-    
+
     if request.method == 'POST':
-        result = _write_post(request, channel=channel)
-        if 'save' in result:
-            return redirect('../' + str(result['save'].id) + '/')
-        
+        result = _write_post(request, channel)
+        if 'success' in result:
+            return redirect('../' + str(result['success'].channel_content.id) + '/')
+
         form_content, form_post, form_attachment = result['failed']
     else:
         form_content = ChannelContentForm()
         form_post = ChannelPostForm(initial={'channel': channel.id})
         form_attachment = ChannelAttachmentForm()
-    
+
     return render(request, 'channel/write.html',
                   {'content_form': form_content,
                    'post_form': form_post,
@@ -81,11 +82,11 @@ def post_write(request, channel_url):
 
 
 @login_required(login_url='/session/login')
-def comment_write(request, channel_url, post_id):
+def comment_write(request, channel_url, content_id):
     if request.method != 'POST':
         return redirect('../')
 
-    post = _get_post(post_id)
+    post = _get_post(content_id)
     if not post:
         raise Http404
 
@@ -95,10 +96,10 @@ def comment_write(request, channel_url, post_id):
 
 
 @login_required(login_url='/session/login')
-def read(request, channel_url, post_id):
+def read(request, channel_url, content_id):
     channel_list = Channel.objects.all()
     channel = _get_channel(channel_url)
-    post = _get_post(post_id)
+    post = _get_post(content_id)
     if not post or not channel:
         raise Http404
 
@@ -107,7 +108,6 @@ def read(request, channel_url, post_id):
     comments = _get_comments(request, post)
     notice_list, post_list, pages, page = _get_post_list(request, channel)
     report_form = ChannelReportForm()
-
 
     querystring = _get_querystring(request, 'page')
     return render(request, 'channel/read.html',
@@ -126,83 +126,127 @@ def read(request, channel_url, post_id):
 
 
 @login_required(login_url='/session/login')
-def modify(request, content_id):
-    post = _get_post(content_id)
-    post_instance = get_object_or_404(ChannelPost, id=post_id)
-    if post_instance.author != request.user.userprofile:
-        return redirect('../')
-    if request.method == "POST":
-        if str(post_instance.channel.id) != request.POST.get('channel', '-1'):
-            return HttpResponseForbidden()
+def modify(request, channel_url, content_id):
+    channel = _get_channel(channel_url)
+    if not channel:
+        raise Http404
 
-        result = _write_post(request, True, post_instance,
-                             post_instance.channel_content)
-        if 'save' in result:  # success modify
+    post = _get_post(content_id)
+    comment = _get_comment(content_id)
+    if not post and not comment:
+        raise Http404
+
+    if post:
+        return modify_post(request, channel, post)
+    return modify_comment(request, channel, comment)
+
+
+def modify_post(request, channel, post):
+    if post.author != request.user.userprofile:
+        return redirect('../')
+
+    if request.method == 'POST':
+        result = _write_post(request, channel, post)
+
+        if 'success' in result:
             return redirect('../')
         else:
-            form_content, form_post, form_attachment = result['failed']
+            form_content, form_post, form_attachment = result['fail']
     else:
-        form_content = ChannelContentForm(
-            is_modify=True,
-            instance=post_instance.channel_content)
-        form_post = ChannelPostForm(is_modify=True, instance=post_instance)
+        form_content = ChannelContentForm(instance=post.channel_content)
+        form_post = ChannelPostForm(instance=post)
         form_attachment = ChannelAttachmentForm()
-    return render(request,
-                  'channel/channel_write.html',
+
+    return render(request, 'channel/write.html',
                   {'content_form': form_content,
                    'post_form': form_post,
                    'attachment_form': form_attachment,
-                   'channel': post_instance.channel.id})
+                   'channel': channel.id})
 
 
-@login_required(login_url='/session/login')
-def comment_modify(request, post_id):
+def modify_comment(request, channel, comment):
+    if comment.author != request.user.userprofile:
+        return redirect('../')
+
     if request.method == 'POST':
-        post_id = _write_comment(request, post_id, True)
+        _write_comment(request, comment=comment)
     querystring = _get_querystring(request, 'page')
     return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')
 def delete(request, channel_url, content_id):
-    message = 'invalid access'
-    if request.method == 'POST':
-        message = _delete_post(request)
-    return HttpResponse(message)
+    if request.method != 'POST':
+        raise PermissionDenied()
+
+    content = _get_content(content_id)
+    if not content:
+        raise Http404
+
+    if hasattr(content, 'channel_post'):
+        author = content.channel_post.author
+    elif hasattr(content, 'channel_comment'):
+        author = content.channel_comment.author
+
+    if author != request.user.userprofile:
+        raise PermissionDenied()
+
+    _delete_content(content)
 
 
 @login_required(login_url='/session/login')
-def log(request, channel_url, post_id):
-    post, modify_log = _get_post_log(post_id)
-    return render(request, "channel/post_log.html",
-                  {
-                      'post': post,
-                      'modify_log': modify_log,
-                  })
+def log(request, channel_url, content_id):
+    post = _get_post(content_id)
+    comment = _get_comment(content_id)
 
+    if not post and not comment:
+        raise Http404
 
-@login_required(login_url='/session/login')
-def comment_modify_log(request, channel_url, comment_id):
-    comment, modify_log = _get_comment_log(comment_id)
+    if post:
+        post, modify_log = _get_post_log(post)
+        return render(request, "channel/post_log.html",
+                      {'post': post, 'modify_log': modify_log})
+
+    comment, modify_log = _get_comment_log(comment)
     return render(request, "channel/comment_log.html",
-                  {
-                      'comment': comment,
-                      'modify_log': modify_log,
-                  })
+                  {'comment': comment, 'modify_log': modify_log})
+
+
+@login_required(login_url='/session/login')
+def mark19(request, channel_url, content_id):
+    if request.method != 'POST':
+        raise PermissionDenied
+
+    content = _get_content(content_id)
+    if not content:
+        raise Http404
+
+    result = _mark_adult(request.user.userprofile, content)
 
 
 @login_required(login_url='/session/login')
 def vote(request, channel_url, content_id):
-    result = {}
-    result['response'] = 'fail'
-    if request.method == 'POST':
-        vote_result = _vote(request)
-        if 'success' in vote_result:
-            result['response'] = 'success'
-            result['message'] = vote_result['success']
-            result['vote'] = vote_result['vote']
-            result['cancel'] = vote_result['cancel']
-    return HttpResponse(json.dumps(result), content_type="application/json")
+    if request.method != 'POST':
+        raise PermissionDenied
+
+    post = _get_post(content_id)
+    comment = _get_comment(content_id)
+
+    if not post and not comment:
+        raise Http404
+
+    if post:
+        rating = request.POST.get('rating', '1')
+        if rating not in ['1', '2', '3', '4', '5']:
+            raise PermissionDenied
+
+        result = _vote_post(request.user.userprofile, post, rating)
+    else:
+        is_up = request.POST.get('up', '0')
+        if is_up not in ['0', '1']:
+            raise PermissionDenied
+
+        result = _vote_comment(request.user.userprofile, comment, is_up)
 
 
 @login_required(login_url='/session/login')
