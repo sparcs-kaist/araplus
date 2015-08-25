@@ -18,15 +18,34 @@ from django.conf.urls import include, url
 urlpatterns = [
     url(r'^$', 'apps.channel.views.home'),
     url(r'^([A-z0-9]*)/$', 'apps.channel.views.list'),
-    url(r'^([A-z0-9]*)/post/$', 'apps.channel.views.post_write'),
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/comment/$', 'apps.channel.views.comment_write'),
 
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/$', 'apps.channel.views.read'),
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/modify/$', 'apps.channel.views.modify'),
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/delete/$', 'apps.channel.views.delete'),
+    url(r'^([A-z0-9]*)/write/$', 'apps.channel.views.write_post'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/write/$',
+        'apps.channel.views.write_comment'),
+    
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/$', 'apps.channel.views.read_post'),
+    
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/modify/$', 'apps.channel.views.modify_post'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/modify/$',
+        'apps.channel.views.modify_comment'),
+    
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/delete/$', 'apps.channel.views.delete_post'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/delete/$',
+        'apps.channel.views.delete_comment'),
+    
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/log/$', 'apps.channel.views.log_post'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/log/$',
+        'apps.channel.views.log_comment'),
 
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/log/$', 'apps.channel.views.log'),
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/vote/$', 'apps.channel.views.vote'),
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/mark19/$', 'apps.channel.views.mark19'),
-    url(r'^([A-z0-9]*)/([1-9][0-9]*)/report/$', 'apps.channel.views.report'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/mark19/$', 'apps.channel.views.mark19_post'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/mark19/$',
+        'apps.channel.views.mark19_comment'),
+
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/vote/$', 'apps.channel.views.vote_post'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/vote/$',
+        'apps.channel.views.vote_comment'),
+
+    #url(r'^([A-z0-9]*)/([1-9][0-9]*)/report/$', 'apps.channel.views.report_post'),
+    #url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/report/$',
+    #    'apps.channel.views.report_comment'),
 ]

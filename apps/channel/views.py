@@ -5,24 +5,12 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from apps.channel.models import *
 from apps.channel.backend import (
-    _render_content,
-    _get_content,
-    _get_channel,
-    _get_post,
-    _get_comment,
     _get_querystring,
+    _parse_channel,
+    _parse_post,
+    _parse_comment, 
     _get_post_list,
     _write_post,
-    _get_comments,
-    _mark_read,
-    _mark_adult,
-    _delete_content,
-    _report,
-    _vote_post,
-    _vote_comment,
-    _write_comment,
-    _get_post_log,
-    _get_comment_log,
 )
 import json
 from apps.channel.forms import *
@@ -38,7 +26,7 @@ def home(request):
 @login_required(login_url='/session/login')
 def list(request, channel_url):
     channel_list = Channel.objects.filter()
-    channel = _get_channel(channel_url)
+    channel = _parse_channel(channel_url)
     if not channel:
         raise Http404
 
@@ -55,8 +43,8 @@ def list(request, channel_url):
 
 
 @login_required(login_url='/session/login')
-def post_write(request, channel_url):
-    channel = _get_channel(channel_url)
+def write_post(request, channel_url):
+    channel = _parse_channel(channel_url)
     if not channel:
         raise Http404
 
@@ -82,11 +70,11 @@ def post_write(request, channel_url):
 
 
 @login_required(login_url='/session/login')
-def comment_write(request, channel_url, content_id):
+def write_comment(request, channel_url, post_order):
     if request.method != 'POST':
         return redirect('../')
 
-    post = _get_post(content_id)
+    channel, post = _parse_post(channel_url, post_order)
     if not post:
         raise Http404
 
@@ -96,11 +84,9 @@ def comment_write(request, channel_url, content_id):
 
 
 @login_required(login_url='/session/login')
-def read(request, channel_url, content_id):
-    channel_list = Channel.objects.all()
-    channel = _get_channel(channel_url)
-    post = _get_post(content_id)
-    if not post or not channel:
+def read_post(request, channel_url, post_order):
+    channel, post = _parse_post(channel_url, post_order, live_only=False)
+    if not post:
         raise Http404
 
     post_rendered = _render_content(request.user.userprofile, post=post)
@@ -126,24 +112,13 @@ def read(request, channel_url, content_id):
 
 
 @login_required(login_url='/session/login')
-def modify(request, channel_url, content_id):
-    channel = _get_channel(channel_url)
-    if not channel:
+def modify_post(request, channel_url, post_order):
+    channel, post = _parse_post(channel_url, post_order)
+    if not post:
         raise Http404
 
-    post = _get_post(content_id)
-    comment = _get_comment(content_id)
-    if not post and not comment:
-        raise Http404
-
-    if post:
-        return modify_post(request, channel, post)
-    return modify_comment(request, channel, comment)
-
-
-def modify_post(request, channel, post):
     if post.author != request.user.userprofile:
-        return redirect('../')
+        raise PermissionDenied
 
     if request.method == 'POST':
         result = _write_post(request, channel, post)
@@ -164,48 +139,69 @@ def modify_post(request, channel, post):
                    'channel': channel.id})
 
 
-def modify_comment(request, channel, comment):
-    if comment.author != request.user.userprofile:
-        return redirect('../')
+@login_required(login_url='/session/login')
+def modify_comment(request, channel_url, post_order, comment_order):
+    if request.method != 'POST':
+        raise PermissionDenied
 
-    if request.method == 'POST':
-        _write_comment(request, comment=comment)
+    channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
+    if not comment:
+        raise Http404
+
+    if comment.author != request.user.userprofile:
+        raise PermissionDenied
+
+    _write_comment(request, comment=comment)
     querystring = _get_querystring(request, 'page')
     return redirect('../' + querystring)
 
 
 @login_required(login_url='/session/login')
-def delete(request, channel_url, content_id):
+def delete_post(request, channel_url, post_order):
     if request.method != 'POST':
         raise PermissionDenied()
 
-    content = _get_content(content_id)
-    if not content:
+    channel, post = _parse_post(channel_url, post_order)
+    if not post:
         raise Http404
+    
+    if post.author != request.user.userprofile:
+        raise PermissionDenied
 
-    if hasattr(content, 'channel_post'):
-        author = content.channel_post.author
-    elif hasattr(content, 'channel_comment'):
-        author = content.channel_comment.author
-
-    if author != request.user.userprofile:
-        raise PermissionDenied()
-
-    _delete_content(content)
+    _delete_content(post.channel_content)
 
 
 @login_required(login_url='/session/login')
-def log(request, channel_url, content_id):
-    post = _get_post(content_id)
-    comment = _get_comment(content_id)
+def delete_comment(request, channel_url, post_order, comment_order):
+    if request.method != 'POST':
+        raise PermissionDenied()
 
-    if not post and not comment:
+    channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
+    if not comment:
+        raise Http404
+    
+    if comment.author != request.user.userprofile:
+        raise PermissionDenied
+
+    _delete_content(comment.channel_content)
+
+
+@login_required(login_url='/session/login')
+def log_post(request, channel_url, post_order):
+    channel, post = _parse_post(channel_url, post_order)
+    if not post:
         raise Http404
 
-    if post:
-        post, modify_log = _get_post_log(post)
-        return render(request, "channel/post_log.html",
-                      {'post': post, 'modify_log': modify_log})
+    post, modify_log = _get_post_log(post)
+    return render(request, "channel/post_log.html",
+                  {'post': post, 'modify_log': modify_log})
+
+
+@login_required(login_url='/session/login')
+def log_comment(request, channel_url, post_order, comment_order):
+    channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
+    if not comment:
+        raise Http404
 
     comment, modify_log = _get_comment_log(comment)
     return render(request, "channel/comment_log.html",
@@ -213,40 +209,59 @@ def log(request, channel_url, content_id):
 
 
 @login_required(login_url='/session/login')
-def mark19(request, channel_url, content_id):
+def mark19_post(request, channel_url, post_order):
     if request.method != 'POST':
         raise PermissionDenied
 
-    content = _get_content(content_id)
-    if not content:
+    channel, post = _parse_post(channel_url, post_order)
+    if not post:
         raise Http404
 
-    result = _mark_adult(request.user.userprofile, content)
+    _mark_adult(request.user.userprofile, post.channel_content)
 
 
 @login_required(login_url='/session/login')
-def vote(request, channel_url, content_id):
+def mark19_comment(request, channel_url, post_order, comment_order):
     if request.method != 'POST':
         raise PermissionDenied
 
-    post = _get_post(content_id)
-    comment = _get_comment(content_id)
-
-    if not post and not comment:
+    channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
+    if not comment:
         raise Http404
 
-    if post:
-        rating = request.POST.get('rating', '1')
-        if rating not in ['1', '2', '3', '4', '5']:
-            raise PermissionDenied
+    _mark_adult(request.user.userprofile, comment.channel_content)
 
-        result = _vote_post(request.user.userprofile, post, rating)
-    else:
-        is_up = request.POST.get('up', '0')
-        if is_up not in ['0', '1']:
-            raise PermissionDenied
 
-        result = _vote_comment(request.user.userprofile, comment, is_up)
+@login_required(login_url='/session/login')
+def vote_post(request, channel_url, post_order):
+    if request.method != 'POST':
+        raise PermissionDenied
+
+    channel, post = _parse_post(channel_url, post_order)
+    if not post:
+        raise Http404
+
+    rating = request.POST.get('rating', '1')
+    if rating not in ['1', '2', '3', '4', '5']:
+        raise PermissionDenied
+
+    result = _vote_post(request.user.userprofile, post, rating)
+    
+
+@login_required(login_url='/session/login')
+def vote_comment(request, channel_url, post_order, comment_order):
+    if request.method != 'POST':
+        raise PermissionDenied
+
+    channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
+    if not comment:
+        raise Http404
+
+    is_up = request.POST.get('up', '0')
+    if is_up not in ['0', '1']:
+        raise PermissionDenied
+
+    result = _vote_comment(request.user.userprofile, comment, is_up)
 
 
 @login_required(login_url='/session/login')

@@ -8,32 +8,51 @@ from apps.channel.forms import *
 from itertools import izip
 
 
-def _get_channel(channel_url):
+def _get_querystring(request, *args):
+    query_list = []
+    querystring = ''
+    for field in args:
+        if request.GET.get(field):
+            query_list.append(field + '=' + request.GET[field])
+
+    if query_list:
+        querystring = '?' + '&'.join(query_list)
+    return querystring
+
+
+def _parse_channel(channel_url):
     try:
-        return Channel.objects.get(url=channel_url, is_deleted=False)
+        return Channel.objects.get(url=channel_url)
     except:
         return None
 
 
-def _get_content(content_id):
-    try:
-        return ChannelContent.objects.get(id=content_id)
+def _parse_post(channel_url, post_order, live_only=True):
+    channel = _parse_channel(channel_url)
+    if channel is None:
+        return None, None
+
+    try: 
+        post = ChannelPost.objects.get(channel=channel, order=post_order)
+        if live_only and post.is_deleted:
+            return channel, None
+        return channel, post
     except:
-        return None
+        return channel, None
 
 
-def _get_post(post_id):
+def _parse_comment(channel_url, post_order, comment_order, live_only=True):
+    channel, post = _parse_post(channel_url, post_order, live_only)
+    if post is None:
+        return channel, None, None
+
     try:
-        return ChannelPost.objects.get(channel_content__id=post_id)
+        comment = ChannelComment.objects.get(channel_post=post, order=comment_order)
+        if live_only and comment.is_deleted:
+            return channel, post, None
+        return channel, post, comment
     except:
-        return None
-
-
-def _get_comment(comment_id):
-    try:
-        return ChannelComment.objects.get(channel_content__id=comment_id)
-    except:
-        return None
+        return channel, post, None
 
 
 def _render_content(userprofile, post=None, comment=None):
@@ -66,18 +85,6 @@ def _render_content(userprofile, post=None, comment=None):
     data['is_adult'] = content.is_adult
     data['auth'] = (userprofile == author)
     return data
-
-
-def _get_querystring(request, *args):
-    query_list = []
-    querystring = ''
-    for field in args:
-        if request.GET.get(field):
-            query_list.append(field + '=' + request.GET[field])
-
-    if query_list:
-        querystring = '?' + '&'.join(query_list)
-    return querystring
 
 
 def _get_post_list(request, channel, item_per_page=15):

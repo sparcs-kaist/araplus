@@ -114,6 +114,7 @@ class ChannelComment(models.Model):
                                      related_name="channel_comment")
     author = models.ForeignKey('session.UserProfile',
                                related_name="channel_comment")
+    order = models.IntegerField()
 
     def __unicode__(self):
         created_time = self.channel_content.created_time
@@ -127,12 +128,13 @@ class ChannelPost(models.Model):
     channel = models.ForeignKey('Channel',
                                 related_name='channel',
                                 db_index=True)
+    order = models.IntegerField()
     author = models.ForeignKey('session.UserProfile',
                                related_name='channel_post')
     channel_content = models.OneToOneField('ChannelContent',
                                            related_name='channel_post')
     modify_log = models.TextField(default='[]')
-
+    
     class Meta:
         ordering = ['-id']
 
