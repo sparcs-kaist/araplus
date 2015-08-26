@@ -91,7 +91,9 @@ def _get_content(request, post_id):
     board_post_is_read.save()
     post = _get_post(request, board_post, 'Post')
     comment_list = []
-    comment_nickname_list = [(board_post.author.nickname, 0)]
+    comment_nickname_list = []
+    if board_post.board_content.is_anonymous is None:
+        comment_nickname_list = [(board_post.author.nickname, 0)]
     order = 1
     for board_comment in board_post.board_comment.all():
         comment = _get_post(request, board_comment, 'Comment',
@@ -99,8 +101,9 @@ def _get_content(request, post_id):
         comment['order'] = order
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
-        username = comment['username']
-        comment_nickname_list.append((username, order))
+        if comment['is_anonymous'] is None:
+            username = comment['username']
+            comment_nickname_list.append((username, order))
         order = order + 1
     best_comment = {}
     best_vote = 0
@@ -289,15 +292,18 @@ def _write_comment(request, post_id, is_modify=False):
             except:
                 pass
     comment_list = []
-    comment_nickname_list = [(board_comment.board_post.author.nickname, 0)]
+    comment_nickname_list = []
+    if board_comment.board_post.board_content.is_anonymous is None:
+        comment_nickname_list = [(board_comment.board_post.author.nickname, 0)]
     order = 1
     for board_comment in board_comment.board_post.board_comment.all():
         comment = _get_post(request, board_comment, 'Comment',
                             comment_nickname_list)
         comment_list.append(board_comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
-        username = comment['username']
-        comment_nickname_list.append((username, order))
+        if comment['is_anonymous'] is None:
+            username = comment['username']
+            comment_nickname_list.append((username, order))
         order = order + 1
     orders = board_comment.board_content.get_taged_order(comment_nickname_list)
     for order in orders:
