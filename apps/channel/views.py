@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.core.exceptions import PermissionDenied
 from apps.channel.models import *
 from apps.channel.backend import (
@@ -144,7 +144,7 @@ def modify_comment(request, channel_url, post_order, comment_order):
 
     _write_comment(request, comment=comment)
     querystring = _get_querystring(request, 'page')
-    return redirect('../' + querystring)
+    return redirect('../../' + querystring)
 
 
 @require_POST
@@ -208,7 +208,7 @@ def mark19_comment(request, channel_url, post_order, comment_order):
 def vote_post(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order)
     rating = request.POST.get('rating', '1')
-    if rating not in ['1', '2', '3', '4', '5']:
+    if rating not in ['0', '1', '2', '3', '4', '5']:
         raise PermissionDenied
 
     result = _vote_post(request.user.userprofile, post, rating)
@@ -223,7 +223,7 @@ def vote_comment(request, channel_url, post_order, comment_order):
         raise PermissionDenied
 
     result = _vote_comment(request.user.userprofile, comment, is_up)
-
+    return JsonResponse(result)
 
 @require_POST
 @login_required(login_url='/session/login')

@@ -16,81 +16,99 @@
 		$(".list-post[data-order=" + post_order + "]").addClass('selected');
 		$(".list-notice[data-order=" + post_order + "]").addClass('selected');
 
+		var ajax_mark19 = function(obj, url) {
+			$.ajax({
+				url: url,
+				type: "POST",
+				data: { csrfmiddlewaretoken: csrf_token },
+				success: function(data) {
+					alert("19금 신고되었습니다.");
+				},
+				error: function(data) {
+					alert("이미 신고한 항목입니다.");
+				}
+			});
+			obj.attr("disabled", "disabled");
+		};
+
 		$(".post-mark19").click(function() {
-			$.ajax({
-				url: "./mark19/",
-				type: "POST",
-				data: { csrfmiddlewaretoken: csrf_token },
-				success: function(data) {
-					alert("19금 신고되었습니다.");
-				},
-				error: function(data) {
-					alert("이미 신고한 항목입니다.");
-				}
-			});
-			$(this).attr("disabled", "disabled");
-		});
-		
-		$(".comment-mark19").click(function() {
-			$.ajax({
-				url: "./" + $(this).data("order") + "/mark19/",
-				type: "POST",
-				data: { csrfmiddlewaretoken: csrf_token },
-				success: function(data) {
-					alert("19금 신고되었습니다.");
-				},
-				error: function(data) {
-					alert("이미 신고한 항목입니다.");
-				}
-			});
-			$(this).attr("disabled", "disabled");
+			ajax_mark19($(this), "./mark19/");
 		});
 
-		$(".post-delete").click(function() {
-			var result = confirm("이 게시글을 정말 삭제하시겠습니까?");
+		$(".comment-mark19").click(function() {
+			ajax_mark19($(this), "./" + $(this).data("order") + "/mark19/");
+		});
+
+		var ajax_delete = function(url) {
+			var result = confirm("정말 삭제하시겠습니까?");
 			if(result != true) return;
 
 			$.ajax({
-				url: "./delete/",
+				url: url,
 				type: "POST",
 				data: { csrfmiddlewaretoken: csrf_token },
 				success: function(data) {
 					location.replace("./");
 				}
 			});
+		};
+
+		$(".post-delete").click(function() {
+			ajax_delete("./delete/");
 		});
 		
 		$(".comment-delete").click(function() {
-			var result = confirm("이 댓글을 정말 삭제하시겠습니까?");
-			if(result != true) return;
-
-			$.ajax({
-				url: "./" + $(this).data("order") + "/delete/",
-				type: "POST",
-				data: { csrfmiddlewaretoken: csrf_token },
-				success: function(data) {
-					location.replace("./");
-				}
-			});
+			ajax_delete("./" + $(this).data("order") + "/delete/");
 		});
 
 		$(".comment-modify").click(function() {
-			var comment_id = $(this).data("order");
+			var comment_order = $(this).data("order");
 			var comment_panel = $(this).parent().parent();
-			var content = $(".comment-body[data-order=" + comment_id + "]").html().replace(/<br\s*[\/]?>/gi,'\n');
-            var comment_html = "<form action='../" + channel_comment_id + "/modify/{{querystring}}' method='POST'>"+
-                "{% csrf_token %}"+
-                "<input type='hidden' name='channel_comment_id' value=" + channel_comment_id + ">"+ 
-                "<input type='hidden' name='channel_post_id' value={{post.id}}>"+
-                "<div class='form-group'>"+
-                    "<textarea class='form-control' rows='2' name='content'>"+
-                        content+
-                        "</textarea>"+
-                    "<div class='col-md-12'>"+
-                        "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
-                            "완료"+
-                            "</button></div></div></form>";
-        });
+			var content = $(".comment-body[data-order=" + comment_order + "]").html().replace(/<br\s*[\/]?>/gi,'');
+            var comment_html = "<form action='./" + comment_order + "/modify/{{querystring}}' method='POST'>" +
+                "{% csrf_token %}" +
+                "<div class='form-group'>" +
+                    "<textarea class='form-control' rows='2' name='content'>" + content + "</textarea>" +
+                    "<div class='col-md-12'>" +
+						"<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>완료</button></div></div></form>";
+			comment_panel.html(comment_html);
+		});
+		
+		var toggle = function(obj, b, toClass, fromClass) {
+			if (!b) {
+				t = toClass; toClass = fromClass; fromClass = t;
+			}
+
+            obj.removeClass(toClass);
+            obj.addClass(fromClass);
+        };
+		
+		var vote = function(order, up) {
+			var but_up = $(".comment-vote-up[data-order=" + order + "]");
+			var but_down = $(".comment-vote-down[data-order=" + order + "]");
+			var result_up = $(".comment-vote-up-result[data-order=" + order + "]");
+			var result_down = $(".comment-vote-down-result[data-order=" + order + "]");
+			$.ajax({
+				url: "./" + order + "/vote/",
+				type: "POST",
+				data: {csrfmiddlewaretoken: csrf_token, up: up},
+				success: function(data) {
+					toggle(but_up, data.up, "btn-success", "btn-warning");
+					toggle(but_down, data.down, "btn-success", "btn-warning");
+					result_up.html(data.tup);
+					result_down.html(data.tdown);
+				}
+			});
+		};
+		
+		$(".comment-vote-up").click(function() {
+			vote($(this).data('order'), '0');
+		});
+
+		$(".comment-vote-down").click(function() {
+			vote($(this).data('order'), '1');
+		});
+
         $(".vote").click(function() {
             var vote_id = $(this).attr("id").split('_'); 
             var vote_up = $("#up_"+vote_id[1]);
@@ -120,32 +138,7 @@
                 }
             });
         });
-        $(".delete").click(function() {
-            var yes=confirm("Do yo REALLY want to delete?");
-            if(yes == true){
-                var delete_uid=$(this).attr("id").slice(7);
-                $.ajax({
-                    url: "delete/",
-                    type : "POST",
-                    data:{id: delete_uid, csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
-                    success: function(data){
-                        console.log(data);
-                        location.reload();
-                    }
-                });
-                return true;
-            }
-            else{
-                return false;
-            }
-        });
-        function toggle(obj,toclass,fromclass) {
-            if(obj.hasClass(toclass)){
-                obj.removeClass(toclass);
-                obj.addClass(fromclass);
-            }
-        }
-        $(".report_submit").click(function() {
+               $(".report_submit").click(function() {
             var report_reason = $("#report_reason").val()
             var report_content = $("#report_content").val()
             $.ajax({
@@ -212,7 +205,7 @@
                 <div class="row">
                 	<div class="col-md-7"></div>
 					{% if not post.deleted %}
-					<button class="btn btn-warning col-md-1 post-mark19">Mark19</button>
+					<button class="btn btn-warning col-md-1 post-mark19" {% if post.mark19 %}disabled{% endif %}>Mark19</button>
 					<button class="btn btn-warning col-md-1 post-report">Report</button>
                     <a class="btn btn-info col-md-1" href="./log/">Log</a>
                     {% if post.auth %}
@@ -237,17 +230,15 @@
 					<span>{{ comment.order }}
                 </div>
                 <div class="col-md-2">User:{{ comment.username }}</div>
-				<div class="col-md-2">Vote: +{{ comment.vote_up }}/-{{ comment.vote_down }}</div>
+				<div class="col-md-2">Vote: +<span class="comment-vote-up-result" data-order="{{ comment.order }}">{{ comment.vote_up }}</span>/-<span class="comment-vote-down-result" data-order="{{ comment.order }}">{{ comment.vote_down }}</span></div>
                 <div class="col-md-3">{{comment.created_time}}</div>
 			</div>
 			<div class="panel-body">
-				<div class="comment-body" data-order="{{ comment.order }}">
-					{{comment.content | safe}}
-				</div>
+				<div class="comment-body" data-order="{{ comment.order }}">{{comment.content | safe}}</div>
                 <div class="row">
                 	<div class="col-md-5"></div>
 					{% if not comment.deleted %}
-					<button class="btn btn-warning col-md-1 comment-mark19" data-order="{{ comment.order }}">Mark19</button>
+					<button class="btn btn-warning col-md-1 comment-mark19" data-order="{{ comment.order }}" {% if comment.mark19 %}disabled{% endif %}>Mark19</button>
 					<button class="btn btn-warning col-md-1 comment-report" data-order="{{ comment.order }}">Report</button>
 					<button class="btn btn-{% if comment.vote.is_up %}warning{% else %}success{% endif %} col-md-1 comment-vote-up" data-order="{{ comment.order }}">Up</button>
 					<button class="btn btn-{% if comment.vote.is_down %}warning{% else %}success{% endif %} col-md-1 comment-vote-down" data-order="{{ comment.order }}">Down</button>

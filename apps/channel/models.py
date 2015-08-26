@@ -30,6 +30,9 @@ class ChannelContent(models.Model):
     is_adult = models.BooleanField(default=False)
     modify_log = models.TextField(default='[]')
 
+    def is_mark19(self, userprofile):
+        return ChannelMarkAdult.objects.filter(channel_content=self, userprofile=userprofile).count() == 1
+
     def set_log(self, log):
         self.modify_log = json.dumps(log)
 
@@ -115,7 +118,7 @@ class ChannelComment(models.Model):
                                      related_name="channel_comment")
     author = models.ForeignKey('session.UserProfile',
                                related_name="channel_comment")
-    order = models.IntegerField()
+    order = models.IntegerField(default=-1)
     
     def get_vote(self):
         votes = ChannelCommentVote.objects.filter(channel_comment=self)
@@ -134,10 +137,11 @@ class ChannelComment(models.Model):
         return vote
 
     def save(self, *args, **kwargs):
-        no = ChannelComment.objects.filter(channel_post=self.channel_post).count()
-        if not no:
-            no = 0
-        self.order = no + 1
+        if self.order == -1:
+            no = ChannelComment.objects.filter(channel_post=self.channel_post).count()
+            if not no:
+                no = 0
+            self.order = no + 1
         super(ChannelComment, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -152,7 +156,7 @@ class ChannelPost(models.Model):
     channel = models.ForeignKey('Channel',
                                 related_name='channel',
                                 db_index=True)
-    order = models.IntegerField()
+    order = models.IntegerField(default=-1)
     author = models.ForeignKey('session.UserProfile',
                                related_name='channel_post')
     channel_content = models.OneToOneField('ChannelContent',
@@ -167,10 +171,11 @@ class ChannelPost(models.Model):
         return ratings.aggregate(Avg('rating')).values()[0]
 
     def save(self, *args, **kwargs):
-        no = ChannelPost.objects.filter(channel=self.channel).count()
-        if not no:
-            no = 0
-        self.order = no + 1
+        if self.order == -1:
+            no = ChannelPost.objects.filter(channel=self.channel).count()
+            if not no:
+                no = 0
+            self.order = no + 1
         super(ChannelPost, self).save(*args, **kwargs)
 
     def get_is_read(self, request):

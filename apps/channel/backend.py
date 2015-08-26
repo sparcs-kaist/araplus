@@ -88,6 +88,7 @@ def _render_content(userprofile, post=None, comment=None):
     data['created_time'] = content.created_time
     data['username'] = author.nickname
     data['is_adult'] = content.is_adult
+    data['mark19'] = content.is_mark19(userprofile)
     data['auth'] = (userprofile == author)
     return data
 
@@ -247,6 +248,8 @@ def _mark_adult(userprofile, content):
 def _vote_post(userprofile, post, rating):
     try:
         vote = ChannelPostVote.objects.get(channel_post=post, userprofile=userprofile)
+        if int(rating) == 0:
+            vote.delete()
     except:
         vote = ChannelPostVote(channel_post=post, userprofile=userprofile)
     vote.rating = int(rating)
@@ -254,14 +257,27 @@ def _vote_post(userprofile, post, rating):
 
 
 def _vote_comment(userprofile, comment, is_up):
+    up = (is_up == '0')
+    result = {}
+
     try:
         vote = ChannelCommentVote.objects.get(channel_comment=comment,
                 userprofile=userprofile)
+        if vote.is_up == up:
+            vote.delete()
+            result['up'], result['down'] = False, False
+    
     except:
         vote = ChannelCommentVote(channel_comment=comment,
                 userprofile=userprofile)
-    vote.is_up = is_up == '0'
-    vote.save()
+
+    if 'up' not in result:
+        vote.is_up = up
+        vote.save()
+        result['up'], result['down'] = vote.is_up, not vote.is_up
+
+    result['tup'], result['tdown'] = comment.get_vote()
+    return result
 
 
 def _get_diff_match(before, after):  # get different match
