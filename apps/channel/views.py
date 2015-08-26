@@ -203,6 +203,7 @@ def mark19_comment(request, channel_url, post_order, comment_order):
         return HttpResponse(status=200)
     return HttpResponse(status=400)
 
+
 @require_POST
 @login_required(login_url='/session/login')
 def vote_post(request, channel_url, post_order):
@@ -212,7 +213,7 @@ def vote_post(request, channel_url, post_order):
         raise PermissionDenied
 
     result = _vote_post(request.user.userprofile, post, rating)
-    
+    return JsonResponse(result)
 
 @require_POST
 @login_required(login_url='/session/login')
@@ -224,6 +225,7 @@ def vote_comment(request, channel_url, post_order, comment_order):
 
     result = _vote_comment(request.user.userprofile, comment, is_up)
     return JsonResponse(result)
+
 
 @require_POST
 @login_required(login_url='/session/login')

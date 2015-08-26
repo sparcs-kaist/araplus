@@ -70,7 +70,8 @@ def _render_content(userprofile, post=None, comment=None):
     data = {}
     if post:
         data['title'] = raw_data.title
-        data['rating'] = raw_data.get_rating()
+        data['rating'] = raw_data.get_my_rating(userprofile)
+        data['rating_avg'] = raw_data.get_rating()
     else:
         data['vote'] = raw_data.get_my_vote(userprofile)
         data['vote_up'], data['vote_down'] = raw_data.get_vote()
@@ -252,8 +253,12 @@ def _vote_post(userprofile, post, rating):
             vote.delete()
     except:
         vote = ChannelPostVote(channel_post=post, userprofile=userprofile)
-    vote.rating = int(rating)
-    vote.save()
+    
+    if int(rating) != 0:
+        vote.rating = int(rating)
+        vote.save()
+
+    return {'rating': post.get_rating()}
 
 
 def _vote_comment(userprofile, comment, is_up):

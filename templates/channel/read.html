@@ -2,10 +2,12 @@
 
 {% block css %}
 <link rel="stylesheet" type="text/css" href="/media/css/channel/list.css">
+<link rel="stylesheet" type="text/css" href="/media/rateit/rateit.css">
 {% endblock %}
 
 {% block js %}
 <script type="text/javascript" src="/media/js/channel/hover.js"></script>
+<script type="text/javascript" src="/media/rateit/rateit.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
     $(document).ready(function(){
@@ -15,6 +17,7 @@
 
 		$(".list-post[data-order=" + post_order + "]").addClass('selected');
 		$(".list-notice[data-order=" + post_order + "]").addClass('selected');
+		$(".rateit.vote").rateit("value", {{ post.rating }});
 
 		var ajax_mark19 = function(obj, url) {
 			$.ajax({
@@ -108,37 +111,21 @@
 		$(".comment-vote-down").click(function() {
 			vote($(this).data('order'), '1');
 		});
-
-        $(".vote").click(function() {
-            var vote_id = $(this).attr("id").split('_'); 
-            var vote_up = $("#up_"+vote_id[1]);
-            var vote_down = $("#down_"+vote_id[1]);
-            console.log(vote_id[0] + vote_id[1]);
-            $.ajax(
-            {
-                url : "vote/",
-                type : "POST",
-                data : { vote_type : vote_id[0], vote_id : vote_id[1], csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
-                dataType : 'json',
-                success : function(data){
-                    if(data.response == 'success'){
-                        $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
-                        if(data.cancel == 'no' || data.cancel == 'yes')
-                        {
-                            toggle(vote_up, 'btn-warning', 'btn-success');
-                            toggle(vote_down, 'btn-warning', 'btn-danger');
-                            if(vote_id[0] == 'up' && data.cancel == 'no') toggle(vote_up, 'btn-success', 'btn-warning');
-                            if(vote_id[0] == 'down' && data.cancel == 'no') toggle(vote_down, 'btn-danger', 'btn-warning');
-                        }
-                        alert(data.message);
-                    }
-                    else{
-                        alert('Failed');
-                    }
-                }
-            });
-        });
-               $(".report_submit").click(function() {
+		
+		$(".rateit.vote").bind("rated reset", function(e) {
+			var v = $(this).rateit("value");
+			$.ajax({
+				url: "./vote/",
+				type: "POST",
+				data: {csrfmiddlewaretoken: csrf_token, rating: v},
+				success: function(data) {
+					$(".rateit.total").rateit("value", data.rating);
+					$(".post-rate-value").html(data.rating);
+				}
+			});
+		});
+        
+		$(".report_submit").click(function() {
             var report_reason = $("#report_reason").val()
             var report_content = $("#report_content").val()
             $.ajax({
@@ -190,20 +177,22 @@
     <div class="col-md-12">
         <div class="panel panel-success">
 			<div class="panel-heading row" style="margin-left:0;margin-right:0">
-            	<div class="col-md-5">
+            	<div class="col-md-4">
                 	{% if post.is_adult %}
                 	<label style="color:red">+19</label>
                 	{% endif %}
                 	Title:{{ post.title }}
                 </div>
                 <div class="col-md-2">User:{{ post.username }}</div>
-				<div class="col-md-2">Rating: {{ post.rating }}</div>
+				<div class="col-md-3">Rating: <span class="rateit total" data-rateit-value="{{ post.rating_avg }}" data-rateit-ispreset="true" data-rateit-readonly="true"></span> <span class="post-rate-value">{{ post.rating_avg }}</span></div>
                 <div class="col-md-3">{{post.created_time}}</div>
 			</div>
             <div class="panel-body">
                 {{post.content | safe}}
                 <div class="row">
-                	<div class="col-md-7"></div>
+					<div class="col-md-5"></div>
+					<input type="range" min="0" max="5" step="1" id="post-rate">
+					<div class="rateit vote col-md-2" data-rateit-backingfld="#post-rate"></div>
 					{% if not post.deleted %}
 					<button class="btn btn-warning col-md-1 post-mark19" {% if post.mark19 %}disabled{% endif %}>Mark19</button>
 					<button class="btn btn-warning col-md-1 post-report">Report</button>

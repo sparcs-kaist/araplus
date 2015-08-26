@@ -168,7 +168,17 @@ class ChannelPost(models.Model):
     
     def get_rating(self):
         ratings = ChannelPostVote.objects.filter(channel_post=self)
-        return ratings.aggregate(Avg('rating')).values()[0]
+        value = ratings.aggregate(Avg('rating')).values()[0]
+        if value is None:
+            return 0
+        return value
+    
+    def get_my_rating(self, userprofile):
+        try:
+            return ChannelPostVote.objects.get(channel_post=self,
+                    userprofile=userprofile).rating
+        except:
+            return 0
 
     def save(self, *args, **kwargs):
         if self.order == -1:

@@ -23,7 +23,9 @@
             <td width=320 class="title title-notice">
                 <a style="font-weight: bold; color: black;" href="/channel/{{current_channel.url}}/{{notice.0.order}}">{{notice.0.title}}</a>
             </td>
-            <td width=80 class="text-center">{{notice.0.rating}}</td>
+            <td width=80 class="text-center">
+                <span class="rateit" data-rateit-value="{{notice.0.get_rating}}" data-rateit-ispreset="true" data-rateit-readonly="true"></span> {{notice.0.get_rating}}
+            </td>
             <td width=80 class="text-center">
                 <span class="timeago" timeago="{{notice.0.channel_content.created_time|date:"c"}}" title="{{notice.0.channel_content.created_time}}"></span>
             </td>
@@ -50,7 +52,9 @@
                     {% endif %}
                 </a>
             </td>
-            <td width=80 class="text-center">{{post.0.rating}}</td>
+            <td width=80 class="text-center">
+                <span class="rateit" data-rateit-value="{{post.0.get_rating}}" data-rateit-ispreset="true" data-rateit-readonly="true"></span> {{post.0.get_rating}}
+            </td>
             <td width=80 class="text-center">
                 <span class="timeago" timeago="{{post.0.channel_content.created_time|date:"c"}}" title="{{post.0.channel_content.created_time}}"></span>
             </td>
