@@ -7,18 +7,17 @@ $(document).ready(function(){
         var board_comment_order = $(this).attr("id").split('-')[1];
         var board_comment_id = $(this).attr("id").split('-')[2];
         var content = $("#comment"+board_comment_order).text().replace(/<br\s*[\/]?>/gi,'\n');
-        var mod_comment = "<form action='./comment_mod/' method='POST' class='comment_modify_form' enctype='multipart/form-data'>"+
+        var mod_comment = "<div class='comment-modify-wrapper'>"+
+        "<form action='./comment_mod/' method='POST' class='comment_modify_form' enctype='multipart/form-data'>"+
             "<input type='hidden' name='csrfmiddlewaretoken' value=" + 
                 $("input[name=csrfmiddlewaretoken]").val() + ">" +
             "<input type='hidden' name='board_comment_id' value=" + board_comment_id + ">"+ 
-            "<div class='form-group'>"+
-            "<textarea class='form-control' rows='2' name='content'>"+
+            "<textarea class='comment-textarea' rows='4' name='content'>"+
             content+
             "</textarea>"+
-            "<div class='col-md-12'>"+
-            "<button type='Submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
+            "<button type='Submit' class='comment-modify-button'>"+
             "완료"+
-            "</button></div></div></form>";
+            "</button></form></div>";
         $(mod_comment).replaceAll("#comment_content"+board_comment_order);
     });
     $(".vote").click(function() {
@@ -33,14 +32,16 @@ $(document).ready(function(){
             data : { vote_type : vote_id[0], vote_id : vote_id[1], csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
             dataType : 'json',
             success : function(data){
+                console.log(data.response);
                 if(data.response == 'success'){
-                    $("#vote_"+vote_id[1]).html("추천 +"+data.vote.up+"/-"+data.vote.down);
+                    $("#vote_up_"+vote_id[1]).html(data.vote.up);
+                    $("#vote_down_"+vote_id[1]).html(data.vote.down);
                     if(data.cancel == 'no' || data.cancel == 'yes')
                     {
-                        toggle(vote_up, 'btn-warning', 'btn-success');
+                        /*toggle(vote_up, 'btn-warning', 'btn-success');
                         toggle(vote_down, 'btn-warning', 'btn-danger');
                         if(vote_id[0] == 'up' && data.cancel == 'no') toggle(vote_up, 'btn-success', 'btn-warning');
-                        if(vote_id[0] == 'down' && data.cancel == 'no') toggle(vote_down, 'btn-danger', 'btn-warning');
+                        if(vote_id[0] == 'down' && data.cancel == 'no') toggle(vote_down, 'btn-danger', 'btn-warning');*/
                     }
                     alert(data.message);
                 }

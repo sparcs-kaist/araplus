@@ -5,8 +5,8 @@
         <title>{% block title %}ARA Plus{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="/media/css/base.css">
         {% block css %}{% endblock %}
-        <script type="text/javascript" src="/media/js/base.js"></script>
         <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script type="text/javascript" src="/media/js/base.js"></script>
         {% block js %}{% endblock %}
     </head>
     <body>
@@ -131,8 +131,6 @@
         {% if unread_count %}
             You have <strong>{{ unread_count }}</strong> unread notifications.
         {% endif %}
-        {% block content %}
-        {% endblock %}
 
         <div id="footer" class="text-center">
             <p>

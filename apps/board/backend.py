@@ -281,11 +281,13 @@ def _write_comment(request, post_id, is_modify=False):
         return  # Invalid form
         board_comment.board_content = content_form.save(
             post=board_comment.board_post)
+    '''
     if form_attachment.is_valid():
         attachments = form_attachment.save(commit=False)
         for attachment in attachments:
             attachment.board_content = board_comment.board_content
             attachment.save()
+    '''
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
     notify_target = board_comment.board_post.get_notify_target()
