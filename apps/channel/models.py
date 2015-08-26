@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.db.models import Avg
 from araplus.settings import UPLOAD_DIR
 import json
 import re
@@ -115,6 +116,29 @@ class ChannelComment(models.Model):
     author = models.ForeignKey('session.UserProfile',
                                related_name="channel_comment")
     order = models.IntegerField()
+    
+    def get_vote(self):
+        votes = ChannelCommentVote.objects.filter(channel_comment=self)
+        return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
+
+    def get_my_vote(self, userprofile):
+        vote = {'is_up': False, 'is_down': False}
+        try:
+            vote_obj = ChannelCommentVote.objects.get(userprofile=userprofile, channel_comment=self)
+            if vote_obj.is_up:
+                vote['is_up'] = True
+            else:
+                vote['is_down'] = True
+        except:
+            pass
+        return vote
+
+    def save(self, *args, **kwargs):
+        no = ChannelComment.objects.filter(channel_post=self.channel_post).count()
+        if not no:
+            no = 0
+        self.order = no + 1
+        super(ChannelComment, self).save(*args, **kwargs)
 
     def __unicode__(self):
         created_time = self.channel_content.created_time
@@ -134,9 +158,20 @@ class ChannelPost(models.Model):
     channel_content = models.OneToOneField('ChannelContent',
                                            related_name='channel_post')
     modify_log = models.TextField(default='[]')
-    
+
     class Meta:
         ordering = ['-id']
+    
+    def get_rating(self):
+        ratings = ChannelPostVote.objects.filter(channel_post=self)
+        return ratings.aggregate(Avg('rating')).values()[0]
+
+    def save(self, *args, **kwargs):
+        no = ChannelPost.objects.filter(channel=self.channel).count()
+        if not no:
+            no = 0
+        self.order = no + 1
+        super(ChannelPost, self).save(*args, **kwargs)
 
     def get_is_read(self, request):
         try:

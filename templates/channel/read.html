@@ -10,14 +10,75 @@
 <script>
     $(document).ready(function(){
 		$("span.timeago").timeago();
+		var post_order = {{ post.order }};
+		var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
 
-        selected_post = location.href.split('/')[5];
-        $("#post-row-"+selected_post).addClass('selected');
+		$(".list-post[data-order=" + post_order + "]").addClass('selected');
+		$(".list-notice[data-order=" + post_order + "]").addClass('selected');
+
+		$(".post-mark19").click(function() {
+			$.ajax({
+				url: "./mark19/",
+				type: "POST",
+				data: { csrfmiddlewaretoken: csrf_token },
+				success: function(data) {
+					alert("19금 신고되었습니다.");
+				},
+				error: function(data) {
+					alert("이미 신고한 항목입니다.");
+				}
+			});
+			$(this).attr("disabled", "disabled");
+		});
 		
-		$(".comment").click(function(){
-            var channel_comment_id=$(this).attr("id").slice(3);
-            var content = $("#comment"+channel_comment_id).html().replace(/<br\s*[\/]?>/gi,'\n');
-            var mod_comment = "<form action='../" + channel_comment_id + "/modify/{{querystring}}' method='POST'>"+
+		$(".comment-mark19").click(function() {
+			$.ajax({
+				url: "./" + $(this).data("order") + "/mark19/",
+				type: "POST",
+				data: { csrfmiddlewaretoken: csrf_token },
+				success: function(data) {
+					alert("19금 신고되었습니다.");
+				},
+				error: function(data) {
+					alert("이미 신고한 항목입니다.");
+				}
+			});
+			$(this).attr("disabled", "disabled");
+		});
+
+		$(".post-delete").click(function() {
+			var result = confirm("이 게시글을 정말 삭제하시겠습니까?");
+			if(result != true) return;
+
+			$.ajax({
+				url: "./delete/",
+				type: "POST",
+				data: { csrfmiddlewaretoken: csrf_token },
+				success: function(data) {
+					location.replace("./");
+				}
+			});
+		});
+		
+		$(".comment-delete").click(function() {
+			var result = confirm("이 댓글을 정말 삭제하시겠습니까?");
+			if(result != true) return;
+
+			$.ajax({
+				url: "./" + $(this).data("order") + "/delete/",
+				type: "POST",
+				data: { csrfmiddlewaretoken: csrf_token },
+				success: function(data) {
+					location.replace("./");
+				}
+			});
+		});
+
+		$(".comment-modify").click(function() {
+			var comment_id = $(this).data("order");
+			var comment_panel = $(this).parent().parent();
+			var content = $(".comment-body[data-order=" + comment_id + "]").html().replace(/<br\s*[\/]?>/gi,'\n');
+            var comment_html = "<form action='../" + channel_comment_id + "/modify/{{querystring}}' method='POST'>"+
                 "{% csrf_token %}"+
                 "<input type='hidden' name='channel_comment_id' value=" + channel_comment_id + ">"+ 
                 "<input type='hidden' name='channel_post_id' value={{post.id}}>"+
@@ -29,7 +90,6 @@
                         "<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>"+
                             "완료"+
                             "</button></div></div></form>";
-            $(mod_comment).replaceAll("#comment_content"+channel_comment_id);
         });
         $(".vote").click(function() {
             var vote_id = $(this).attr("id").split('_'); 
@@ -129,53 +189,37 @@
             });
             return false
         });
-        var hoverHTMLDemoBasic = '<p class="comment_preview_content">' + '번 댓글 미리보기 입니다' + '</p>';
-        $(".comment_preview").hovercard({
-            detailsHTML : hoverHTMLDemoBasic,
-            width: 400,
-            onHoverIn: function() {
-                var order = $(this).children('a').attr('title').split('_')[1];
-                $(".comment_preview_content").prepend('<span class="comment_preview_order">' + order + '</span>');
-            },
-            onHoverOut: function() {
-                $(".comment_preview_order").remove();
-            }
-        });
-    });
+	});
 </script>
 {% endblock %}
 {% block content %}
 <div class="container">
     <div class="col-md-12">
         <div class="panel panel-success">
-            <div class="panel-heading">
-                <div>
-                    <label class="col-md-5">
-                        {% if post.is_adult %}
-                        <label style="color:red">+19</label>
-                        {% endif %}
-                        Title:{{ post.title }}
-                    </label>
-                    <span class="col-md-3">User:{{ post.username }}</span>
-             	</div>
-                <div>
-                    <span class="col-md-10">{{post.created_time}}</span>
-                    <span>추천 +TBA</span>
+			<div class="panel-heading row" style="margin-left:0;margin-right:0">
+            	<div class="col-md-5">
+                	{% if post.is_adult %}
+                	<label style="color:red">+19</label>
+                	{% endif %}
+                	Title:{{ post.title }}
                 </div>
-            </div>
+                <div class="col-md-2">User:{{ post.username }}</div>
+				<div class="col-md-2">Rating: {{ post.rating }}</div>
+                <div class="col-md-3">{{post.created_time}}</div>
+			</div>
             <div class="panel-body">
                 {{post.content | safe}}
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-7"></div>
-                        {% if not post.deleted %}
-                        <a class="btn btn-info col-md-1" href="./log/">Log</a>
-                        {% if post.auth %}
-                        <a class="btn btn-info col-md-1" href="./modify/">Modify</a>
-                        <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
-                        {% endif %}
-                        {% endif %}
-                    </div>
+                <div class="row">
+                	<div class="col-md-7"></div>
+					{% if not post.deleted %}
+					<button class="btn btn-warning col-md-1 post-mark19">Mark19</button>
+					<button class="btn btn-warning col-md-1 post-report">Report</button>
+                    <a class="btn btn-info col-md-1" href="./log/">Log</a>
+                    {% if post.auth %}
+                    <a class="btn btn-info col-md-1" href="./modify/">Modify</a>
+					<button class="btn btn-danger col-md-1 post-delete">Delete</button>
+                    {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -185,74 +229,52 @@
         {% else %}
         <div class="panel panel-success">
         {% endif %}
-        	<div class="panel-heading">
-            	<div>
-                	<span id=comment_order_{{comment.order}}> {{ comment.order }}</span>
-                    <span>{{ comment.author.nickname }}</span>
+        	<div class="panel-heading row" style="margin-left:0;margin-right:0">	
+				<div class="col-md-5">
+                	{% if comment.is_adult %}
+                	<label style="color:red">+19</label>
+                	{% endif %}
+					<span>{{ comment.order }}
                 </div>
-                <div> 
-                    <span class="col-md-10">{{comment.channel_content.created_time}}</span>
-                    <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
+                <div class="col-md-2">User:{{ comment.username }}</div>
+				<div class="col-md-2">Vote: +{{ comment.vote_up }}/-{{ comment.vote_down }}</div>
+                <div class="col-md-3">{{comment.created_time}}</div>
+			</div>
+			<div class="panel-body">
+				<div class="comment-body" data-order="{{ comment.order }}">
+					{{comment.content | safe}}
+				</div>
+                <div class="row">
+                	<div class="col-md-5"></div>
+					{% if not comment.deleted %}
+					<button class="btn btn-warning col-md-1 comment-mark19" data-order="{{ comment.order }}">Mark19</button>
+					<button class="btn btn-warning col-md-1 comment-report" data-order="{{ comment.order }}">Report</button>
+					<button class="btn btn-{% if comment.vote.is_up %}warning{% else %}success{% endif %} col-md-1 comment-vote-up" data-order="{{ comment.order }}">Up</button>
+					<button class="btn btn-{% if comment.vote.is_down %}warning{% else %}success{% endif %} col-md-1 comment-vote-down" data-order="{{ comment.order }}">Down</button>
+					<a class="btn btn-info col-md-1" href="./{{ comment.order }}/log/">Log</a>
+                    {% if post.auth %}
+					<button class="btn btn-info col-md-1 comment-modify" data-order="{{ comment.order }}">Modify</button>
+					<button class="btn btn-danger col-md-1 comment-delete" data-order="{{ comment.order }}">Delete</button>
+                    {% endif %}
+                    {% endif %}
                 </div>
-            </div>
-            <div class="panel-body">
-            	<div id="comment_content{{ comment.content_id }}">
-                	<div id="comment{{comment.content_id}}">{{ comment.content | safe }}</div>
-                    	<div class="col-md-12">
-                            <div class="row">
-                                <div class="col-md-7"></div>
-                                {% if not comment.deleted %}
-                                <div class="dropdown col-md-1">
-                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        Report
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                        <li><a href="#" class="report"
-                                            id="report_{{comment.content_id}}">신고</a></li>
-                                        <li><a href="#" class="vote adult" id="adult_{{comment.content_id}}">가버렷</a></li>
-                                        <li><a href="#" class="vote political" id="political_{{comment.content_id}}">보내야한다</a></li>
-                                    </ul>
-                                </div>
-                                {% if comment.vote.is_up %}
-                                <button class="btn btn-warning col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
-                                {% else %}
-                                <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
-                                {% endif %}
-                                {% if comment.vote.is_down %}
-                                <button class="btn btn-warning col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
-                                {%else %}
-                                <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
-                                {% endif %}
-                                <a class="btn btn-info col-md-1 comment" id="log_{{comment.content_id}}" href="../{{comment.content_id}}/log/">Log</a>
-                                {% if comment.auth %}
-                                <button type="submit" class="btn btn-info col-md-1 comment" id="btn{{comment.content_id}}">Modify</button>
-                                <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
-                                {% else %}
-                                <div class="col-md-2"></div>
-                                {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+			</div>
+		</div>
+		{% endfor %}
+        {% if not post.deleted %}
+        <div>
+        	<form action="./write/{{querystring}}" method="POST">
+            	{% csrf_token %}
+                <div class="form-group">
+                	<textarea class="form-control" rows="3" name="content"></textarea>
                 </div>
-            </div>
-            {% endfor %}
-            {% if not post.deleted %}
-            <div>
-                <form action="./comment/{{querystring}}" method="POST">
-                    {%csrf_token%}
-                    <input type="hidden" name="channel_post_id" value="{{ post.id }}">
-                    <div class="form-group">
-                        <textarea class="form-control" rows="3" name="content"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
-                </form>
-            </div>
-            {% endif %}
-        </div>   
-    </div>
+                <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
+           	</form>
+        </div>
+        {% endif %}
+    </div>   
+</div>
 
-    {% include "channel/list_core.html" %}
-    {% include "channel/modal.html" %}
-    {% endblock %}
+{% include "channel/list_core.html" %}
+{% include "channel/modal.html" %}
+{% endblock %}

@@ -4,7 +4,7 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage
 import diff_match_patch
-from django.db.models import Q, Avg
+from django.db.models import Q
 from apps.channel.forms import *
 from itertools import izip
 
@@ -30,10 +30,10 @@ def _parse_channel(channel_url):
 
 def _parse_post(channel_url, post_order, live_only=True):
     channel = _parse_channel(channel_url)
-
-    try: 
+    
+    try:
         post = ChannelPost.objects.get(channel=channel, order=post_order)
-        if live_only and post.is_deleted:
+        if live_only and post.channel_content.is_deleted:
             raise Http404
 
         return channel, post
@@ -45,8 +45,9 @@ def _parse_comment(channel_url, post_order, comment_order, live_only=True):
     channel, post = _parse_post(channel_url, post_order, live_only)
 
     try:
-        comment = ChannelComment.objects.get(channel_post=post, order=comment_order)
-        if live_only and comment.is_deleted:
+        comment = ChannelComment.objects.get(channel_post=post,
+                order=int(comment_order))
+        if live_only and comment.channel_content.is_deleted:
             raise Http404
 
         return channel, post, comment
@@ -69,13 +70,10 @@ def _render_content(userprofile, post=None, comment=None):
     data = {}
     if post:
         data['title'] = raw_data.title
-
-        votes = ChannelPostVote.objects.filter(channel_post=post)
-        data['rating'] = votes.aggregate(Avg('rating'))
+        data['rating'] = raw_data.get_rating()
     else:
-        votes = ChannelCommentVote.objects.filter(channel_comment=comment)
-        data['vote_up'] = votes.filter(is_up=True).count()
-        data['vote_down'] = votes.filter(is_up=False).count()
+        data['vote'] = raw_data.get_my_vote(userprofile)
+        data['vote_up'], data['vote_down'] = raw_data.get_vote()
 
     if content.is_deleted:
         data['title'] = '--Deleted--'
@@ -84,6 +82,7 @@ def _render_content(userprofile, post=None, comment=None):
         data['content'] = content.replace_content_tags()
 
     data['id'] = raw_data.id
+    data['order'] = raw_data.order
     data['deleted'] = content.is_deleted
     data['content_id'] = content.id
     data['created_time'] = content.created_time
@@ -145,7 +144,7 @@ def _get_comment_list(request, post):
         filter(lambda x: x['vote_up'] > 5, comment_list),
         key=lambda x: x['vote_up'] - x['vote_down']))
 
-    return best_comments + comment_list
+    return list(best_comments) + comment_list
 
 
 def _mark_read(userprofile, post):

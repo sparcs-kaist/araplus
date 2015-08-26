@@ -60,7 +60,7 @@ def write_post(request, channel_url):
     if request.method == 'POST':
         result = _write_post(request, channel)
         if 'success' in result:
-            return redirect('../' + str(result['success'].channel_content.id) + '/')
+            return redirect('../' + str(result['success'].order) + '/')
 
         form_content, form_post, form_attachment = result['fail']
     else:
@@ -87,9 +87,10 @@ def write_comment(request, channel_url, post_order):
 @login_required(login_url='/session/login')
 def read_post(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order, live_only=False)
+    channel_list = Channel.objects.all()
     post_rendered = _render_content(request.user.userprofile, post=post)
     _mark_read(request.user.userprofile, post)
-    comments = _get_comments(request, post)
+    comments = _get_comment_list(request, post)
     notice_list, post_list, pages, page = _get_post_list(request, channel)
     report_form = ChannelReportForm()
 
@@ -154,6 +155,7 @@ def delete_post(request, channel_url, post_order):
         raise PermissionDenied
 
     _delete_content(post.channel_content)
+    return HttpResponse(status=200)
 
 
 @require_POST
@@ -164,13 +166,14 @@ def delete_comment(request, channel_url, post_order, comment_order):
         raise PermissionDenied
 
     _delete_content(comment.channel_content)
+    return HttpResponse(status=200)
 
 
 @login_required(login_url='/session/login')
 def log_post(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order)
     post, modify_log = _get_post_log(post)
-    return render(request, "channel/post_log.html",
+    return render(request, "channel/log_post.html",
                   {'post': post, 'modify_log': modify_log})
 
 
@@ -178,7 +181,7 @@ def log_post(request, channel_url, post_order):
 def log_comment(request, channel_url, post_order, comment_order):
     channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
     comment, modify_log = _get_comment_log(comment)
-    return render(request, "channel/comment_log.html",
+    return render(request, "channel/log_comment.html",
                   {'comment': comment, 'modify_log': modify_log})
 
 
@@ -186,15 +189,19 @@ def log_comment(request, channel_url, post_order, comment_order):
 @login_required(login_url='/session/login')
 def mark19_post(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order)
-    _mark_adult(request.user.userprofile, post.channel_content)
-
+    result = _mark_adult(request.user.userprofile, post.channel_content)
+    if result:
+        return HttpResponse(status=200)
+    return HttpResponse(status=400)
 
 @require_POST
 @login_required(login_url='/session/login')
 def mark19_comment(request, channel_url, post_order, comment_order):
     channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
-    _mark_adult(request.user.userprofile, comment.channel_content)
-
+    result = _mark_adult(request.user.userprofile, comment.channel_content)
+    if result:
+        return HttpResponse(status=200)
+    return HttpResponse(status=400)
 
 @require_POST
 @login_required(login_url='/session/login')
