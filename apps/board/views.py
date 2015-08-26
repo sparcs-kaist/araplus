@@ -187,8 +187,8 @@ def post_read(request, board_url, post_id):
                       'current_board': current_board,
                       'report_form': report_form,
                       # Below thing is for attachment form for comment
-                      'attachment_form': attachment_form
-                      'current_category': current_category
+                      'attachment_form': attachment_form,
+                      'current_category': current_category,
                       # Below, there are things for comment_list
                       'comment_list': comment_list,
                       'comment_pages': comment_page_range,
