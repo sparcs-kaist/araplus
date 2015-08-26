@@ -4,7 +4,7 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage
 import diff_match_patch
-from django.db.models import Q
+from django.db.models import Q, Avg
 from apps.channel.forms import *
 from itertools import izip
 
@@ -70,6 +70,13 @@ def _render_content(userprofile, post=None, comment=None):
     if post:
         data['title'] = raw_data.title
 
+        votes = ChannelPostVote.objects.filter(channel_post=post)
+        data['rating'] = votes.aggregate(Avg('rating'))
+    else:
+        votes = ChannelCommentVote.objects.filter(channel_comment=comment)
+        data['vote_up'] = votes.filter(is_up=True).count()
+        data['vote_down'] = votes.filter(is_up=False).count()
+
     if content.is_deleted:
         data['title'] = '--Deleted--'
         data['content'] = '--Deleted--'
@@ -130,24 +137,15 @@ def _get_post_list(request, channel, item_per_page=15):
 
 def _get_comment_list(request, post):
     comment_list = []
-    order = 1
     for comment in post.channel_comment.all():
         comment = _render_content(request.user.userprofile, comment=comment)
-        comment['order'] = order
-        order = order + 1
         comment_list.append(comment)
 
-    """best_comment = {}
-    best_vote = 0
-    for comment in comment_list:
-        if comment['vote']['up'] > 5 and comment['vote']['up'] > best_vote:
-            best_vote = comment['vote']['up']
-            best_comment = comment
+    best_comments = reversed(sorted(
+        filter(lambda x: x['vote_up'] > 5, comment_list),
+        key=lambda x: x['vote_up'] - x['vote_down']))
 
-    if best_comment:
-        best_comment['best_comment'] = True
-        comment_list.insert(0, best_comment)"""
-    return comment_list
+    return best_comments + comment_list
 
 
 def _mark_read(userprofile, post):
@@ -307,17 +305,9 @@ def _get_comment_log(comment):
     return comment, modify_log
 
 
-def _report(request):
-    content_id = request.POST.get('id', 0)
+def _report(request, content):
     report_form = ChannelReportForm(request.POST)
-    print report_form.errors
     if report_form.is_valid():
-        try:
-            channel_content = ChannelContent.objects.get(id=content_id)
-        except:
-            return {'message': 'No content'}
-        report_form.save(user=request.user.userprofile,
-                         content=channel_content)
-        return {'message': 'Success'}
-    else:
-        return {'message': 'Invalid form'}
+        report_form.save(user=request.user.userprofile, content=content)
+        return True
+    return False

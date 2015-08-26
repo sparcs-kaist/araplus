@@ -218,8 +218,15 @@ def vote_comment(request, channel_url, post_order, comment_order):
     result = _vote_comment(request.user.userprofile, comment, is_up)
 
 
+@require_POST
 @login_required(login_url='/session/login')
-def report(request, channel_url, content_id):
-    if request.method == 'POST':
-        message = _report(request)
-    return HttpResponse(json.dumps(message), content_type='application/json')
+def report_post(request, channel_url, post_order):
+    channel, post = _parse_post(channel_url, post_order)
+    _report(request, post.channel_content)
+
+
+@require_POST
+@login_required(login_url='/session/login')
+def report_comment(request, channel_url, post_order, comment_order):
+    channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
+    _report(request, comment.channel_content)
