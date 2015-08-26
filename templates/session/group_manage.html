@@ -18,8 +18,9 @@
                 <button type="submit" class="btn btn-default">Invite</button>
             </div>
         </form>
-        <form method="delete">
+        <form method="POST">
             {% csrf_token %}
+            <input type="hidden" name="DELETE" value="true">
             <div class="form-group">
                 <button type="submit" class="btn btn-default">Leave this group</button>
             </div>

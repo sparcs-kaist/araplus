@@ -68,7 +68,7 @@ def manage(request, groupname):
                       {'group': group, 'members': members})
 
     # DELETE request(remove self)
-    if request.method == "DELETE":
+    if request.method == "POST" and request.POST.has_key("DELETE"):
         group.remove_member(request.user.userprofile)
         return redirect('/session/group/')
 
