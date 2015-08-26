@@ -125,6 +125,15 @@
                 </div>
             </div>
         </nav>
+
+        {% load notifications_tags %}
+        {% notifications_unread as unread_count %}
+        {% if unread_count %}
+            You have <strong>{{ unread_count }}</strong> unread notifications.
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+
         <div id="footer" class="text-center">
             <p>
                 <a href="/main/credit/">Credit</a>

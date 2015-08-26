@@ -6,6 +6,7 @@ import diff_match_patch
 from django.db.models import Q
 from apps.board.forms import *
 from itertools import izip
+from notifications import notify
 
 
 POINTS_POST_WRITE = 5
@@ -99,31 +100,19 @@ def _get_content(request, post_id):
     post = _get_post(request, board_post, 'Post')
     comment_list = []
     comment_nickname_list = []
+    if board_post.board_content.is_anonymous is None:
+        comment_nickname_list = [(board_post.author.nickname, 0)]
     order = 1
     for board_comment in board_post.board_comment.all():
         comment = _get_post(request, board_comment, 'Comment',
                             comment_nickname_list)
         comment['order'] = order
-        order = order + 1
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
-        username = comment['username']
-        if order == 2:
-            comment_nickname_list.append((username, 1))
-        else:
-            n = len(comment_nickname_list)
-            x = n
-            y = n
-            for i in range(0, n):
-                if comment_nickname_list[i][0] == username:
-                    x = i
-                    y = i + 1
-                    break
-                if (len(username) >= len(comment_nickname_list[i][0])
-                        and x == n):
-                    x = i
-                    y = i
-            comment_nickname_list = comment_nickname_list[0:x] + [(username, order-1)] + comment_nickname_list[y:]
+        if comment['is_anonymous'] is None:
+            username = comment['username']
+            comment_nickname_list.append((username, order))
+        order = order + 1
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
@@ -299,6 +288,56 @@ def _write_comment(request, post_id, is_modify=False):
             attachment.save()
     board_comment.board_post.board_content.save()  # update modified_time
     board_comment.save()
+    notify_target = board_comment.board_post.get_notify_target()
+
+    for target in notify_target:
+        target = target.userprofile.user
+        if request.user != target:
+            notify.send(request.user,
+                        recipient=target,
+                        verb='가 댓글을 달았습니다.'.decode('utf-8'))
+    numtags = board_comment.board_content.get_numtags()
+    if numtags:
+        comments = board_comment.board_post.board_comment.all()
+        comments = comments.order_by('id')
+        for num in numtags:
+            try:
+                if num == 0:
+                    notify.send(request.user,
+                                recipient=board_comment.board_post.author.user,
+                                verb='님이 태그했습니다.'.decode('utf-8'))
+                else:
+                    target = comments[num - 1].author.user
+                    notify.send(request.user,
+                                recipient=target,
+                                verb='님이 태그했습니다.'.decode('utf-8'))
+            except:
+                pass
+    comment_list = []
+    comment_nickname_list = []
+    if board_comment.board_post.board_content.is_anonymous is None:
+        comment_nickname_list = [(board_comment.board_post.author.nickname, 0)]
+    order = 1
+    for board_comment in board_comment.board_post.board_comment.all():
+        comment = _get_post(request, board_comment, 'Comment',
+                            comment_nickname_list)
+        comment_list.append(board_comment)
+        # 현재 글에 달린 댓글의 닉네임 리스트
+        if comment['is_anonymous'] is None:
+            username = comment['username']
+            comment_nickname_list.append((username, order))
+        order = order + 1
+    orders = board_comment.board_content.get_taged_order(comment_nickname_list)
+    for order in orders:
+        order = order - 1
+        if order == -1:
+            target = board_comment.board_post.author.user
+        else:
+            target = comment_list[order].author.user
+        if request.user != target:
+            notify.send(request.user,
+                        recipient=target,
+                        verb='님이 태그했습니다.'.decode('utf-8'))
     return board_comment.board_post.id
 
 
