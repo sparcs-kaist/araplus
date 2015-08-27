@@ -21,12 +21,6 @@
     padding-right: 40px;
     padding-left: 25px;
 }
-.comment-vote-container {
-    margin-top: 15px;
-}
-.comment-vote-container button{
-    display: inline;
-}
 
 .content-wrapper{
     width: calc(100% - 200px);
@@ -172,4 +166,24 @@
     display: inline; 
 }
 
+.comment-vote-container {
+    margin-top: 15px;
+    float:right;
+    display: inline;
+}
 
+.vote-up{
+    outline: none;
+    border: none;
+    color: #40e0d0;
+    display: inline;
+    background: none;
+}
+
+.vote-down{
+    outline: none;
+    border: none;
+    color: #ff4500;
+    display: inline;
+    background: none;
+}

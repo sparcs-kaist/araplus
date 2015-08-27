@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+	{% if unread|length %}
+	<ul> 안 읽은 알림
+		{% for noti in unread %}
+		<li>
+			<a> {{noti.actor}} {{noti.verb}} </a>
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+	<span> 경계선 </span>
+	{% if read|length %}
+	<ul>
+		{% for noti in read %}
+		<li>
+			<a> {{noti.actor}} {{noti.verb}} </a>
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+{% endblock %}

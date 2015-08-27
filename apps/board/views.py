@@ -17,6 +17,7 @@ from apps.board.backend import (
     _get_comment_log,
     _remove_board,
     _add_member,
+    _change_permission,
     _check_valid,
 )
 import json
@@ -68,6 +69,17 @@ def add_member(request, board_url):
                   {'boardmember_form': form_boardmember, 'members': members})
 
 
+def change_permission(request, board_url):
+    try:
+        board = Board.objects.get(url=board_url,
+                                  admin=request.user.userprofile)
+    except:
+        return HttpResponse('Invalid access')
+    if request.method == 'POST':
+        _change_permission(request, board)
+    return redirect('../')
+
+
 def delete_member(request, board_url):
     try:
         board = Board.objects.get(url=board_url,
@@ -82,7 +94,7 @@ def delete_member(request, board_url):
             member.delete()
         except:
             pass
-    return redirect('../')
+    return HttpResponse('done')
 
 
 @login_required(login_url='/session/login')
@@ -172,8 +184,7 @@ def post_read(request, board_url, post_id):
         querystring = querystring + '&'
     report_form = BoardReportForm()
     attachment_form = AttachmentFormSet(queryset=Attachment.objects.none())
-    return render(request,
-                  'board/board_read.html',
+    return render(request, "board/board_read.html",
                   {
                       'querystring': querystring,
                       'post': post,  # post for post
@@ -354,3 +365,11 @@ def trace_list(request, board_url, item_per_page=20):
                   {'post_list': post_list,
                    'current_page': page,
                    'pages': post_paginator.page_range})
+
+
+@login_required(login_url='/session/login')
+def set_adult_filter(request):
+    userprofile = request.user.userprofile
+    userprofile.adult_filter = not userprofile.adult_filter
+    userprofile.save()
+    return redirect('../')

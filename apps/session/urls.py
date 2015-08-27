@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^message/', include('apps.session.message.urls')),
     url(r'^group/', include('apps.session.group.urls')),
     url(r'^account/', include('apps.session.account.urls')),
+    url(r'^notifications/$', 'apps.session.views.view_notifications'),
 ]

@@ -1,13 +1,8 @@
 {% extends "base.html" %}
 {% block css %}
 <link rel="stylesheet" type="text/css" href="/media/css/board/list.css"> 
-<!--
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
--->
 {% endblock %}
 {% block js %}
-<!--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--!>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
     jQuery(document).ready(function(){
@@ -25,4 +20,9 @@
 </div>
 -->
 {% include "board/list.html" %}
+{% if request.user.userprofile.adult_filter %}
+<a href="set_adult_filter/">성인글 필터링 해제</a>
+{% else %}
+<a href="set_adult_filter/">성인글 필터링</a>
+{% endif %}
 {% endblock %}

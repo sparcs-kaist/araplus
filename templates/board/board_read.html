@@ -1,213 +1,159 @@
+{% extends "base.html" %}
 {% load bootstrap %}
 {% block css %}
-<link rel="stylesheet" type="text/css" href="/media/css/board/list.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="/media/css/board/board_read.css">
 {% endblock %}
 {% block js %}
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="/media/js/board/hover.js"></script>
-<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script type="text/javascript" src="/media/js/board/board.js"></script>
 <script type="text/javascript" src="/media/js/board/upload_handling.js"></script>
-<script>
-  jQuery(document).ready(function() {
-    jQuery("span.timeago").timeago();
-  });
-</script>
 {% endblock %}
 {% block content %}
-<div class="container">
-    <div class="col-md-12">
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                <div>
-                    <label class="col-md-5">
-                        {% if post.adult %}
-                        <label style="color:red">+19</label>
-                        {% endif %}
-                        Title:{{ post.title }}
-                    </label>
-                    <div class="dropdown col-md-3">
-                        {% if post.is_anonymous %}
-                        {{ post.username }}
-                        {% else %}
-                        <a class="dropdown-toggle" id="post_username" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            {{ post.username }}
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="post_username">
-                            <li><a href="/session/message/send/?to={{ post.username }}">Send message</a></li>
-                            <li><a href="#">Block</a></li>
-                        </ul>
-                        {% endif %}
-                    </div>
-                    <span class="col-md-2">Board:{{post.board}}</span>
-                    <span class="col-md-2">Category:{{post.category}}</span>
-
-                    {% if board_post_trace.is_trace %}
-                    <span class="glyphicon glyphicon-star pull-right trace tracing"
-                        id="trace-{{post.id}}"></span>
-                    {% else %}
-                    <span class="glyphicon glyphicon-star-empty pull-right trace"
-                        id="trace-{{post.id}}"></span>
-                    {% endif %}
-                    {% if board_post_trace.is_notified %}
-                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
-                        id="alarm-{{post.id}}"></span>
-                    {% else %}
-                    <span class="glyphicon glyphicon-bookmark pull-right alarm"
-                        id="alarm-{{post.id}}" style="color:white;"></span>
-                    {% endif %}
-                </div>
-                <div>
-                    <span class="col-md-10">{{post.created_time}}</span>
-                    <span id="vote_{{post.content_id}}">추천 +{{post.vote.up}}/-{{post.vote.down}}</span>
-                </div>
-            </div>
-            <div class="panel-body">
-                {{post.content | safe}}
-				<div class="col-md-12">
-					<div class="col-md-12">{{post.signiture}}</div>
-					<div class="row">
-						<div class="col-md-6"></div>
-                        {% if not post.deleted %}
-                        <div class="dropdown col-md-1">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                Report
-                                <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                    <li><a href="javascript:;" class="report" id="report_{{post.content_id}}">신고</a></li>
-                                    <li><a href="javascript:;" class="vote adult" id="adult_{{post.content_id}}">가버렷</a></li>
-                                    <li><a href="javascript:;" class="vote political" id="political_{{post.content_id}}">보내야한다</a></li>
-                            </ul>
-                        </div>
-                        {% if post.vote.is_up %}
-                        <button class="btn btn-warning col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
-                        {% else %}
-                        <button class="btn btn-success col-md-1 vote up" id="up_{{post.content_id}}">Up</button>
-                        {% endif %}
-                        {% if post.vote.is_down %}
-                        <button class="btn btn-warning col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
-                        {%else %}
-                         <button class="btn btn-danger col-md-1 vote down" id="down_{{post.content_id}}">Down</button>
-                         {% endif %}
-                         <a class="btn btn-info col-md-1" href="./post-log/?board={{post.board_id}}">Log</a>
-                        {% if post.return %}			
-                        <a class="btn btn-info col-md-1" href="./modify/?board={{post.board_id}}">Modify</a>
-                        <button class="btn btn-normal col-md-1 delete" id="delete_{{post.content_id}}">Delete</button>
-                        {% endif %}
-                        {% endif %}		
-					</div>
-                </div>
-            </div>
+<div id="content-wrapper">
+    <div id="board-title">
+        {{current_board|default:'All'}} | ㅁㄴㅇㄹ
+    </div>
+    <div id="post-header-wrapper">
+        <div id="post-title">
+            {% if post.adult %}
+            <label style="color:red; display:inline-block">+19</label>
+            {% endif %}
+            {{post.title}}
         </div>
+        <div id="post-information">
+            <h3>
+            {% if post.is_anonymous %}
+            {{ post.username }}
+            {% else %}
+            {{ post.username }}
+            <!-- message send 기능 -->
+            {% endif %}
+            </h3>
+            | {{ post.created_time }} | 조회 224 | 추천
+            {% if post.vote.up > 0 %}
+            <span class="vote-color-up" id="post-vote-up">{{post.vote.up}}</span>
+            {% else %}
+            {{post.vote.up}}
+            {% endif %}
+            / 반대
+            {% if post.vote.down > 0 %}
+            <span class="vote-color-down" id="post-vote-down">{{post.vote.down}}</span>
+            {% else %}
+            {{post.vote.down}}
+            {% endif %}
+        </div>
+    </div>
+    <div class="post-content-wrapper" id="comment_order_0">
+        {% if not post.deleted %}
+        <div id="post-content">
+            {{post.content | safe}}
+        </div>
+        <div id="post-vote-number">
+            <div class="vote-number vote-up-color" id="vote_up_{{post.content_id}}">{{post.vote.up}}</div>
+            <div class="vote-number vote-down-color" id="vote_down_{{post.content_id}}">{{post.vote.down}}</div>
+        </div>
+        <div id="post-function">
+            <!-- trace, 즐찾 기능 -->
+            {% if post.vote.is_up %}
+            <button class="post-vote-button up-button vote" id="up_{{post.content_id}}">▲ UP</button>
+            {% else %}
+            <button class="post-vote-button up-button vote" id="up_{{post.content_id}}">▲ UP</button>
+            {% endif %}
+            {% if post.vote.is_down %}
+            <button class="post-vote-button down-button vote" id="down_{{post.content_id}}">▼ DOWN</button>
+            {% else %}
+            <button class="post-vote-button down-button vote" id="down_{{post.content_id}}">▼ DOWN</button>
+            {% endif %}
+            <!-- 추천 반대 클릭한 표시-->
+            <!-- 신고 기능 -->
+            <!-- 수정, log, 삭제 -->
+        </div>
+        {% else %}
+        <div id="post-content">
+        삭제된 글입니다.
+        </div>
+        {% endif %}
+    </div>
+    <div id="post-comment-wrapper">
         {% for comment in comment_list %}
         {% if comment.best_comment %}
-        <div class="panel panel-danger">
+        <!-- best 댓글 기능-->
         {% else %}
-        <div class="panel panel-success">
         {% endif %}
-            <div class="panel-heading">
-                <div>
-                    <span class="col-md-3" id=comment_order_{{comment.order}}> {{ comment.order }}</span>
-                    <div class="dropdown col-md-9">
-                        {% if comment.is_anonymous %}
-                        {{ comment.username }}
-                        {% else %}
-                        <a class="dropdown-toggle" id="comment_username_{{ comment.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            {{ comment.username }}
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="comment_username_{{ comment.id }}">
-                            <li><a href="/session/message/send/?to={{ comment.username }}">Send message</a></li>
-                            <li><a href="#">Block</a></li>
-                        </ul>
-                        {% endif %}
-                    </div>
-                </div>
-                <div> 
-                    <span class="col-md-10">{{comment.created_time}}</span>
-                    <span id="vote_{{comment.content_id}}">추천 +{{comment.vote.up}}/-{{comment.vote.down}}</span>
+        <div class="post-comment">
+            <div class="comment-info">
+                <span class="comment-order" id="comment_order_{{comment.order}}">{{ comment.order }}</span>
+                <span class="comment-nickname">
+                {% if comment.is_anonymous %}
+                {{ comment.username }}
+                {% else %}
+                {{ comment.username }}
+                <!-- message send 기능 -->
+                {% endif %}
+                </span>
+                <span class="comment-time" >{{ comment.created_time }}</span>
+                <div class="comment-vote-wrapper">
+                    <!-- 삭제된 글이면 추천반대 안되게 해야함-->
+                    <button class="vote-up-color inblock vote comment-button" id="up_{{comment.content_id}}">▲추천</button>
+                    <span class="inblock" id="vote_up_{{comment.content_id}}">{{comment.vote.up}}</span>
+                    <button style="margin-left: 10px" class="vote-down-color inblock vote comment-button" id="down_{{comment.content_id}}">▼반대</button>
+                    <span class="inblock" id="vote_down_{{comment.content_id}}">{{comment.vote.down}}</span>
                 </div>
             </div>
             <div class="panel-body">
-                <div id="comment_content{{ comment.id }}">
+				<div id="comment_content{{ comment.order }}">
 					{% if comment.is_political %}
 					<a onclick="this.nextSibling.style.display=(this.nextSibling.style.display=='none')?'block':'none';" href="javascript:void(0)">이건 정치글입니다.</a><div style="display:none"><div id="comment{{comment.id}}">{{ comment.content | force_escape | linebreaksbr }}</div></div>
+                	{% elif request.user.userprofile.adult_filter and comment.adult %}
+					<div class="comment-content hiddenContent" id="comment{{comment.order}}" value="{{ comment.content | safe }}">
+					</div>
 					{% else %}
-					<div id="comment{{comment.id}}">{{ comment.content | force_escape | linebreaksbr}} </div>
-					{% endif %}
-					<div class="col-md-12">
-						<div class="row">
-						    <div class="col-md-7"></div>
-                            {% if not comment.deleted %}
-                            <div class="dropdown col-md-1">
-                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    Report
-                                    <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                        <li><a href="#" class="report"
-                                            id="report_{{comment.content_id}}">신고</a></li>
-                                        <li><a href="#" class="vote adult" id="adult_{{comment.content_id}}">가버렷</a></li>
-                                        <li><a href="#" class="vote political" id="political_{{comment.content_id}}">보내야한다</a></li>
-                                </ul>
-                            </div>
-                            {% if comment.vote.is_up %}
-                            <button class="btn btn-warning col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
-                            {% else %}
-                            <button class="btn btn-success col-md-1 vote up" id="up_{{comment.content_id}}">Up</button>
-                            {% endif %}
-                            {% if comment.vote.is_down %}
-                            <button class="btn btn-warning col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
-                            {%else %}
-                            <button class="btn btn-danger col-md-1 vote down" id="down_{{comment.content_id}}">Down</button>
-                            {% endif %}
-                            <a class="btn btn-info col-md-1 comment" id="log_{{comment.content_id}}" href="../{{comment.id}}/comment-log/?board={{post.board_id}}">Log</a>
-                            {% if comment.return %}		
-                            <button type="submit" class="btn btn-info col-md-1 comment" id="btn-{{comment.order}}-{{comment.id}}">Modify</button>
-                            <button class="btn btn-normal col-md-1 delete" id="delete_{{comment.content_id}}">Delete</button>
-                            {% else %}
-                            <div class="col-md-2"></div>
-                            {% endif %}
-                            {% endif %}		
-						</div>
-                    </div>
+					<div class="comment-content" id="comment{{comment.order}}">
+						{{ comment.content | safe}}
+                	</div>
+                	{% endif %}
+                {% if not comment.deleted %}
+                <div class="comment-function">
+                    <!-- 신고 기능 작동 -->
+                   <button class="comment-button function-btn report" id="report_{{comment.content_id}}">[신고]</button>
+                   <button class="comment-button function-btn vote" id="adult_{{comment.content_id}}">[성인글]</button>
+                   <button class="comment-button function-btn vote" id="political_{{comment.content_id}}">[정치글]</button>
+                   <button class="comment-button function-btn comment" type="submit" id="btn-{{comment.order}}-{{comment.id}}">[수정]</button>
+                   <button class="comment-button function-btn delete" id="delete_{{comment.content_id}}">[삭제]</button>
+                   <a class="comment-button function-btn" href="../{{comment.id}}/comment-log/?board={{post.board_id}}" id="log_{{comment.content_id}}">[로그]</a>
                 </div>
+                {% endif %}
             </div>
-		</div>
+        </div>
 		{% endfor %}
-		<div style="text-align: center;">
-			<ul class="pagination pagination-sm">
-				{% if comment_page_left != 0 %}
-				<li><a href="{{querystring}}comment_page={{comment_page_left}}"">&laquo;</a></li>
-				{% endif %}
-				{% for comment_page in comment_pages%}
-				{% if comment_page == comment_current_page %}
-				<li class="active">
-				<a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}<span class="sr-only"></span></a>
-				</li>
-				{% else %}
-				<li><a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}</a></li>
-				{% endif %}
-				{% endfor %}
-				{% if comment_page_right != 0 %}
-				<li><a href="{{querystring}}comment_page={{comment_page_right}}"">&raquo;</a></li>
-				{% endif %}
-			</ul>
-		</div>
-		{% if not post.deleted %}
-        <div>
-			<form action="./comment/{{querystring}}
-				comment_page={{comment_current_page}}" method="POST" enctype="multipart/form-data">
-                {%csrf_token%}
-                <input type="hidden" name="board_post_id" value="{{ post.id }}">
-                <div class="form-group">
-                    <label>Anonymous</label>
-                    <input type="checkbox" name="is_anonymous">
+		<div style="text-align: center;" class="post-pagination">
+				<ul>
+					{% if comment_page_left != 0 %}
+					<li><a href="{{querystring}}comment_page={{comment_page_left}}"">&laquo;</a></li>
+					{% endif %}
+					{% for comment_page in comment_pages%}
+					{% if comment_page == comment_current_page %}
+					<li class="active">
+					<a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}<span class="sr-only"></span></a>
+					</li>
+					{% else %}
+					<li><a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}</a></li>
+					{% endif %}
+					{% endfor %}
+					{% if comment_page_right != 0 %}
+					<li><a href="{{querystring}}comment_page={{comment_page_right}}"">&raquo;</a></li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>   
+        {% if not post.deleted %}
+		<div id="comment-write-wrapper">
+			<form action="./comment/{{querystring}}comment_page={{comment_current_page}}" method="POST" enctype="multipart/form-data">
+            {%csrf_token%}
+            <input type="hidden" name="board_post_id" value="{{ post.id }}">
+            <textarea class="comment-textarea" rows="5" name="content" placeholder="댓글을 입력하세요."></textarea>
+                <!--
                 </div>
-                <div class="form-group">
-                    <textarea class="form-control" rows="3" name="content"></textarea>
                     <div id="attachment_handling">
                         {{ attachment_form.management_form }}
                         {% for form in attachment_form.forms %}
@@ -217,15 +163,17 @@
                         {% endfor %}
                     </div>
                 </div>
-                <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
-            </form>
+                사진 업로드 기능
+                -->
+				<div id="comment-write-footer">
+                    <button type="submit" class="comment-write-button" class="btn btn-normal col-md-1 col-md-offset-11">댓글 남기기</button>
+                    <h3>성인</h3>
+                    <input type="checkbox" name="is_adult">
+                    <h3>익명</h3>
+                    <input type="checkbox" name="is_anonymous">
+                </div>
+			</form>
         </div>
-        {% endif %}
-	</div>   
+		{% endif %}
 </div>
-
-{% include "board/list.html" %}
-{% include "board/modal.html" %}
 {% endblock %}
-
-

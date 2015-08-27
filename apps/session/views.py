@@ -41,7 +41,7 @@ def user_login_callback(request):
         nexturl = request.GET.get('next', '/')
         uid = request.GET['uid']
         sso_profile = urllib.urlopen('http://bit.sparcs.org:22223/\
-                                      oauth/info?uid='+uid)
+                                      oauth/info?uid=' + uid)
         sso_profile = json.load(sso_profile)
         username = sso_profile['username']
         user_list = User.objects.filter(username=username)
@@ -121,3 +121,13 @@ def check_message(request):
     messages = Message.objects.filter(receiver=sender)
     return render(request,
                   'session/check_message.html', {'messages': messages})
+
+
+@login_required(login_url='/session/login/')
+def view_notifications(request):
+    user = request.user
+    unread_noti = user.notifications.unread()
+    read_noti = user.notifications.read()
+    return render(request,
+                  'session/notification_view.html',
+                  {'unread': unread_noti, 'read': read_noti})

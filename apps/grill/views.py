@@ -74,9 +74,10 @@ def view_grill(request, grill_id):
             grill_comment=comment,
             is_up=False
         ).count()
-
-        if user_vote.filter(grill_comment=comment):
+        if user_vote.filter(grill_comment = comment):
             comment.vote_disable = True
+        else:
+            comment.vote_disable = False
 
     return render(request,
                   'grill/view.html',
