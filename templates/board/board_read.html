@@ -101,7 +101,15 @@
                 </div>
             </div>
             <div id="comment_content{{ comment.order }}">
-                <div class="comment-content" id="comment{{comment.order}}">{{ comment.content | safe}}</div>
+                {% if request.user.userprofile.adult_filter and comment.adult %}
+                <div class="comment-content hiddenContent" id="comment{{comment.order}}" value="{{ comment.content | safe }}">
+                    성인 댓글 입니다.
+                </div>
+                {% else %}
+                <div class="comment-content" id="comment{{comment.order}}">
+                    {{ comment.content | safe}}
+                </div>
+                {% endif %}
                 {% if not comment.deleted %}
                 <div class="comment-function">
                     <!-- 신고 기능 작동 -->
@@ -137,6 +145,8 @@
                 -->
                 <div id="comment-write-footer">
                     <button type="submit" class="comment-write-button" class="btn btn-normal col-md-1 col-md-offset-11">댓글 남기기</button>
+                    <h3>성인</h3>
+                    <input type="checkbox" name="is_adult">
                     <h3>익명</h3>
                     <input type="checkbox" name="is_anonymous">
                 </div>

@@ -171,4 +171,7 @@ $(document).ready(function(){
             }
         });
     });
+    $(".hiddenContent").click(function(){
+        $(this).html($(this).attr("value"));
+    });
 });
