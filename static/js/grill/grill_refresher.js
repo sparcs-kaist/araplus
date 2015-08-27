@@ -81,7 +81,7 @@ var add_comment = function(grill_id, socket){
             return false;
         };
         $("#new-content").val('');
-        $("#text-counter").text('0');
+        $("#text-counter").text('140');
         $.ajax({
             type: 'POST',
             url: '/grill/'+grill_id+'/add_comment/',
@@ -130,7 +130,16 @@ $(document).ready(function(){
             })
 
             $("#new-content").on('keyup',function(event){
-                $("#text-counter").text(140-$($("#new-content")[0]).val().length);
+                var typeable = 140-$($("#new-content")[0]).val().length;
+                $("#text-counter").text(typeable);
+                if (typeable<0) {
+                    $("#btn-add-comment").attr('disabled',true);
+                    $("#text-counter").css('color','red');
+                } else{
+                    $("#btn-add-comment").attr('disabled',false);
+                    $("#text-counter").css('color','black');
+                }
+
             })   
 
             // websocket Initialize

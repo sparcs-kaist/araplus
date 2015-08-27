@@ -7,6 +7,7 @@ from .forms import GrillAddForm, CommentAddForm
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import SuspiciousOperation
 import json
 import datetime
 from django.core.paginator import Paginator
@@ -22,6 +23,15 @@ def home(request,item_per_page=10):
     page_range = grill_paginator.page_range
     page_left = 0
     page_right = 0
+    grills = []
+    for grill in grill_paged:
+        grill_dict = {}
+        grill_dict['comment'] = grill.get_comment()
+        grill_dict['title'] = grill.title
+        grill_dict['created_time'] = grill.created_time
+        grill_dict['author'] = grill.author.nickname
+        grill_dict['id'] = grill.id
+        grills.append(grill_dict)
     if len(page_range) > 10 :
         last_page = len(page_range)
         page_target = (current_page-1)/10 
@@ -36,7 +46,7 @@ def home(request,item_per_page=10):
 
     return render(request, 'grill/main.html',
                   {
-                      'grills': grill_paged,
+                      'grills': grills,
                       'pages': page_range,
                       'currnet_page': current_page,
                       'page_left': page_left,
@@ -103,6 +113,9 @@ def add_comment(request, grill_id):
     post_data = request.POST
     grill = get_object_or_404(Grill, pk=grill_id)
     userprofile = UserProfile.objects.get(user=request.user)
+    print("f2")
+    if len(post_data.get('new_content')) > 140:
+        raise SuspiciousOperation('Too long content')
     new_comment = GrillComment(
         grill=grill, author=userprofile, content=post_data.get('new_content'))
     new_comment.save()
@@ -116,8 +129,10 @@ def add_comment(request, grill_id):
     ms += '<span class="col-md-1">' + str(new_comment.order) + '</span>'
     ms += '<strong>' + new_comment.author.nickname.encode('utf-8')
     ms += '</strong>'
-    ms += '<span class="pull-right">' + str(new_comment.created_time)
-    ms += '</span></div>'
+    ms += '<span class="pull-right"><abbr class="timeago" timeago='
+    ms += new_comment.created_time.isoformat()
+    ms += ' title='+str(new_comment.created_time)+'>'
+    ms += '</abbr></span></div>'
     ms += '<div class="comment-content-container">'
     ms += '<span>' + new_comment.replace_tags().encode('utf8') + '</span>'
     ms += '<div class="comment-vote-container">'
