@@ -24,6 +24,7 @@ from apps.channel.backend import (
     _vote_comment,
     _get_post_log,
     _get_comment_log,
+    _report,
 )
 import json
 from apps.channel.forms import *
@@ -263,6 +264,7 @@ def vote_post(request, channel_url, post_order):
     result = _vote_post(request.user.userprofile, post, rating)
     return JsonResponse(result)
 
+
 @require_POST
 @login_required(login_url='/session/login')
 def vote_comment(request, channel_url, post_order, comment_order):
@@ -280,6 +282,7 @@ def vote_comment(request, channel_url, post_order, comment_order):
 def report_post(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order)
     _report(request, post.channel_content)
+    return HttpResponse(status=200)
 
 
 @require_POST
@@ -287,3 +290,4 @@ def report_post(request, channel_url, post_order):
 def report_comment(request, channel_url, post_order, comment_order):
     channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
     _report(request, comment.channel_content)
+    return HttpResponse(status=200)

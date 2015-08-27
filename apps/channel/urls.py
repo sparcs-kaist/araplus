@@ -48,7 +48,7 @@ urlpatterns = [
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/vote/$',
         'apps.channel.views.vote_comment'),
 
-    #url(r'^([A-z0-9]*)/([1-9][0-9]*)/report/$', 'apps.channel.views.report_post'),
-    #url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/report/$',
-    #    'apps.channel.views.report_comment'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/report/$', 'apps.channel.views.report_post'),
+    url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/report/$',
+        'apps.channel.views.report_comment'),
 ]
