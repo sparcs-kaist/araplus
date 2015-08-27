@@ -10,12 +10,14 @@ from apps.channel.backend import (
     _parse_channel,
     _parse_post,
     _parse_comment,
+    _write_channel,
     _render_content,
     _get_post_list,
     _get_comment_list,
     _mark_read,
     _write_post,
     _write_comment,
+    _delete_channel,
     _delete_content,
     _mark_adult,
     _vote_post,
@@ -29,9 +31,24 @@ from apps.channel.forms import *
 
 @login_required(login_url='/session/login')
 def home(request):
-    channel_list = Channel.objects.all()
+    channel_list = Channel.objects.filter(is_deleted=False)
     return render(request, 'channel/main.html',
                   {'channel_list': channel_list})
+
+
+@login_required(login_url='/session/login')
+def create(request):
+    if request.method == 'POST':
+        result = _write_channel(request)
+        if 'success' in result:
+            return redirect('../' + result['success'].url + '/')
+        
+        form_channel = result['fail']
+    else:
+        form_channel = ChannelForm()
+
+    return render(request, 'channel/channel.html',
+                  {'channel_form': form_channel})
 
 
 @login_required(login_url='/session/login')
@@ -48,6 +65,7 @@ def list(request, channel_url):
                    'current_channel': channel,
                    'pages': pages,
                    'current_page': page,
+                   'is_admin': channel.admin == request.user.userprofile,
                    'querystring': querystring})
 
 
@@ -111,6 +129,25 @@ def read_post(request, channel_url, post_order):
 
 
 @login_required(login_url='/session/login')
+def modify_channel(request, channel_url):
+    channel = _parse_channel(channel_url)
+    if channel.admin != request.user.userprofile:
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        result = _write_channel(request, channel)
+        if 'success' in result:
+            return redirect('../../' + result['success'].url + '/')
+ 
+        form_channel = result['fail']
+    else:
+        form_channel = ChannelForm(instance=channel)
+
+    return render(request, 'channel/channel.html',
+                  {'channel_form': form_channel})
+
+
+@login_required(login_url='/session/login')
 def modify_post(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order)
     if post.author != request.user.userprofile:
@@ -121,8 +158,8 @@ def modify_post(request, channel_url, post_order):
 
         if 'success' in result:
             return redirect('../')
-        else:
-            form_content, form_post, form_attachment = result['fail']
+        
+        form_content, form_post, form_attachment = result['fail']
     else:
         form_content = ChannelContentForm(instance=post.channel_content)
         form_post = ChannelPostForm(instance=post)
@@ -145,6 +182,17 @@ def modify_comment(request, channel_url, post_order, comment_order):
     _write_comment(request, comment=comment)
     querystring = _get_querystring(request, 'page')
     return redirect('../../' + querystring)
+
+
+@require_POST
+@login_required(login_url='/session/login')
+def delete_channel(request, channel_url):
+    channel = _parse_channel(channel_url)
+    if channel.admin != request.user.userprofile:
+        raise PermissionDenied
+
+    _delete_channel(channel)
+    return HttpResponse(status=200)
 
 
 @require_POST

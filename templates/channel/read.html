@@ -191,9 +191,9 @@
                 {{post.content | safe}}
                 <div class="row">
 					<div class="col-md-5"></div>
+					{% if not post.deleted %}
 					<input type="range" min="0" max="5" step="1" id="post-rate">
 					<div class="rateit vote col-md-2" data-rateit-backingfld="#post-rate"></div>
-					{% if not post.deleted %}
 					<button class="btn btn-warning col-md-1 post-mark19" {% if post.mark19 %}disabled{% endif %}>Mark19</button>
 					<button class="btn btn-warning col-md-1 post-report">Report</button>
                     <a class="btn btn-info col-md-1" href="./log/">Log</a>
@@ -232,7 +232,7 @@
 					<button class="btn btn-{% if comment.vote.is_up %}warning{% else %}success{% endif %} col-md-1 comment-vote-up" data-order="{{ comment.order }}">Up</button>
 					<button class="btn btn-{% if comment.vote.is_down %}warning{% else %}success{% endif %} col-md-1 comment-vote-down" data-order="{{ comment.order }}">Down</button>
 					<a class="btn btn-info col-md-1" href="./{{ comment.order }}/log/">Log</a>
-                    {% if post.auth %}
+                    {% if comment.auth %}
 					<button class="btn btn-info col-md-1 comment-modify" data-order="{{ comment.order }}">Modify</button>
 					<button class="btn btn-danger col-md-1 comment-delete" data-order="{{ comment.order }}">Delete</button>
                     {% endif %}

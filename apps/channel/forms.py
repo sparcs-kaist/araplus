@@ -3,6 +3,17 @@ from apps.channel.models import *
 from django.forms import ModelForm, Textarea
 
 
+class ChannelForm(ModelForm):
+    class Meta:
+        model = Channel
+        exclude = ['admin', 'thumbnail', 'is_deleted']
+
+    def save(self, *args, **kwargs):
+        self.instance.is_deleted = False
+        self.instance.admin = kwargs.pop('admin')
+        return super(ChannelForm, self).save(*args, **kwargs)
+
+
 class ChannelContentForm(ModelForm):
     class Meta:
         model = ChannelContent

@@ -23,7 +23,7 @@ def _get_querystring(request, *args):
 
 def _parse_channel(channel_url):
     try:
-        return Channel.objects.get(url=channel_url)
+        return Channel.objects.get(url=channel_url, is_deleted=False)
     except:
         raise Http404
 
@@ -53,6 +53,16 @@ def _parse_comment(channel_url, post_order, comment_order, live_only=True):
         return channel, post, comment
     except:
         raise Http404
+
+
+def _write_channel(request, channel=None):
+    form_channel = ChannelForm(request.POST, instance=channel)
+
+    if form_channel.is_valid():
+        channel = form_channel.save(admin=request.user.userprofile)
+        return {'success': channel}
+    else:
+        return {'fail': form_channel}
 
 
 def _render_content(userprofile, post=None, comment=None):
@@ -227,6 +237,11 @@ def _write_comment(request, post=None, comment=None):
     comment.channel_content = content_form.save()
     comment.save()
     return True
+
+
+def _delete_channel(channel):
+    channel.is_deleted = True
+    channel.save()
 
 
 def _delete_content(content):

@@ -10,11 +10,44 @@
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
 $(document).ready(function(){
-    $("span.timeago").timeago();
+	$("span.timeago").timeago();
+	
+	var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+
+	$(".channel-delete").click(function() {
+		var result = confirm("주의! 채널을 삭제하면 채널 내의 모든 글과 댓글에 접근할 수 없습니다. 계속하시겠습니까?");
+		if (result != true) return;
+
+		$.ajax({
+			url: './delete/',
+			type: 'POST',
+			data: {csrfmiddlewaretoken: csrf_token},
+			success: function(data) {
+				location.replace('../');
+			}
+		});
+	});
 });
 </script>
 {% endblock %}
 
 {% block content %}
+<div class="container">
+	<div class="row">
+		<div class="col-xs-4">
+			<h3 style="margin:0">{{ current_channel.kor_name }} <small>admin: {{ current_channel.admin.nickname }}</small></h3>
+		</div>
+		<div class="col-xs-8">
+			<p>설명: {{ current_channel.description|safe }}</p>
+		</div>
+	</div>
+	{% if is_admin %}
+	<div class="pull-right">
+		{% csrf_token %}
+		<a class="btn btn-warning" href="./modify/">채널 수정</a>
+        <button class="btn btn-danger channel-delete">채널 삭제</button>
+	</div>
+	{% endif %}
+</div>
 {% include "channel/list_core.html" %}
 {% endblock %}
