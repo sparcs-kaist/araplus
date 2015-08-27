@@ -67,11 +67,13 @@
 		$(".comment-modify").click(function() {
 			var comment_order = $(this).data("order");
 			var comment_panel = $(this).parent().parent();
+			var is_adult = comment_panel.parent().find("label.adult-mark").length > 0 ? "checked" : "";
 			var content = $(".comment-body[data-order=" + comment_order + "]").html().replace(/<br\s*[\/]?>/gi,'');
             var comment_html = "<form action='./" + comment_order + "/modify/{{querystring}}' method='POST'>" +
                 "{% csrf_token %}" +
                 "<div class='form-group'>" +
-                    "<textarea class='form-control' rows='2' name='content'>" + content + "</textarea>" +
+					"<textarea class='form-control' rows='2' name='content'>" + content + "</textarea>" + 
+					"<div class='checkbox pull-right'><label><input type='checkbox' name='is_adult' " + is_adult + "> 성인 댓글</label></div>" + 
                     "<div class='col-md-12'>" +
 						"<button type='submit' class='btn btn-info col-md-1 col-md-offset-11'>완료</button></div></div></form>";
 			comment_panel.html(comment_html);
@@ -216,10 +218,10 @@
         {% endif %}
         	<div class="panel-heading row" style="margin-left:0;margin-right:0">	
 				<div class="col-md-5">
+					<span>{{ comment.order }}</span>
                 	{% if comment.is_adult %}
-                	<label style="color:red">+19</label>
+                	<label class="adult-mark" style="color:red">+19</label>
                 	{% endif %}
-					<span>{{ comment.order }}
                 </div>
                 <div class="col-md-2">User:{{ comment.username }}</div>
 				<div class="col-md-2">Vote: +<span class="comment-vote-up-result" data-order="{{ comment.order }}">{{ comment.vote_up }}</span>/-<span class="comment-vote-down-result" data-order="{{ comment.order }}">{{ comment.vote_down }}</span></div>
@@ -249,7 +251,12 @@
         	<form action="./write/{{querystring}}" method="POST">
             	{% csrf_token %}
                 <div class="form-group">
-                	<textarea class="form-control" rows="3" name="content"></textarea>
+					<textarea class="form-control" rows="3" name="content"></textarea>
+					<div class="checkbox pull-right">
+						<label>
+							<input type="checkbox" name="is_adult"> 성인 댓글
+						</label>
+					</div>
                 </div>
                 <button type="submit" class="btn btn-normal col-md-1 col-md-offset-11">Submit</button>
            	</form>
