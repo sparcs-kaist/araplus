@@ -128,9 +128,10 @@ class BoardPostForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         is_modify = kwargs.pop('is_modify', False)
+        is_staff = kwargs.pop('is_staff', False)
         super(BoardPostForm, self).__init__(*args, **kwargs)
         self.fields['board_category'].queryset = BoardCategory.objects.all()
-        if is_modify:
+        if is_modify or not is_staff:
             del self.fields['is_notice']
 
     def save(self, *args, **kwargs):

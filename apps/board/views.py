@@ -117,7 +117,8 @@ def post_write(request, board="All"):
         except:
             board = Board.objects.get(id=1)
         form_content = BoardContentForm()
-        form_post = BoardPostForm(initial={'board': board.id})
+        form_post = BoardPostForm(initial={'board': board.id},
+                                  is_staff=request.user.is_staff)
         form_attachment = AttachmentFormSet(queryset=Attachment.objects.none())
     return render(request,
                   'board/board_write.html',

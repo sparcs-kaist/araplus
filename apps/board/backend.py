@@ -181,7 +181,8 @@ def _write_post(request, is_modify=False, post=None,
         author=request.user.userprofile)
     form_post = BoardPostForm(
         request.POST,
-        instance=post)  # get form from post and instance
+        instance=post,
+        is_staff=request.user.is_staff)  # get form from post and instance
     form_attachment = AttachmentFormSet(request.POST, request.FILES)
     try:  # for modify log, get title and content before modify.
         # modify log for content
