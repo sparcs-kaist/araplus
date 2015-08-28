@@ -341,7 +341,7 @@ def _write_comment(request, post_id, is_modify=False):
             notify.send(request.user,
                         recipient=target,
                         verb='님이 태그했습니다.'.decode('utf-8'))
-    return board_comment.board_post.id
+    return board_comment.board_post.id, order - 1
 
 
 def _delete_post(request):

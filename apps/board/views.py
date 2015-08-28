@@ -231,9 +231,9 @@ def comment_write(request, board_url, post_id):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
     if request.method == 'POST':
-        post_id = _write_comment(request, post_id)
+        post_id, order = _write_comment(request, post_id)
     querystring = _get_querystring(request, 'best', 'page')
-    return redirect('../' + querystring)
+    return redirect('../' + querystring + '#comment_order_' + str(order))
 
 
 @login_required(login_url='/session/login')
@@ -241,9 +241,9 @@ def comment_modify(request, board_url, post_id):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
     if request.method == 'POST':
-        post_id = _write_comment(request, post_id, True)
+        post_id, order = _write_comment(request, post_id, True)
     querystring = _get_querystring(request, 'best', 'page')
-    return redirect('../' + querystring)
+    return redirect('../' + querystring + '#comment_order_' + str(order))
 
 
 @login_required(login_url='/session/login')
