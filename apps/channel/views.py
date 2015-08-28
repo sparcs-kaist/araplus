@@ -43,7 +43,7 @@ def create(request):
         result = _write_channel(request)
         if 'success' in result:
             return redirect('../' + result['success'].url + '/')
-        
+
         form_channel = result['fail']
     else:
         form_channel = ChannelForm()
@@ -98,7 +98,7 @@ def write_post(request, channel_url):
 @login_required(login_url='/session/login')
 def write_comment(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order)
-    _write_comment(request, post)
+    _write_comment(request, channel_url, post)
     querystring = _get_querystring(request, 'page')
     return redirect('../' + querystring)
 
@@ -141,7 +141,7 @@ def modify_channel(request, channel_url):
         result = _write_channel(request, channel)
         if 'success' in result:
             return redirect('../../' + result['success'].url + '/')
- 
+
         form_channel = result['fail']
     else:
         form_channel = ChannelForm(instance=channel)
@@ -161,7 +161,7 @@ def modify_post(request, channel_url, post_order):
 
         if 'success' in result:
             return redirect('../')
-        
+
         form_content, form_post, form_attachment = result['fail']
     else:
         form_content = ChannelContentForm(instance=post.channel_content)
