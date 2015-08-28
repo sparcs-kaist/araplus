@@ -121,8 +121,7 @@ class ChannelComment(models.Model):
     
     def get_vote(self):
         votes = ChannelCommentVote.objects.filter(channel_comment=self)
-        #return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
-        return 100, 50
+        return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
 
     def get_my_vote(self, userprofile):
         vote = {'is_up': False, 'is_down': False}
