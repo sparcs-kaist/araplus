@@ -7,6 +7,7 @@ import diff_match_patch
 from django.db.models import Q
 from apps.channel.forms import *
 from itertools import izip
+#from notifications import notify
 
 
 def _get_querystring(request, *args):
@@ -30,7 +31,7 @@ def _parse_channel(channel_url):
 
 def _parse_post(channel_url, post_order, live_only=True):
     channel = _parse_channel(channel_url)
-    
+
     try:
         post = ChannelPost.objects.get(channel=channel, order=post_order)
         if live_only and post.channel_content.is_deleted:
@@ -222,7 +223,7 @@ def _write_post(request, channel, post=None):
         return {'fail': [form_content, form_post, form_attachment]}
 
 
-def _write_comment(request, post=None, comment=None):
+def _write_comment(request, channel_url="", post=None, comment=None):
     userprofile = request.user.userprofile
 
     if comment is not None:
@@ -251,6 +252,29 @@ def _write_comment(request, post=None, comment=None):
     comment.save()
 
     comment.channel_post.save()
+
+    content = comment.channel_content.content
+    index = 0
+    while index < len(content):
+        index = content.find("@", index)
+        if index == -1:
+            break
+        tagged_comment_num = 0
+        while index + 1 < len(content):
+            index = index + 1
+            if '0' <= content[index] <= '9':
+                tagged_comment_num = 10*tagged_comment_num + int(content[index])
+        tagged_comment = _parse_comment(channel_url, post.order, tagged_comment_num)[2]
+        if request.user.userprofile != tagged_comment.author:
+            try:
+                print request.user.userprofile.nickname
+                print tagged_comment.author.nickname
+                #notify.send(request.user,
+                #            recipient=tagged_comment.author,
+                #            verb='님이 태그했습니다.'.decode('utf-8'))
+            except:
+                pass
+
     return True
 
 
@@ -287,7 +311,7 @@ def _vote_post(userprofile, post, rating):
             vote.delete()
     except:
         vote = ChannelPostVote(channel_post=post, userprofile=userprofile)
-    
+
     if int(rating) != 0:
         vote.rating = int(rating)
         vote.save()
@@ -305,7 +329,7 @@ def _vote_comment(userprofile, comment, is_up):
         if vote.is_up == up:
             vote.delete()
             result['up'], result['down'] = False, False
-    
+
     except:
         vote = ChannelCommentVote(channel_comment=comment,
                 userprofile=userprofile)
