@@ -52,8 +52,7 @@ class ChannelContent(models.Model):
     def replace_content_tags(self):
         result = cgi.escape(self.content)
         result = result.replace("\n", "<br/>")
-        result = re.sub(r'@(?P<target>\d+)', '<a title="comment_\g<target>"' +
-                        'class="comment_preview" href="#comment_order_\g<target>">' +
+        result = re.sub(r'@(?P<target>\d+)', '<a href="#comment-\g<target>">' +
                         '@\g<target></a>', result)
         return hashtag_regex.sub(
             '\1<a href="../?tag=\g<target>">#\g<target></a>',
@@ -122,7 +121,8 @@ class ChannelComment(models.Model):
     
     def get_vote(self):
         votes = ChannelCommentVote.objects.filter(channel_comment=self)
-        return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
+        #return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
+        return 100, 50
 
     def get_my_vote(self, userprofile):
         vote = {'is_up': False, 'is_down': False}
@@ -179,6 +179,16 @@ class ChannelPost(models.Model):
                     userprofile=userprofile).rating
         except:
             return 0
+
+    def get_best_comments(self):
+        comments = ChannelComment.objects.filter(channel_post=self)
+        best_comments = list(reversed(sorted(
+            filter(lambda x: x.get_vote()[0] > 5, comments),
+            key=lambda x: x.get_vote()[0] - x.get_vote()[1])))
+ 
+        if len(best_comments) > 3:
+            return best_comments[:3]
+        return best_comments
 
     def save(self, *args, **kwargs):
         if self.order == -1:

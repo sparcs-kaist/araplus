@@ -56,7 +56,7 @@ def _parse_comment(channel_url, post_order, comment_order, live_only=True):
 
 
 def _write_channel(request, channel=None):
-    form_channel = ChannelForm(request.POST, instance=channel)
+    form_channel = ChannelForm(request.POST, request.FILES, instance=channel)
 
     if form_channel.is_valid():
         channel = form_channel.save(admin=request.user.userprofile)
@@ -146,17 +146,30 @@ def _get_post_list(request, channel, item_per_page=15):
     return notice_list, post_list, paginator.page_range, current_page
 
 
-def _get_comment_list(request, post):
+def _get_comment_list(request, post, item_per_page=5):
+    page = int(request.GET.get('cpage', '1'))
+    userprofile = request.user.userprofile
+
+    comments = post.channel_comment.all()
+    paginator = Paginator(comments, item_per_page)
+    try:
+        comment_paged = paginator.page(page)
+    except EmptyPage:
+        comment_paged = paginator.page(paginator.num_pages)
+    current_page = comment_paged.number
+
     comment_list = []
-    for comment in post.channel_comment.all():
-        comment = _render_content(request.user.userprofile, comment=comment)
+    for comment in comment_paged:
+        comment = _render_content(userprofile, comment=comment)
         comment_list.append(comment)
 
-    best_comments = reversed(sorted(
-        filter(lambda x: x['vote_up'] > 5, comment_list),
-        key=lambda x: x['vote_up'] - x['vote_down']))
+    best_comments = []
+    for comment in map(lambda x: _render_content(userprofile, comment=x),
+            post.get_best_comments()):
+        comment['best_comment'] = True
+        best_comments.append(comment)
 
-    return list(best_comments) + comment_list
+    return best_comments + comment_list, paginator.page_range, current_page
 
 
 def _mark_read(userprofile, post):
@@ -236,6 +249,8 @@ def _write_comment(request, post=None, comment=None):
 
     comment.channel_content = content_form.save()
     comment.save()
+
+    comment.channel_post.save()
     return True
 
 
@@ -258,6 +273,10 @@ def _mark_adult(userprofile, content):
         marker = ChannelMarkAdult(channel_content=content,
                 userprofile=userprofile)
         marker.save()
+
+        if len(content.channel_mark_adult.all()) > 3:
+            content.is_adult = True
+            content.save()
         return True
 
 

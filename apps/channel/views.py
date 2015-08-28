@@ -109,7 +109,7 @@ def read_post(request, channel_url, post_order):
     channel_list = Channel.objects.all()
     post_rendered = _render_content(request.user.userprofile, post=post)
     _mark_read(request.user.userprofile, post)
-    comments = _get_comment_list(request, post)
+    comments, c_pages, c_page = _get_comment_list(request, post)
     notice_list, post_list, pages, page = _get_post_list(request, channel)
     report_form = ChannelReportForm()
 
@@ -123,6 +123,8 @@ def read_post(request, channel_url, post_order):
                       'post_list': post_list,
                       'pages': pages,
                       'current_page': page,
+                      'c_pages': c_pages,
+                      'current_c_page': c_page,
                       'channel_list': channel_list,
                       'current_channel': channel,
                       'report_form': report_form

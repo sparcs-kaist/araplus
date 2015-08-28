@@ -6,7 +6,7 @@ from django.forms import ModelForm, Textarea
 class ChannelForm(ModelForm):
     class Meta:
         model = Channel
-        exclude = ['admin', 'thumbnail', 'is_deleted']
+        exclude = ['admin', 'is_deleted']
 
     def save(self, *args, **kwargs):
         self.instance.is_deleted = False

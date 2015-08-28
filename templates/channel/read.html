@@ -126,31 +126,17 @@
 				}
 			});
 		});
-        
-		$(".report_submit").click(function() {
-            var report_reason = $("#report_reason").val()
-            var report_content = $("#report_content").val()
-            $.ajax({
-                url : "report/",
-                type : "POST",
-                data : { id : report_uid, report_reason : report_reason, report_content : report_content,csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()},
-                success : function(data){
-                    alert(data);
-                }
-            });
-            doOverlayClose();
-        });
-		
+ 
 		$(".post-report").click(function(){
 			$("#report-form").attr('action', './report/');
 			$("#modal-report").modal();
 		});
-		
+
 		$(".comment-report").click(function(){
 			$("#report-form").attr('action', './' + $(this).data('order') + '/report/');
 			$("#modal-report").modal();
 		});
-		
+
 		$("#id_content").keyup(function(){
 			if ($(this).val() == '')
 				$(".report-submit").prop("disabled", true);
@@ -216,7 +202,7 @@
         {% else %}
         <div class="panel panel-success">
         {% endif %}
-        	<div class="panel-heading row" style="margin-left:0;margin-right:0">	
+			<div class="panel-heading row" id="comment-{{ comment.order }}" style="margin-left:0;margin-right:0">	
 				<div class="col-md-5">
 					<span>{{ comment.order }}</span>
                 	{% if comment.is_adult %}
@@ -246,7 +232,19 @@
 			</div>
 		</div>
 		{% endfor %}
-        {% if not post.deleted %}
+		<div class="text-center">
+        	<ul class="pagination pagination-sm">
+            	{% for c_page in c_pages %}
+            	{% if c_page == current_c_page %}
+            	<li class="active"><a href="./?cpage={{c_page}}">{{c_page}}</a></li>
+            	{% else %}
+            	<li><a href="./?cpage={{c_page}}">{{c_page}}</a></li>
+            	{% endif %}
+            	{% endfor %}
+        	</ul>
+    	</div>
+
+		{% if not post.deleted %}
         <div>
         	<form action="./write/{{querystring}}" method="POST">
             	{% csrf_token %}
