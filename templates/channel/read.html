@@ -18,6 +18,10 @@
 		$(".list-post[data-order=" + post_order + "]").addClass('selected');
 		$(".list-notice[data-order=" + post_order + "]").addClass('selected');
 		$(".rateit.vote").rateit("value", {{ post.rating }});
+		$(".numtag").each(function() { 
+			order = $(this).data("order");
+			$(this).attr("href", "./?cpage=" + Math.ceil(order / 5) + "#comment-" + order);
+		});
 
 		var ajax_mark19 = function(obj, url) {
 			$.ajax({
@@ -69,7 +73,10 @@
 			var comment_panel = $(this).parent().parent();
 			var is_adult = comment_panel.parent().find("label.adult-mark").length > 0 ? "checked" : "";
 			var content = $(".comment-body[data-order=" + comment_order + "]").html().replace(/<br\s*[\/]?>/gi,'');
-            var comment_html = "<form action='./" + comment_order + "/modify/{{querystring}}' method='POST'>" +
+			console.log(content);
+			content = content.replace(/<a class="numtag"[^\>]*>(@\d+)<\/a>/gi, '$1');
+			console.log(content);
+			var comment_html = "<form action='./" + comment_order + "/modify/{{querystring}}' method='POST'>" +
                 "{% csrf_token %}" +
                 "<div class='form-group'>" +
 					"<textarea class='form-control' rows='2' name='content'>" + content + "</textarea>" + 

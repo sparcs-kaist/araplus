@@ -6,7 +6,7 @@ import json
 import re
 import cgi
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
-
+numtag_regex = re.compile(r'@(?P<target>\d+)')
 
 class Channel(models.Model):
     kor_name = models.CharField(max_length=45, unique=True)
@@ -52,14 +52,16 @@ class ChannelContent(models.Model):
     def replace_content_tags(self):
         result = cgi.escape(self.content)
         result = result.replace("\n", "<br/>")
-        result = re.sub(r'@(?P<target>\d+)', '<a href="#comment-\g<target>">' +
-                        '@\g<target></a>', result)
+        result = numtag_regex.sub('<a class="numtag" data-order="\g<target>">@\g<target></a>', result)
         return hashtag_regex.sub(
             '\1<a href="../?tag=\g<target>">#\g<target></a>',
             result)
 
     def get_hashtags(self):
         return [tag[1] for tag in hashtag_regex.findall(self.content)]
+
+    def get_numtags(self):
+        return [tag[1] for tag in numtag_regex.findall(self.content)]
 
 
 class Attachment(models.Model):
