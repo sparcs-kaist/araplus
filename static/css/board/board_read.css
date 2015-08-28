@@ -305,15 +305,3 @@ style{
     color: #adadad;
     margin-left: 10px;
 }
-
-.post-pagination ul li{
-    display: inline-block;
-    
-}
-.active{
-    background: #333;
-}
-
-.active a{
-    color: #fff;
-}

@@ -87,7 +87,6 @@ a{
     width: 100%;
     height: 19px;
     margin-top: 30px;
-    text-align: center;
 }
 
 #board-pagination-number{
@@ -102,6 +101,7 @@ a{
     line-height: 11px;
     padding-top: 4px;
     margin-right: 10px;
+    text-align: center;
     display: inline-block;
 }
 

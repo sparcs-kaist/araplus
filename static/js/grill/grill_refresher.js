@@ -81,7 +81,7 @@ var add_comment = function(grill_id, socket){
             return false;
         };
         $("#new-content").val('');
-        $("#text-counter").text('140');
+        $("#text-counter").text('0');
         $.ajax({
             type: 'POST',
             url: '/grill/'+grill_id+'/add_comment/',
@@ -115,33 +115,22 @@ $(document).ready(function(){
             $(document).on('click','button.vote-up',function(){
                 $(this).attr('disabled',true);
                 $(this).parent().children("button.vote-down").attr('disabled', true);
-				//vote button이 작동하지 않는 bug
-				//vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, true);
+                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, true);
                 var target_new_like = $(this).text().trim().split('+')[1].slice(0, -1)*1 + 1;
-                $(this).text("▲추천 (+"+target_new_like+")")
+                $(this).text("추천 (+"+target_new_like+")")
             })
 
             $(document).on('click','button.vote-down',function(){
                 $(this).attr('disabled',true);
                 $(this).parent().children("button.vote-up").attr('disabled', true);
                 console.log($(this).parentsUntil("#comment-content-list"));
-                //vote button이 작동하지 않는 버그
-				//vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, false);
+                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, false);
                 var target_new_like = $(this).text().trim().split('-')[1].slice(0, -1)*1 + 1;
-                $(this).text("▼반대 (-"+target_new_like+")")
+                $(this).text("반대 (-"+target_new_like+")")
             })
 
             $("#new-content").on('keyup',function(event){
-                var typeable = 140-$($("#new-content")[0]).val().length;
-                $("#text-counter").text(typeable);
-                if (typeable<0) {
-                    $("#btn-add-comment").attr('disabled',true);
-                    $("#text-counter").css('color','red');
-                } else{
-                    $("#btn-add-comment").attr('disabled',false);
-                    $("#text-counter").css('color','black');
-                }
-
+                $("#text-counter").text(140-$($("#new-content")[0]).val().length);
             })   
 
             // websocket Initialize

@@ -73,7 +73,6 @@ def _get_post_list(request, board_url='', item_per_page=15):
 def _get_querystring(request, *args):
     query_list = []
     querystring = ''
-    print(request.GET.get('comment_page','none'))
     for field in args:
         if request.GET.get(field):
             query_list.append(field + '=' + request.GET[field])
@@ -82,7 +81,7 @@ def _get_querystring(request, *args):
     return querystring
 
 
-def _get_content(request, post_id, comment_per_page=10):
+def _get_content(request, post_id):
     try:
         board_post = BoardPost.objects.get(id=post_id)
     except ObjectDoesNotExist:
@@ -99,43 +98,21 @@ def _get_content(request, post_id, comment_per_page=10):
         board_post_is_read.userprofile = request.user.userprofile
     board_post_is_read.save()
     post = _get_post(request, board_post, 'Post')
-    ##pagination of comments##
-    board_comments = board_post.board_comment.all()
-    comment_page = int(request.GET.get('comment_page',1))
-    comment_paginator = Paginator(board_comments, comment_per_page)
-    comment_paged = comment_paginator.page(comment_page)
-    current_page = comment_page
-    page_range = comment_paginator.page_range
-    page_left = 0
-    page_right = 0
-    if len(page_range) == 1:
-        page_range.remove(1)       
-    if len(page_range) > 5:
-        last_page = len(page_range)
-        page_target = (current_page-1)/5
-        page_range = []
-        page_left = page_target * 5
-        page_right = page_target * 5 + 6
-        for i in range(page_left+1,page_right):
-            if i>last_page:
-                page_right = 0
-                break
-            page_range.append(i)
     comment_list = []
     comment_nickname_list = []
     if board_post.board_content.is_anonymous is None:
         comment_nickname_list = [(board_post.author.nickname, 0)]
     order = 1
-    for board_comment in comment_paged:
-        comment = _get_post(request, board_comment, 'Comment')
-        comment['order'] = comment_per_page*(current_page-1)+order
-        order = order + 1
-        comment['is_political'] = board_comment.is_political
+    for board_comment in board_post.board_comment.all():
+        comment = _get_post(request, board_comment, 'Comment',
+                            comment_nickname_list)
+        comment['order'] = order
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
         if comment['is_anonymous'] is None:
             username = comment['username']
             comment_nickname_list.append((username, order))
+        order = order + 1
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
@@ -145,7 +122,7 @@ def _get_content(request, post_id, comment_per_page=10):
     if best_comment:
         best_comment['best_comment'] = True
         comment_list.insert(0, best_comment)
-    return (post, comment_list, page_range, current_page, page_left, page_right)
+    return (post, comment_list)
 
 
 def _get_post(request, board_post, type, comment_nickname_list=[]):
@@ -182,10 +159,6 @@ def _get_post(request, board_post, type, comment_nickname_list=[]):
     post['vote'] = board_content.get_vote()
     post['vote']['is_up'] = False
     post['vote']['is_down'] = False
-    if board_content.use_signiture:
-        post['signiture'] = request.user.userprofile.signiture
-    else:
-        post['signiture'] = ''
     try:
         is_vote = BoardContentVote.objects.get(
             userprofile=userprofile, board_content=board_content)
@@ -494,23 +467,10 @@ def _vote(request):
         vote.userprofile = user_profile
         vote.save()
         _make_best(board_content)
-        if board_content.go_political():
-            try:
-                board_post = BoardPost.objects.get(board_content=board_content)
-                board_political = Board.objects.get(eng_name='Political')
-                board_post.board = board_political
-                board_post.save()
-            except ObjectDoesNotExist:
-                board_comment = BoardComment.objects.get(board_content=board_content)
-                board_comment.is_political = True
-                board_comment.save()
-        if board_content.go_adult():
-            board_content.is_adult = True
-            board_content.save()
         return {'success': 'vote ' + vote_type,
                 'vote': board_content.get_vote(), 'cancel': cancel}
     except ObjectDoesNotExist:
-        return {'fail': 'Unvalid content id'}
+        return {'fail': 'Unvalid ontent id'}
 
 
 def _make_best(board_content):

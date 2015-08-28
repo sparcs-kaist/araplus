@@ -17,6 +17,7 @@ def main(request):
 def validate_nickname(nickname):
     if not re.match(r'[\w_-]{5,30}', nickname):
         return False
+
     user_profile = UserProfile.objects.filter(nickname=nickname)
     if len(user_profile) > 0:
         return False

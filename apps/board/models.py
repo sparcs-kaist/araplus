@@ -35,7 +35,6 @@ class BoardContent(models.Model):
     is_anonymous = models.TextField(default=None, null=True)
     is_adult = models.BooleanField(default=False, null=False)
     modify_log = models.TextField(default='[]')
-    use_signiture = models.BooleanField(default=False, null=False)
 
     def set_log(self, log):
         self.modify_log = json.dumps(log)
@@ -65,20 +64,6 @@ class BoardContent(models.Model):
         vote['up'] = up
         vote['down'] = down
         return vote
-
-    def go_adult(self):
-        adult = 0 
-        adult = self.board_content_vote_adult.count()
-        if adult > 0 :
-            return True
-        return False
-    
-    def go_political(self):
-        political = 0
-        political = self.board_content_vote_political.count()
-        if political > 0 :
-            return True
-        return False
 
     def replace_content_tags(self, type, comment_nickname_list):
         result = cgi.escape(self.content)
@@ -127,7 +112,6 @@ class BoardComment(models.Model):
                                    null=True)
     author = models.ForeignKey('session.UserProfile',
                                related_name="board_comment")
-    is_political = models.BooleanField(default=False, null=False)
 
     def __str__(self):
         created_time = self.board_content.created_time

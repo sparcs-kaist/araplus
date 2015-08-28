@@ -1,76 +1,34 @@
 {% extends "base.html" %}
-{% block css %}
-<link rel="stylesheet" type="text/css" href="/media/css/grill/list.css"> 
-{% endblock %}
-{%block js%}
-<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
-<script>
-    jQuery(document).ready(function() {
-        jQuery("abbr.timeago").timeago();
-    });
-</script>
-{%endblock%}
-
 {% block content %}
-<div id="content-wrapper">
-	<div id ="grill-title">
-		이것은 불판
-	</div>
-	<div>
-		<table id="post-list-wrapper">
-			<tr id="list-header" class="list">
-				<td width=50><p align=center></p></td>
-				<td width=600><p align=center>불판</p></td>
-				<td width=100><p align=center>고기수</p></td>
-				<td width=120><p align=center>뷸판 세운 날짜</p></td>
-				<td width=180><p align=center>글쓴이</p></td>
-			</tr>
-			{% if grills|length %}
-			<ul>
-				{% for grill in grills %}
-				<tr class="list">
-					<td width=50><p align=center></p></td>
-					<td width=600 style="padding-left: 10px">
-						<p align=left>
-							<a href="{% url 'view_grill' grill.id %}">{{ grill.title }}</a>
-						</p>
-					</td>
-					<td width=100 style="color: #40e0d0"><p align=center>{{ grill.comment }}</p></td>
-					<td width=120>
-						<p align=center>
-							<abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
-						</p>
-					</td>
-					<td width=180 style="color: #adadad;"><p align=left style="padding-left: 10%;">{{grill.author}}</p></td>
-				</tr>
-				{% endfor %}
-			</ul>
-			{% else %}
-			<p>No Data.</p>
-			{% endif %}
-		</table>
-	</div>
-	<div style="text-align: center;" id="grill-pagination">
-		<ul id="grill-pagination-number">
-			{% if page_left != 0 %}
-			<li><a href="/grill/?page={{page_left}}">&laquo;</a></li>
-			{% endif %}
-			{% for page in pages %}
-			{% if page == current_page %}
-			<li class="active">
-			<a href="/grill/?page={{page}}">{{page}}<span class="sr-only"></span></a>
-			</li>
-			{% else %}
-			<li><a href="/grill/?page={{page}}">{{page}}</a></li>
-			{% endif %}
-			{% endfor %}
-			{% if page_right != 0 %}
-			<li><a href="/grill/?page={{page_right}}">&raquo;</a></li>
-			{% endif %}
-		</ul>
-	</div>
+<div class="container">
+    <table class="table" width=700>
+        <tr>
+            <td width=50><p align=center>번호</p></td>
+            <td width=100><p align=center>이름</p></td>
+            <td width=320><p align=center>제목</p></td>
+            <td width=100><p align=center>등록일</p></td>
+        </tr>
+        {% if grills|length %}
+        <ul>
+            {% for grill in grills %}
+            <tr>
+                <td width=50><p align=center>{{ grill.id }}</p></td>
+                <td width=100><p align=center>{{ grill.author.nickname }}</p></td>
+                <td width=320>
+                    <p align=center>
+                        <a href="{% url 'view_grill' grill.id %}">{{ grill.title }}</a>
+                    </p>
+                </td>
+                <td width=100><p align=center>{{ grill.created_time }}</p></td>
+            </tr>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No Data.</p>
+        {% endif %}
+    </table>
     <div class="pull-right">
-        <a class="write" href="/grill/add_grill/">글쓰기</a>
+        <a class="btn btn-default" href="/grill/add_grill/">글쓰기</a>
     </div>
 </div>
 {% endblock %}

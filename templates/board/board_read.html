@@ -100,18 +100,16 @@
                     <span class="inblock" id="vote_down_{{comment.content_id}}">{{comment.vote.down}}</span>
                 </div>
             </div>
-            <div class="panel-body">
-				<div id="comment_content{{ comment.order }}">
-					{% if comment.is_political %}
-					<a onclick="this.nextSibling.style.display=(this.nextSibling.style.display=='none')?'block':'none';" href="javascript:void(0)">이건 정치글입니다.</a><div style="display:none"><div id="comment{{comment.id}}">{{ comment.content | force_escape | linebreaksbr }}</div></div>
-                	{% elif request.user.userprofile.adult_filter and comment.adult %}
-					<div class="comment-content hiddenContent" id="comment{{comment.order}}" value="{{ comment.content | safe }}">
-					</div>
-					{% else %}
-					<div class="comment-content" id="comment{{comment.order}}">
-						{{ comment.content | safe}}
-                	</div>
-                	{% endif %}
+            <div id="comment_content{{ comment.order }}">
+                {% if request.user.userprofile.adult_filter and comment.adult %}
+                <div class="comment-content hiddenContent" id="comment{{comment.order}}" value="{{ comment.content | safe }}">
+                    성인 댓글 입니다.
+                </div>
+                {% else %}
+                <div class="comment-content" id="comment{{comment.order}}">
+                    {{ comment.content | safe}}
+                </div>
+                {% endif %}
                 {% if not comment.deleted %}
                 <div class="comment-function">
                     <!-- 신고 기능 작동 -->
@@ -125,33 +123,13 @@
                 {% endif %}
             </div>
         </div>
-		{% endfor %}
-		<div style="text-align: center;" class="post-pagination">
-				<ul>
-					{% if comment_page_left != 0 %}
-					<li><a href="{{querystring}}comment_page={{comment_page_left}}"">&laquo;</a></li>
-					{% endif %}
-					{% for comment_page in comment_pages%}
-					{% if comment_page == comment_current_page %}
-					<li class="active">
-					<a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}<span class="sr-only"></span></a>
-					</li>
-					{% else %}
-					<li><a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}</a></li>
-					{% endif %}
-					{% endfor %}
-					{% if comment_page_right != 0 %}
-					<li><a href="{{querystring}}comment_page={{comment_page_right}}"">&raquo;</a></li>
-					{% endif %}
-				</ul>
-			</div>
-		</div>   
+        {% endfor %}
         {% if not post.deleted %}
-		<div id="comment-write-wrapper">
-			<form action="./comment/{{querystring}}comment_page={{comment_current_page}}" method="POST" enctype="multipart/form-data">
-            {%csrf_token%}
-            <input type="hidden" name="board_post_id" value="{{ post.id }}">
-            <textarea class="comment-textarea" rows="5" name="content" placeholder="댓글을 입력하세요."></textarea>
+        <div id="comment-write-wrapper">
+            <form action="./comment/{{querystring}}" method="POST" enctype="multipart/form-data">
+                {%csrf_token%}
+                <input type="hidden" name="board_post_id" value="{{ post.id }}">
+                <textarea class="comment-textarea" rows="5" name="content" placeholder="댓글을 입력하세요."></textarea>
                 <!--
                 </div>
                     <div id="attachment_handling">
@@ -165,15 +143,16 @@
                 </div>
                 사진 업로드 기능
                 -->
-				<div id="comment-write-footer">
+                <div id="comment-write-footer">
                     <button type="submit" class="comment-write-button" class="btn btn-normal col-md-1 col-md-offset-11">댓글 남기기</button>
                     <h3>성인</h3>
                     <input type="checkbox" name="is_adult">
                     <h3>익명</h3>
                     <input type="checkbox" name="is_anonymous">
                 </div>
-			</form>
+        </form>
         </div>
-		{% endif %}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

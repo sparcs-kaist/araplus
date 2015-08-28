@@ -3,7 +3,7 @@
     "Invalid access"
     {% endif %}
     <div id="board-title">
-        {{current_board|default:'All'}} 
+        {{current_board|default:'All'}} | ㅁㄴㅇㄹ
     </div>
     <table id="post-list-wrapper">
         <tr id="list-header" class="list">
@@ -112,9 +112,11 @@
     </div>
 <div>
 
+<!--
     <div class="pull-right btn-group" role="group">
         <a class="btn btn-default" href="?best=true">Best</a>
         <a class="btn btn-default"
             href="/board/{{current_board.url|default:'all'}}/post">글 쓰기</a>
     </div>
 </div>
+-->
