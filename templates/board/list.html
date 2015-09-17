@@ -99,6 +99,7 @@
             </tr>
         {% endfor %}
     </table>
+    <!-- page 넘어가는 <> 넣기 -->
     <div id="board-pagination">
         <ul id="board-pagination-number">
             {% for page in pages %}
@@ -109,7 +110,15 @@
             {% endif %}
             {% endfor %}
         </ul>
+        <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
+        <input id="board-search" placeholder="Search" type="text">
     </div>
+    {% if request.user.userprofile.adult_filter %}
+    <!-- 성인글 부분 수정 -->
+    <a style="width: 150px; height:20px; display:inline-block; margin-top:15px" href="set_adult_filter/">성인글 필터링 해제</a>
+    {% else %}
+    <a style="width: 150px; height:20px; display:inline-block; margin-top:15px"href="set_adult_filter/">성인글 필터링</a>
+    {% endif %}
 <div>
 
 <!--
