@@ -1,10 +1,9 @@
+{% extends "base.html" %}
 {% load bootstrap %}
 {% block css %}
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="/media/css/board/board_write.css">
 {% endblock %}
 {% block js %}
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="/media/js/board/upload_handling.js"></script>
 <script>
     $(document).ready(function(){
@@ -22,6 +21,64 @@
 </script>
 {% endblock %}
 {% block content %}
+<div id="content-wrapper">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div id="board-title">
+            {{current_board|default:'All'}} | ㅁㄴㅇㄹ
+        </div>
+        <div class="line"></div>
+        <!-- board의 종류 넣어야함 -->
+        <div id="board-write-info">
+            <div class="info-nav-item">
+                <h3>CATEGORY</h3>
+                <!-- 디자인 수정 -->
+                <select id="id_board_category" name="board_category">
+                    <option value="">---------</option>
+                    {% for choice in post_form.board_category.field.queryset %}
+                    <option class="{{ choice.board }} board_category"
+                    value="{{ choice.id }}"
+                    {% if post_form.board_category.value == choice.id %} selected {% endif %}
+                    >{{ choice.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="info-nav-item">
+                <h3>TITLE</h3>
+                {{ post_form.title }}
+            </div>
+            <div class="info-nav-item">
+                <h3>ATTRIBUTES</h3>
+                <div id="info-select">
+                    <div id="adult" class="col-xs-2">
+                        {{ content_form.is_adult }}
+                        <span>성인글</span>
+                    </div>
+                    {% if content_form.is_anonymous %}
+                    <div id="anonymous" class="col-xs-3">
+                        {{ content_form.is_anonymous }}
+                        <span>익명글</span>
+                    </div>
+                    {% endif %}
+                    {% if post_form.is_notice %}
+                    <div id="notice" class="col-xs-2"> 
+                        {{ post_form.is_notice }}
+                        <span>공지글</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {{ content_form.content }}
+        <!-- attachment -->
+        <div id="board-write-tail">
+            <button type="submit" id="board-write-btn">글 작성 완료</button>
+        </div>
+        <!-- error -->
+    </form>
+</div>
+
+<!--
 <div class="container">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
@@ -94,4 +151,5 @@
         <button type="submit" class="btn btn-default">Submit</button>
     </form>
 </div>
+-->
 {% endblock %}
