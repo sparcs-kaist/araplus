@@ -71,85 +71,11 @@
         </div>
         {{ content_form.content }}
         <!-- attachment -->
+        {{ attachment_form }}
         <div id="board-write-tail">
             <button type="submit" id="board-write-btn">글 작성 완료</button>
         </div>
         <!-- error -->
     </form>
 </div>
-
-<!--
-<div class="container">
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="title">
-            {{ post_form.title|bootstrap }}
-        </div>
-        <div id="selecting" class="col-xs-12" style="padding-left: 0;">
-            <div id="board" class="col-xs-3" style="padding-left: 0;">
-                {{ post_form.board|bootstrap }}
-            </div>
-            <div id="category" class="col-xs-2">
-                {% if post_form.board_category.errors %}
-                <div class="form-group has-error">
-                {% else %}
-                <div class="form-group">
-                {% endif %}
-                    <label class="control-label"
-                        for="id_board_category">Category</label>
-                    <div class=" ">
-                        <select class="form-control" id="id_board_category"
-                            name="board_category">
-                            <option value="">---------</option>
-                            {% for choice in post_form.board_category.field.queryset %}
-                            <option class="category-{{ choice.board }} board_category"
-                            value="{{ choice.id }}" style="display:none;"
-                            {% if post_form.board_category.value == choice.id %} selected {% endif %}
-                            >{{ choice.name }}</option>
-                            {% endfor %}
-                        </select>
-                        {% if post_form.board_category.errors %}
-                        <span
-                            class="help-block">{{ post_form.board_category.errors|striptags }}
-                        </span>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="select">
-                <div id="adult" class="col-xs-2">
-                    {{ content_form.is_adult|bootstrap }}
-                </div>
-                {% if content_form.is_anonymous %}
-                <div id="anonymous" class="col-xs-3">
-                    {{ content_form.is_anonymous|bootstrap }}
-                </div>
-                {% endif %}
-                {% if post_form.is_notice %}
-                <div id="notice" class="col-xs-2"> 
-                    {{ post_form.is_notice|bootstrap }}
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        <div id="content">
-            {{ content_form.content|bootstrap }}
-        </div>
-        <div id="attachments">
-            {% if attachment_form.non_form_errors %}
-            <div class="form-group has-error">
-                <span class="help-block">{{ attachment_form.non_form_errors|striptags }}</span>
-            </div>
-            {% endif %}
-            {{ attachment_form.management_form }}
-            {% for form in attachment_form.forms %}
-            <div class="attachment">
-                {{ form|bootstrap }}
-            </div>
-            {% endfor %}
-		</div>
-        <button type="submit" class="btn btn-default">Submit</button>
-    </form>
-</div>
--->
 {% endblock %}

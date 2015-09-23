@@ -106,9 +106,7 @@
                     성인 댓글 입니다.
                 </div>
                 {% else %}
-                <div class="comment-content" id="comment{{comment.order}}">
-                    {{ comment.content | safe}}
-                </div>
+                <div class="comment-content" id="comment{{comment.order}}">{{ comment.content | safe}}</div>
                 {% endif %}
                 {% if not comment.deleted %}
                 <div class="comment-function">

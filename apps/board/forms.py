@@ -121,7 +121,7 @@ class BoardContentForm(ModelForm):
 class BoardPostForm(ModelForm):
     class Meta:
         model = BoardPost
-        fields = ['title', 'board', 'board_category', 'is_notice', ]
+        fields = ['title', 'board_category', 'is_notice', ]
         labels = {
             'board_category': 'Category',
         }
@@ -137,10 +137,12 @@ class BoardPostForm(ModelForm):
     def save(self, *args, **kwargs):
         self.instance.author = kwargs.pop('author')
         self.instance.board_content = kwargs.pop('content')
+        self.instance.board = kwargs.pop('board')
         return super(BoardPostForm, self).save(*args, **kwargs)
 
-    def clean(self):
+    """def clean(self):
         cleaned_data = super(BoardPostForm, self).clean()
+        print cleaned_data
         if 'board' in cleaned_data:
             board = cleaned_data['board']
             board_category = cleaned_data['board_category']
@@ -154,7 +156,7 @@ class BoardPostForm(ModelForm):
         else:
             msg = u"Select Board first"
             self.add_error('board_category', msg)
-        return cleaned_data
+        return cleaned_data"""
 
 
 class BoardReportForm(ModelForm):

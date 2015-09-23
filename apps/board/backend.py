@@ -184,6 +184,11 @@ def _write_post(request, is_modify=False, post=None,
         instance=post,
         is_staff=request.user.is_staff)  # get form from post and instance
     form_attachment = AttachmentFormSet(request.POST, request.FILES)
+    # Get board instance, if failed return fail 
+    try:
+        board_instance = Board.objects.get(url = board)
+    except:
+        return {'failed': [form_content, form_post, form_attachment]}
     try:  # for modify log, get title and content before modify.
         # modify log for content
         content_before = content.content
@@ -220,7 +225,8 @@ def _write_post(request, is_modify=False, post=None,
             request.user.userprofile.save()
         board_post = form_post.save(
             author=request.user.userprofile,
-            content=form_content.save(post=post))  # save
+            content=form_content.save(post=post),
+            board = board_instance)  # save
         board_content = board_post.board_content
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
