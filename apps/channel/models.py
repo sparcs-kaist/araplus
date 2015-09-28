@@ -75,8 +75,6 @@ class ChannelPostVote(models.Model):
                                      related_name="channel_post_vote")
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="channel_post_vote")
-    is_up = models.BooleanField()
-
 
 class ChannelCommentVote(models.Model):
     channel_comment = models.ForeignKey('ChannelComment',
@@ -169,16 +167,13 @@ class ChannelPost(models.Model):
 
     def get_vote(self):
         votes = ChannelPostVote.objects.filter(channel_post=self)
-        return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
+        return votes.count()
 
     def get_my_vote(self, userprofile):
-        vote = {'is_up': False, 'is_down': False}
+        vote = {'is_up': False}
         try:
             vote_obj = ChannelPostVote.objects.get(userprofile=userprofile, channel_post=self)
-            if vote_obj.is_up:
-                vote['is_up'] = True
-            else:
-                vote['is_down'] = True
+            vote['is_up'] = True
         except:
             pass
         return vote

@@ -92,20 +92,16 @@
             obj.addClass(fromClass);
         };
 
-        var post_vote = function(order, up) {
+        var post_vote = function() {
             var but_up = $(".post-vote-up");
-            var but_down = $(".post-vote-down");
             var result_up = $(".post-vote-up-result");
-            var result_down = $(".post-vote-down-result");
             $.ajax({
                 url: "./vote/",
                 type: "POST",
-                data: {csrfmiddlewaretoken: csrf_token, up: up},
+                data: {csrfmiddlewaretoken: csrf_token},
                 success: function(data) {
                     toggle(but_up, data.up, "btn-success", "btn-warning");
-                    toggle(but_down, data.down, "btn-success", "btn-warning");
                     result_up.html(data.tup);
-                    result_down.html(data.tdown);
                 }
             });
         }
@@ -129,11 +125,7 @@
 		};
 
         $(".post-vote-up").click(function() {
-            post_vote($(this), '0');
-        });
-
-        $(".post-vote-down").click(function() {
-            post_vote($(this), '1');
+            post_vote($(this));
         });
 
 		$(".comment-vote-up").click(function() {
@@ -192,7 +184,7 @@
                 	Title:{{ post.title }}
                 </div>
                 <div class="col-md-2">User:{{ post.username }}</div>
-                <div class="col-md-2">Vote: +<span class="post-vote-up-result">{{ post.vote_up }}</span>/-<span class="post-vote-down-result">{{ post.vote_down }}</span></div>
+                <div class="col-md-2">Vote: +<span class="post-vote-up-result">{{ post.vote_up }}</span></div>
                 <div class="col-md-3">{{post.created_time}}</div>
 			</div>
             <div class="panel-body">
@@ -203,7 +195,6 @@
 					<button class="btn btn-warning col-md-1 post-mark19" {% if post.mark19 %}disabled{% endif %}>Mark19</button>
 					<button class="btn btn-warning col-md-1 post-report">Report</button>
                     <button class="btn btn-{% if post.vote.is_up %}warning{% else %}success{% endif %} col-md-1 post-vote-up">Up</button>
-                    <button class="btn btn-{% if post.vote.is_down %}warning{% else %}success{% endif %} col-md-1 post-vote-down">Down</button>
                     <a class="btn btn-info col-md-1" href="./log/">Log</a>
                     {% if post.auth %}
                     <a class="btn btn-info col-md-1" href="./modify/">Modify</a>

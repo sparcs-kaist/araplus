@@ -259,11 +259,7 @@ def mark19_comment(request, channel_url, post_order, comment_order):
 @login_required(login_url='/session/login')
 def vote_post(request, channel_url, post_order):
     channel, post = _parse_post(channel_url, post_order)
-    is_up = request.POST.get('up', '0')
-    if is_up not in ['0', '1']:
-        raise PermissionDenied
-
-    result = _vote_post(request.user.userprofile, post, is_up)
+    result = _vote_post(request.user.userprofile, post)
     return JsonResponse(result)
 
 
