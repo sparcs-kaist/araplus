@@ -2,12 +2,10 @@
 
 {% block css %}
 <link rel="stylesheet" type="text/css" href="/media/css/channel/list.css">
-<link rel="stylesheet" type="text/css" href="/media/rateit/rateit.css">
 {% endblock %}
 
 {% block js %}
 <script type="text/javascript" src="/media/js/channel/hover.js"></script>
-<script type="text/javascript" src="/media/rateit/rateit.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
     $(document).ready(function(){
@@ -17,7 +15,6 @@
 
 		$(".list-post[data-order=" + post_order + "]").addClass('selected');
 		$(".list-notice[data-order=" + post_order + "]").addClass('selected');
-		$(".rateit.vote").rateit("value", {{ post.rating }});
 		$(".numtag").each(function() { 
 			order = $(this).data("order");
 			$(this).attr("href", "./?cpage=" + Math.ceil(order / 5) + "#comment-" + order);
@@ -94,8 +91,26 @@
             obj.removeClass(toClass);
             obj.addClass(fromClass);
         };
-		
-		var vote = function(order, up) {
+
+        var post_vote = function(order, up) {
+            var but_up = $(".post-vote-up");
+            var but_down = $(".post-vote-down");
+            var result_up = $(".post-vote-up-result");
+            var result_down = $(".post-vote-down-result");
+            $.ajax({
+                url: "./vote/",
+                type: "POST",
+                data: {csrfmiddlewaretoken: csrf_token, up: up},
+                success: function(data) {
+                    toggle(but_up, data.up, "btn-success", "btn-warning");
+                    toggle(but_down, data.down, "btn-success", "btn-warning");
+                    result_up.html(data.tup);
+                    result_down.html(data.tdown);
+                }
+            });
+        }
+
+		var comment_vote = function(order, up) {
 			var but_up = $(".comment-vote-up[data-order=" + order + "]");
 			var but_down = $(".comment-vote-down[data-order=" + order + "]");
 			var result_up = $(".comment-vote-up-result[data-order=" + order + "]");
@@ -112,28 +127,23 @@
 				}
 			});
 		};
-		
+
+        $(".post-vote-up").click(function() {
+            post_vote($(this), '0');
+        });
+
+        $(".post-vote-down").click(function() {
+            post_vote($(this), '1');
+        });
+
 		$(".comment-vote-up").click(function() {
-			vote($(this).data('order'), '0');
+			comment_vote($(this).data('order'), '0');
 		});
 
 		$(".comment-vote-down").click(function() {
-			vote($(this).data('order'), '1');
+			comment_vote($(this).data('order'), '1');
 		});
 		
-		$(".rateit.vote").bind("rated reset", function(e) {
-			var v = $(this).rateit("value");
-			$.ajax({
-				url: "./vote/",
-				type: "POST",
-				data: {csrfmiddlewaretoken: csrf_token, rating: v},
-				success: function(data) {
-					$(".rateit.total").rateit("value", data.rating);
-					$(".post-rate-value").html(data.rating);
-				}
-			});
-		});
- 
 		$(".post-report").click(function(){
 			$("#report-form").attr('action', './report/');
 			$("#modal-report").modal();
@@ -175,14 +185,14 @@
     <div class="col-md-12">
         <div class="panel panel-success">
 			<div class="panel-heading row" style="margin-left:0;margin-right:0">
-            	<div class="col-md-4">
+            	<div class="col-md-5">
                 	{% if post.is_adult %}
                 	<label style="color:red">+19</label>
                 	{% endif %}
                 	Title:{{ post.title }}
                 </div>
                 <div class="col-md-2">User:{{ post.username }}</div>
-				<div class="col-md-3">Rating: <span class="rateit total" data-rateit-value="{{ post.rating_avg }}" data-rateit-ispreset="true" data-rateit-readonly="true"></span> <span class="post-rate-value">{{ post.rating_avg }}</span></div>
+                <div class="col-md-2">Vote: +<span class="post-vote-up-result">{{ post.vote_up }}</span>/-<span class="post-vote-down-result">{{ post.vote_down }}</span></div>
                 <div class="col-md-3">{{post.created_time}}</div>
 			</div>
             <div class="panel-body">
@@ -190,10 +200,10 @@
                 <div class="row">
 					<div class="col-md-5"></div>
 					{% if not post.deleted %}
-					<input type="range" min="0" max="5" step="1" id="post-rate">
-					<div class="rateit vote col-md-2" data-rateit-backingfld="#post-rate"></div>
 					<button class="btn btn-warning col-md-1 post-mark19" {% if post.mark19 %}disabled{% endif %}>Mark19</button>
 					<button class="btn btn-warning col-md-1 post-report">Report</button>
+                    <button class="btn btn-{% if post.vote.is_up %}warning{% else %}success{% endif %} col-md-1 post-vote-up">Up</button>
+                    <button class="btn btn-{% if post.vote.is_down %}warning{% else %}success{% endif %} col-md-1 post-vote-down">Down</button>
                     <a class="btn btn-info col-md-1" href="./log/">Log</a>
                     {% if post.auth %}
                     <a class="btn btn-info col-md-1" href="./modify/">Modify</a>
@@ -217,7 +227,7 @@
                 	{% endif %}
                 </div>
                 <div class="col-md-2">User:{{ comment.username }}</div>
-				<div class="col-md-2">Vote: +<span class="comment-vote-up-result" data-order="{{ comment.order }}">{{ comment.vote_up }}</span>/-<span class="comment-vote-down-result" data-order="{{ comment.order }}">{{ comment.vote_down }}</span></div>
+                <div class="col-md-2">Vote: +<span class="comment-vote-up-result" data-order="{{ comment.order }}">{{ comment.vote_up }}</span>/-<span class="comment-vote-down-result" data-order="{{ comment.order }}">{{ comment.vote_down }}</span></div>
                 <div class="col-md-3">{{comment.created_time}}</div>
 			</div>
 			<div class="panel-body">

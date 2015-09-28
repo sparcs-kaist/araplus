@@ -4,7 +4,7 @@
         <td width=5></td>
         <td width=90 class="text-center">User</td>
         <td width=320 class="text-center">Title</td>
-        <td width=80 class="text-center">Rating</td>
+        <td width=80 class="text-center">Vote</td>
         <td width=80 class="text-center">Date</td>
     </tr>
     <ul>
@@ -24,7 +24,7 @@
                 <a style="font-weight: bold; color: black;" href="/channel/{{current_channel.url}}/{{notice.0.order}}">{{notice.0.title}}</a>
             </td>
             <td width=80 class="text-center">
-                <span class="rateit" data-rateit-value="{{notice.0.get_rating}}" data-rateit-ispreset="true" data-rateit-readonly="true"></span> {{notice.0.get_rating}}
+                +<span class="post-vote-up-result" data-order="{{notice.0.order}}">{{notice.0.get_vote.0}}</span>/-<span class="post-vote-down-result" data-order="{{notice.0.order}}">{{notice.0.get_vote.1}}</span>
             </td>
             <td width=80 class="text-center">
                 <span class="timeago" timeago="{{notice.0.channel_content.created_time|date:"c"}}" title="{{notice.0.channel_content.created_time}}"></span>
@@ -53,7 +53,7 @@
                 </a>
             </td>
             <td width=80 class="text-center">
-                <span class="rateit" data-rateit-value="{{post.0.get_rating}}" data-rateit-ispreset="true" data-rateit-readonly="true"></span> {{post.0.get_rating}}
+                +<span class="post-vote-up-result" data-order="{{post.0.order}}">{{post.0.get_vote.0}}</span>/-<span class="post-vote-down-result" data-order="{{post.0.order}}">{{post.0.get_vote.1}}</span>
             </td>
             <td width=80 class="text-center">
                 <span class="timeago" timeago="{{post.0.channel_content.created_time|date:"c"}}" title="{{post.0.channel_content.created_time}}"></span>

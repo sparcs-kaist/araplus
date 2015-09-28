@@ -81,11 +81,8 @@ def _render_content(userprofile, post=None, comment=None):
     data = {}
     if post:
         data['title'] = raw_data.title
-        data['rating'] = raw_data.get_my_rating(userprofile)
-        data['rating_avg'] = raw_data.get_rating()
-    else:
-        data['vote'] = raw_data.get_my_vote(userprofile)
-        data['vote_up'], data['vote_down'] = raw_data.get_vote()
+    data['vote'] = raw_data.get_my_vote(userprofile)
+    data['vote_up'], data['vote_down'] = raw_data.get_vote()
 
     if content.is_deleted:
         data['title'] = '--Deleted--'
@@ -304,20 +301,28 @@ def _mark_adult(userprofile, content):
         return True
 
 
-def _vote_post(userprofile, post, rating):
+def _vote_post(userprofile, post, is_up):
+    up = (is_up == '0')
+    result = {}
+
     try:
-        vote = ChannelPostVote.objects.get(channel_post=post, userprofile=userprofile)
-        if int(rating) == 0:
+        vote = ChannelPostVote.objects.get(channel_post=post,
+                userprofile=userprofile)
+        if vote.is_up == up:
             vote.delete()
+            result['up'], result['down'] = False, False
+
     except:
-        vote = ChannelPostVote(channel_post=post, userprofile=userprofile)
+        vote = ChannelPostVote(channel_post=post,
+                userprofile=userprofile)
 
-    if int(rating) != 0:
-        vote.rating = int(rating)
+    if 'up' not in result:
+        vote.is_up = up
         vote.save()
+        result['up'], result['down'] = vote.is_up, not vote.is_up
 
-    return {'rating': post.get_rating()}
-
+    result['tup'], result['tdown'] = post.get_vote()
+    return result
 
 def _vote_comment(userprofile, comment, is_up):
     up = (is_up == '0')

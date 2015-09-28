@@ -75,7 +75,7 @@ class ChannelPostVote(models.Model):
                                      related_name="channel_post_vote")
     userprofile = models.ForeignKey('session.UserProfile',
                                     related_name="channel_post_vote")
-    rating = models.IntegerField()
+    is_up = models.BooleanField()
 
 
 class ChannelCommentVote(models.Model):
@@ -120,7 +120,7 @@ class ChannelComment(models.Model):
     author = models.ForeignKey('session.UserProfile',
                                related_name="channel_comment")
     order = models.IntegerField(default=-1)
-    
+
     def get_vote(self):
         votes = ChannelCommentVote.objects.filter(channel_comment=self)
         return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
@@ -166,27 +166,29 @@ class ChannelPost(models.Model):
 
     class Meta:
         ordering = ['-id']
-    
-    def get_rating(self):
-        ratings = ChannelPostVote.objects.filter(channel_post=self)
-        value = ratings.aggregate(Avg('rating')).values()[0]
-        if value is None:
-            return 0
-        return value
-    
-    def get_my_rating(self, userprofile):
+
+    def get_vote(self):
+        votes = ChannelPostVote.objects.filter(channel_post=self)
+        return votes.filter(is_up=True).count(), votes.filter(is_up=False).count()
+
+    def get_my_vote(self, userprofile):
+        vote = {'is_up': False, 'is_down': False}
         try:
-            return ChannelPostVote.objects.get(channel_post=self,
-                    userprofile=userprofile).rating
+            vote_obj = ChannelPostVote.objects.get(userprofile=userprofile, channel_post=self)
+            if vote_obj.is_up:
+                vote['is_up'] = True
+            else:
+                vote['is_down'] = True
         except:
-            return 0
+            pass
+        return vote
 
     def get_best_comments(self):
         comments = ChannelComment.objects.filter(channel_post=self)
         best_comments = list(reversed(sorted(
             filter(lambda x: x.get_vote()[0] > 5, comments),
             key=lambda x: x.get_vote()[0] - x.get_vote()[1])))
- 
+
         if len(best_comments) > 3:
             return best_comments[:3]
         return best_comments
