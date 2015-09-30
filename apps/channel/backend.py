@@ -191,7 +191,7 @@ def _write_post(request, channel, post=None):
         title_before = post.title
 
     form_content = ChannelContentForm(request.POST, instance=content)
-    form_post = ChannelPostForm(request.POST, instance=post)
+    form_post = ChannelPostForm(request.POST, request.FILES, instance=post)
     form_attachment = ChannelAttachmentForm(request.POST, request.FILES)
 
     if form_post.is_valid() and form_content.is_valid():

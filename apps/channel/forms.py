@@ -30,7 +30,7 @@ class ChannelContentForm(ModelForm):
 class ChannelPostForm(ModelForm):
     class Meta:
         model = ChannelPost
-        fields = ['title', 'is_notice', ]
+        fields = ['title', 'is_notice', 'thumbnail', ]
 
     def save(self, *args, **kwargs):
         self.instance.channel = kwargs.pop('channel')

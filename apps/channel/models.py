@@ -16,6 +16,7 @@ class Channel(models.Model):
     admin = models.ForeignKey('session.UserProfile',
                               related_name="channel")
     thumbnail = models.ImageField(null=True, blank=True, upload_to=UPLOAD_DIR)
+    default_post_thumbnail = models.ImageField(null=True, blank=True, upload_to=UPLOAD_DIR)
     is_deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
@@ -161,6 +162,7 @@ class ChannelPost(models.Model):
     channel_content = models.OneToOneField('ChannelContent',
                                            related_name='channel_post')
     modify_log = models.TextField(default='[]')
+    thumbnail = models.ImageField(null=True, blank=True, upload_to=UPLOAD_DIR)
 
     class Meta:
         ordering = ['-id']
