@@ -29,8 +29,13 @@
             <div class="comment-content">
                 <span>{{ comment.content|safe }}</span>
                 <div class="comment-vote-container">
+                    {% if comment.vote_disable %}
+                    <button class="vote-up btn btn-default" disabled> 추천 (+{{ comment.like }}) </button>
+                    <button class="vote-down btn btn-default" disabled> 반대 (-{{ comment.hate }}) </button>
+                    {% else %}
                     <button class="vote-up btn btn-default"> 추천 (+{{ comment.like }})</button>
                     <button class="vote-down btn btn-default"> 반대 (-{{ comment.hate }})</button>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
