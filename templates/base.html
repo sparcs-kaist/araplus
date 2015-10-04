@@ -19,16 +19,25 @@
         </div>
         <div id="header-wrapper">
             <div id="logo-wrapper">
-                <h1 id="logo">
-                    ARAPLUS
-                </h1>
+                <a href="/main">
+                    <h1 id="logo">
+                        ARAPLUS
+                    </h1>
+                </a>
                 <button id="menu-button-wrapper" type="button" onclick="menuHide()">
                     <span id="menu-button"></span>
                 </button>
             </div>
             <ul id="nav-list">
                 <li class="nav-item">
-                    <h3>반응보기</h3>
+                    <a href="/session/notifications">
+                        <h3>반응보기
+                            {% load notifications_tags %}
+                            {% notifications_unread as unread_count %}
+                            {% if unread_count %} {{ unread_count }}
+                            {% endif %}
+                        </h3>
+                    </a>
                 </li>
                 <li class="nav-item">
                     <h3>내글보기</h3>
@@ -37,7 +46,7 @@
                     <h3>갈피모음</h3>
                 </li>
                 <li class="nav-item">
-                    <h3>쪽지</h3>
+                    <a href="/session"><h3>쪽지</h3></a>
                 </li>
                 <li class="nav-item">
                     <h3>포인트관리</h3>
@@ -126,11 +135,6 @@
             </div>
         </nav>
 
-        {% load notifications_tags %}
-        {% notifications_unread as unread_count %}
-        {% if unread_count %}
-            You have <strong>{{ unread_count }}</strong> unread notifications.
-        {% endif %}
 
         <div id="footer" class="text-center">
             <p>

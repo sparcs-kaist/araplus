@@ -1,22 +1,48 @@
 {% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/session.css">
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function(){
+        jQuery("span.timeago").timeago();
+    });
+</script>
+{% endblock %}
 {% block content %}
 	{% if unread|length %}
-	<ul> 안 읽은 알림
+    <div id="noread-wrapper"> 
 		{% for noti in unread %}
-		<li>
-			<a> {{noti.actor}} {{noti.verb}} </a>
-		</li>
+            <div class="noti">
+                <div class="noti-category">
+                    mention
+                </div>
+                <div class="noti-content-wrapper">
+                    <a class="noti-content"> {{noti.actor}} {{noti.verb}} <a>
+                    <a class="noti-time">
+                        <span class="timeago" timeago="{{noti.timestamp|date:"c"}}" title="{{noti.timestamp}}"</span>
+                    </a>
+                </div>
+            </div>
 		{% endfor %}
-	</ul>
+	</div>
 	{% endif %}
-	<span> 경계선 </span>
 	{% if read|length %}
-	<ul>
+    <div id="read-wrapper"> 
 		{% for noti in read %}
-		<li>
-			<a> {{noti.actor}} {{noti.verb}} </a>
-		</li>
+            <div class="noti">
+                <div class="noti-category">
+                    mention
+                </div>
+                <div class="noti-content-wrapper">
+                    <a class="noti-content"> {{noti.actor}} {{noti.verb}} <a>
+                    <a class="noti-time">
+                        <span class="timeago" timeago="{{noti.timestamp|date:"c"}}" title="{{noti.timestamp}}"</span>
+                    </a>
+                </div>
+            </div>
 		{% endfor %}
-	</ul>
+	</div>
 	{% endif %}
 {% endblock %}

@@ -17,6 +17,7 @@ body{
 }
 a{
     color: #000;
+    text-decoration: none;
 }
 
 style{
@@ -94,6 +95,7 @@ style{
 }
 #nav-list{
     float: left;
+    padding-left: 10px;
 }
 .nav-item{
     float: left;

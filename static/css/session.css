@@ -1,3 +1,7 @@
+style{
+    display: none;
+}
+
 body {
     font-family:'맑은 고딕', 'Malgun Gothic', "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -35,4 +39,66 @@ form {
 
 .has-error .control-label {
     color:black;
+}
+
+#noread-wrapper{
+    width: 700px;
+    background: #ffffff;
+    border: 1px solid #fafafa;
+    float: left;
+    margin-left: 140px;
+    margin-top: 40px;
+}
+
+#read-wrapper{
+    width: 700px;
+    background: #ffffff;
+    border: 1px solid #fafafa;
+    float: left;
+    margin-left: 140px;
+    margin-top: 40px;
+}
+
+.noti{
+    width: 660px;
+    height: 80px;
+    margin-left: 20px;
+    border-bottom: 2px solid #fafafa;
+}
+
+.noti-category{
+    height: 80px;
+    width: 90px;
+    font-size: 14px;
+    line-height: 14px;
+    padding-top: 35px;
+    text-align: center;
+    font-weight: bold;
+    color: #40e0d0;
+    float: left;
+}
+
+.noti-content-wrapper{
+    float: left;
+    height: 80px;
+    width: 570px;
+    padding-top: 15px;
+    padding-left: 15px;
+}
+
+.noti-content{
+    height: 30px;
+    width: 570px;
+    font-size: 16px;
+    line-height: 16px;
+    padding-top: 7px;
+}
+
+.noti-time{
+    height: 20px;
+    width: 570px;
+    font-size: 12px;
+    line-height: 12px;
+    padding-top: 4px;
+    color: #adadad;
 }
