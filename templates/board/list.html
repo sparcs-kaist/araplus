@@ -8,7 +8,7 @@
     <table id="post-list-wrapper">
         <tr id="list-header" class="list">
             <th width=90>카테고리</th>
-            <th width=550>제목</th>
+            <th class="list-header-title">제목</th>
             <th width=215>글쓴이</th>
             <th width=60>작성일</th>
             <th width=50>조회</th>
@@ -28,7 +28,7 @@
                 <td width=5><span style="display: inline; color: #000">N</span></td>
                 {% endif %}
                 </span>
-                <td width=545 id="notice-title-{{notice.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}">{{notice.0.title}}</a></td>
+                <td class="list-title" id="notice-title-{{notice.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}">{{notice.0.title}}</a></td>
                 {% if notice.0.board_content.is_anonymous %}
                 <td width=215 style="padding-left: 20px">{{notice.0.board_content.is_anonymous}}</td>
                 {% else %}
@@ -69,9 +69,9 @@
                 {% endif %}
                 </span>
                 {% if request.user.userprofile.adult_filter and post.0.board_content.is_adult %}
-                <td width=545 id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">성인글</a></td>
+                <td class="list-title" id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">성인글</a></td>
                 {% else %}
-                <td width=545 id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">{{post.0.title}}</a></td>
+                <td class="list-title" id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">{{post.0.title}}</a></td>
                 {% endif %}
                 {% if post.0.board_content.is_anonymous %}
                 <td width=215 style="padding-left: 20px">{{post.0.board_content.is_anonymous}}</td>
@@ -115,9 +115,9 @@
     </div>
     {% if request.user.userprofile.adult_filter %}
     <!-- 성인글 부분 수정 -->
-    <a style="width: 150px; height:20px; display:inline-block; margin-top:15px" href="set_adult_filter/">성인글 필터링 해제</a>
+    <a style="width: 150px; height:20px; margin-top:15px" href="set_adult_filter/">성인글 필터링 해제</a>
     {% else %}
-    <a style="width: 150px; height:20px; display:inline-block; margin-top:15px"href="set_adult_filter/">성인글 필터링</a>
+    <a style="width: 150px; height:20px; margin-top:15px"href="set_adult_filter/">성인글 필터링</a>
     {% endif %}
 <div>
 

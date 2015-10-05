@@ -5,6 +5,10 @@
     box-sizing: border-box;
 }
 
+html{
+    min-width: 1200px;
+}
+
 .list-notice:hover, .list-post:hover{
     background-color: #E6E6FF;
 }
@@ -147,4 +151,12 @@ a{
     border-radius: 4px;
     cursor: pointer;
     float: right;
+}
+
+.list-header-title{
+    width: calc(100% - 475px);
+}
+
+.list-title{
+    width: calc(100% - 480px);
 }

@@ -9,7 +9,7 @@ title, script{
 }
 html{
     height: 100%;
-    min-width: 1000px;
+    min-width: 1200px;
 }
 body{
     background: #fafafa;
@@ -111,7 +111,7 @@ style{
 }
 #user-wrapper{
     height: 100%;
-    margin-right: 20px;
+    margin-right: 50px;
     overflow: visible;
     float: right;
 }
