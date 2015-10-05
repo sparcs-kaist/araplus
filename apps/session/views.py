@@ -28,7 +28,7 @@ def nickname_check(request):
 def user_login(request):
     if request.user.is_authenticated():
         return redirect('/')
-    return redirect('https://sso.sparcs.org/oauth/require/?callback=' + \
+    return redirect('https://sso.sparcs.org/oauth/require/?url=' + \
                     request.build_absolute_uri('/session/login/callback/'))
 
 
