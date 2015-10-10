@@ -19,6 +19,11 @@ class Channel(models.Model):
     default_post_thumbnail = models.ImageField(null=True, blank=True, upload_to=UPLOAD_DIR)
     is_deleted = models.BooleanField(default=False)
 
+    def get_thumbnail_url(self):
+        if self.thumbnail:
+            return '/upload/'+self.thumbnail.url.split('/')[-1]
+        return '/upload/default.jpg'
+
     def __unicode__(self):
         return self.kor_name
 
@@ -210,6 +215,13 @@ class ChannelPost(models.Model):
 
     def get_log(self):
         return json.loads(self.modify_log)
+
+    def get_thumbnail_url(self):
+        if self.thumbnail:
+            return '/upload/'+self.thumbnail.url.split('/')[-1]
+        elif self.channel.default_post_thumbnail:
+            return '/upload/'+self.channel.default_post_thumbnail.url.split('/')[-1]
+        return '/upload/default.jpg'
 
     def __unicode__(self):
         title = self.title

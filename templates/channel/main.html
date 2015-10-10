@@ -7,14 +7,15 @@
 <table class="table post-list" width=700>
     <tr class="list" id="list-header">
         <td width=90><p align=center>User</p></td>
+        <td width=30><p>thumbnail</p></td>
         <td width=320 class="title"><p>Title<p></td>
     </tr>
     <ul>
             {% for channel in channel_list %}
             <tr class="list list-post" id="channel-row-{{channel.url}}"}>
                 <td width=90><p align=center>{{channel.admin.nickname}}</p></td>
-
-                <td width=320 class="title title-post" id="channel-title-{{channel.url}}"
+                <td width=30><img src={{channel.get_thumbnail_url}} width=50 height=50 /></td>
+                <td width=290 class="title title-post" id="channel-title-{{channel.url}}"
                     id><a href="/channel/{{channel.url}}/">{{channel.kor_name}}</a></td>
             </tr>
             {% endfor %}

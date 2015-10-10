@@ -34,5 +34,9 @@ urlpatterns = [
     # Media Root
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': os.path.join(BASE_DIR, 'static')}),
+
+    # Upload Root
+    url(r'^upload/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': os.path.join(BASE_DIR, 'upload')}),
 ]
 

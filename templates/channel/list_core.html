@@ -3,7 +3,8 @@
     <tr class="list" id="list-header">
         <td width=5></td>
         <td width=90 class="text-center">User</td>
-        <td width=320 class="text-center">Title</td>
+        <td width=30 class="text-center">thumbnail</td>
+        <td width=290 class="text-center">Title</td>
         <td width=80 class="text-center">Vote</td>
         <td width=80 class="text-center">Date</td>
     </tr>
@@ -20,7 +21,8 @@
             <td width=5>N</td>
             {% endif %}
             <td width=90 class="text-center">{{notice.0.author.nickname}}</td>
-            <td width=320 class="title title-notice">
+            <td width=30><img src={{notice.0.get_thumbnail_url}} width=30 height=30 /></td>
+            <td width=290 class="title title-notice">
                 <a style="font-weight: bold; color: black;" href="/channel/{{current_channel.url}}/{{notice.0.order}}">{{notice.0.title}}</a>
             </td>
             <td width=80 class="text-center">
@@ -43,7 +45,8 @@
             <td width=5>N</td>
             {% endif %}
             <td width=90 class="text-center">{{post.0.author.nickname}}</td>
-            <td width=320 class="title title-post">
+            <td width=30><img src={{post.0.get_thumbnail_url}} width=50 height=50 /></td>
+            <td width=290 class="title title-post">
                 <a href="/channel/{{current_channel.url}}/{{post.0.order}}">
                     {% if post.0.channel_content.is_deleted %}
                     --deleted--
