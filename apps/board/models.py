@@ -35,6 +35,7 @@ class BoardContent(models.Model):
     is_anonymous = models.TextField(default=None, null=True)
     is_adult = models.BooleanField(default=False, null=False)
     modify_log = models.TextField(default='[]')
+    use_signiture = models.BooleanField(default=False, null=False)
 
     def set_log(self, log):
         self.modify_log = json.dumps(log)

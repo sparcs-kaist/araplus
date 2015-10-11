@@ -18,7 +18,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     gender = models.CharField(max_length=1, choices=GENDER, default=ETC)
     birthday = models.DateTimeField(blank=True, null=True)
-
+    signiture = models.CharField(max_length=20)
     nickname = models.TextField(max_length=12)
     points = models.IntegerField(default=0)
     adult_filter = models.BooleanField(default=True)

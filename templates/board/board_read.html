@@ -67,7 +67,9 @@
             <!-- 추천 반대 클릭한 표시-->
             <!-- 신고 기능 -->
             <!-- 수정, log, 삭제 -->
-        </div>
+		</div>
+		<div style="width:100%; text-align:left;">{{post.signiture}} </div>
+
         {% else %}
         <div id="post-content">
         삭제된 글입니다.
@@ -121,10 +123,31 @@
                 {% endif %}
             </div>
         </div>
-        {% endfor %}
-        {% if not post.deleted %}
+		{% endfor %}
+		<div style="text-align: center;" class="post-pagination>
+			<ul style="display:inline-block;"> 
+				{% if comment_page_left != 0 %}
+				<li><a href="{{querystring}}comment_page={{comment_page_left}}"">&laquo;</a></li>
+				{% endif %}
+				{% for comment_page in comment_pages%}
+				{% if comment_page == comment_current_page %}					
+				<li style="display:inline-block;" class="active">
+				<a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}<span class="sr-only"></span></a>
+				</li>
+				{% else %}
+				<li style="display:inline-block;"><a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}</a></li>
+				{% endif %}
+				{% endfor %}
+				{% if comment_page_right != 0 %}
+				<li style="display:inline-block;"><a href="{{querystring}}comment_page={{comment_page_right}}"">&raquo;</a></li>
+				{% endif %}
+			</ul
+		</div>
+	</div>   
+
+	{%if not post.deleted%}
         <div id="comment-write-wrapper">
-            <form action="./comment/{{querystring}}" method="POST" enctype="multipart/form-data">
+			<form action="./comment/{{querystring}}comment_page={{comment_current_page}}" method="POST" enctype="multipart/form-data">
                 {%csrf_token%}
                 <input type="hidden" name="board_post_id" value="{{ post.id }}">
                 <textarea class="comment-textarea" rows="5" name="content" placeholder="댓글을 입력하세요."></textarea>
