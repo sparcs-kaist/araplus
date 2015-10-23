@@ -38,7 +38,7 @@
                     <span class="timeago" timeago="{{notice.0.board_content.created_time|date:"c"}}"
                         title="{{notice.0.board_content.created_time}}"></span>
                 </td>
-                <td width=50 align=center> </td>
+                <td width=50 align=center> 224 </td>
                 <td width=60 align=center>
                     {% if notice.0.board_content.get_vote.up > 0 %}
                     <span id="post-vote-up">{{notice.0.board_content.get_vote.up}}</span>
@@ -82,7 +82,7 @@
                     <span class="timeago" timeago="{{post.0.board_content.created_time|date:"c"}}"
                         title="{{post.0.board_content.created_time}}"></span>
                 </td>
-                <td width=50 align=center> </td>
+                <td width=50 align=center> 224 </td>
                 <td width=60 align=center>
                     {% if post.0.board_content.get_vote.up > 0 %}
                     <span id="post-vote-up">{{post.0.board_content.get_vote.up}}</span>
@@ -115,9 +115,9 @@
     </div>
     {% if request.user.userprofile.adult_filter %}
     <!-- 성인글 부분 수정 -->
-    <a style="width: 150px; height:20px; margin-top:15px" href="set_adult_filter/">성인글 필터링 해제</a>
+    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block" href="set_adult_filter/">성인글 필터링 해제</a>
     {% else %}
-    <a style="width: 150px; height:20px; margin-top:15px"href="set_adult_filter/">성인글 필터링</a>
+    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block"href="set_adult_filter/">성인글 필터링</a>
     {% endif %}
 <div>
 

@@ -31,15 +31,15 @@
             </h3>
             | {{ post.created_time }} | 조회 224 | 추천
             {% if post.vote.up > 0 %}
-            <span class="vote-color-up" id="post-vote-up">{{post.vote.up}}</span>
+            <span class="post-vote vote-color-up" id="post-vote-up-{{post.content_id}}">{{post.vote.up}}</span>
             {% else %}
-            {{post.vote.up}}
+            <span class="post-vote" id="post-vote-up-{{post.content_id}}">{{post.vote.up}}</span>
             {% endif %}
             / 반대
             {% if post.vote.down > 0 %}
-            <span class="vote-color-down" id="post-vote-down">{{post.vote.down}}</span>
+            <span class="post-vote vote-color-down" id="post-vote-down-{{post.content_id}}">{{post.vote.down}}</span>
             {% else %}
-            {{post.vote.down}}
+            <span class="post-vote" id="post-vote-down-{{post.content_id}}">{{post.vote.down}}</span>
             {% endif %}
         </div>
     </div>

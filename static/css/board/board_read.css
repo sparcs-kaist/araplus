@@ -61,11 +61,7 @@ style{
     display: inline;
 }
 
-#post-vote-up{
-    display: inline;
-}
-
-#post-vote-down{
+.post-vote{
     display: inline;
 }
 
@@ -157,6 +153,7 @@ style{
 
 #comment-write-wrapper{
    margin-top: 20px; 
+   margin-bottom: 50px;
    background: #fafafa; 
    border-width: 2px 1px 1px;
    border-style: solid;

@@ -22,8 +22,6 @@ $(document).ready(function(){
     });
     $(".vote").click(function() {
         var vote_id = $(this).attr("id").split('_'); 
-        var vote_up = $("#up_"+vote_id[1]);
-        var vote_down = $("#down_"+vote_id[1]);
         console.log(vote_id[0] + vote_id[1]);
         $.ajax(
         {
@@ -36,13 +34,8 @@ $(document).ready(function(){
                 if(data.response == 'success'){
                     $("#vote_up_"+vote_id[1]).html(data.vote.up);
                     $("#vote_down_"+vote_id[1]).html(data.vote.down);
-                    if(data.cancel == 'no' || data.cancel == 'yes')
-                    {
-                        /*toggle(vote_up, 'btn-warning', 'btn-success');
-                        toggle(vote_down, 'btn-warning', 'btn-danger');
-                        if(vote_id[0] == 'up' && data.cancel == 'no') toggle(vote_up, 'btn-success', 'btn-warning');
-                        if(vote_id[0] == 'down' && data.cancel == 'no') toggle(vote_down, 'btn-danger', 'btn-warning');*/
-                    }
+                    $("#post-vote-up-"+vote_id[1]).html(data.vote.up);
+                    $("#post-vote-down-"+vote_id[1]).html(data.vote.down);
                     alert(data.message);
                 }
                 else{

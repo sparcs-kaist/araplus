@@ -4,6 +4,14 @@ style{
     display: none;
 }
 
+label{
+    display: none;
+}
+
+textarea{
+    margin-bottom: 15px;
+}
+
 #content-wrapper{
     width: calc(100% - 200px);
     height: 100%;
@@ -173,4 +181,3 @@ style{
     padding-top: 8px;
     font-family: "Nanum Gothic", sans-serif;
 }
-
