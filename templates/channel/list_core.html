@@ -1,84 +1,126 @@
-<div class="container">
-<table class="table post-list" width=700>
-    <tr class="list" id="list-header">
-        <td width=5></td>
-        <td width=90 class="text-center">User</td>
-        <td width=30 class="text-center">thumbnail</td>
-        <td width=290 class="text-center">Title</td>
-        <td width=80 class="text-center">Vote</td>
-        <td width=80 class="text-center">Date</td>
-    </tr>
-    <ul>
-        {% for notice in notice_list %}
-        <tr class="list list-notice" data-order="{{ notice.0.order }}">
-            {% if notice.1 %}
-            {% if notice.0.channel_content.modified_time >= notice.1.last_read %}
-            <td width=5>U</td>
-            {% else %}
-            <td width=5> </td>
-            {% endif %}
-            {% else %}
-            <td width=5>N</td>
-            {% endif %}
-            <td width=90 class="text-center">{{notice.0.author.nickname}}</td>
-            <td width=30><img src={{notice.0.get_thumbnail_url}} width=30 height=30 /></td>
-            <td width=290 class="title title-notice">
-                <a style="font-weight: bold; color: black;" href="/channel/{{current_channel.url}}/{{notice.0.order}}">{{notice.0.title}}</a>
-            </td>
-            <td width=80 class="text-center">
-                <span class="post-vote-up-result" data-order="{{notice.0.order}}">+{{notice.0.get_vote}}</span>
-            </td>
-            <td width=80 class="text-center">
-                <span class="timeago" timeago="{{notice.0.channel_content.created_time|date:"c"}}" title="{{notice.0.channel_content.created_time}}"></span>
-            </td>
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/channel/listInChannel.css"> 
+<link rel="stylesheet" type="text/css" href="/media/rateit/rateit.css">
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/media/rateit/rateit.min.js"></script>
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+$(document).ready(function(){
+	$("span.timeago").timeago();
+	
+	var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+
+	$(".channel-delete").click(function() {
+		var result = confirm("주의! 채널을 삭제하면 채널 내의 모든 글과 댓글에 접근할 수 없습니다. 계속하시겠습니까?");
+		if (result != true) return;
+
+		$.ajax({
+			url: './delete/',
+			type: 'POST',
+			data: {csrfmiddlewaretoken: csrf_token},
+			success: function(data) {
+				location.replace('../');
+			}
+		});
+	});
+});
+</script>
+{% endblock %}
+{% block content %}
+<div id="channel-content-wrapper">
+    {% include "channel/list.html" %}
+    <table class="table post-list" width=700>
+        <tr class="list" id="list-header">
+            <td width=5></td>
+            <td width=90 class="text-center">User</td>
+            <td width=30 class="text-center">thumbnail</td>
+            <td width=290 class="text-center">Title</td>
+            <td width=80 class="text-center">Vote</td>
+            <td width=80 class="text-center">Date</td>
         </tr>
-        {% endfor %}
-        {% for post in post_list %}
-        <tr class="list list-post" data-order="{{ post.0.order }}">
-            {% if post.1 %}
-            {% if post.0.channel_content.modified_time >= post.1.last_read %}
-            <td width=5>U</td>
-            {% else %}
-            <td width=5> </td>
-            {% endif %}
-            {% else %}
-            <td width=5>N</td>
-            {% endif %}
-            <td width=90 class="text-center">{{post.0.author.nickname}}</td>
-            <td width=30><img src={{post.0.get_thumbnail_url}} width=50 height=50 /></td>
-            <td width=290 class="title title-post">
-                <a href="/channel/{{current_channel.url}}/{{post.0.order}}">
-                    {% if post.0.channel_content.is_deleted %}
-                    --deleted--
-                    {% else %}
-                    {{post.0.title}} [{{post.0.channel_comment.count}}]
-                    {% endif %}
-                </a>
-            </td>
-            <td width=80 class="text-center">
-                <span class="post-vote-up-result" data-order="{{post.0.order}}">+{{post.0.get_vote}}</span>
-            </td>
-            <td width=80 class="text-center">
-                <span class="timeago" timeago="{{post.0.channel_content.created_time|date:"c"}}" title="{{post.0.channel_content.created_time}}"></span>
-            </td>
-        </tr>
-        {% endfor %}
-        </ul>
-    </table>
-    <div class="pull-right">
-        <a class="btn btn-default"
-            href="/channel/{{current_channel.url}}/write">글 쓰기</a>
-    </div>
-    <div style="text-align: center;">
-        <ul class="pagination pagination-sm">
-            {% for page in pages %}
-            {% if page == current_page %}
-            <li class="active"><a href="/channel/{{current_channel.url}}/?page={{page}}"
-                >{{page}} <span class="sr-only"></span></a></li>
-            {% else %}
-            <li><a href="/channel/{{current_channel.url}}/?page={{page}}">{{page}}</a></li>
-            {% endif %}
+        <ul>
+            {% for notice in notice_list %}
+            <tr class="list list-notice" data-order="{{ notice.0.order }}">
+                {% if notice.1 %}
+                {% if notice.0.channel_content.modified_time >= notice.1.last_read %}
+                <td width=5>U</td>
+                {% else %}
+                <td width=5> </td>
+                {% endif %}
+                {% else %}
+                <td width=5>N</td>
+                {% endif %}
+                <td width=90 class="text-center">{{notice.0.author.nickname}}</td>
+                <td width=30><img src={{notice.0.get_thumbnail_url}} width=30 height=30 /></td>
+                <td width=290 class="title title-notice">
+                    <a style="font-weight: bold; color: black;" href="/channel/{{current_channel.url}}/{{notice.0.order}}">{{notice.0.title}}</a>
+                </td>
+                <td width=80 class="text-center">
+                    <span class="post-vote-up-result" data-order="{{notice.0.order}}">+{{notice.0.get_vote}}</span>
+                </td>
+                <td width=80 class="text-center">
+                    <span class="timeago" timeago="{{notice.0.channel_content.created_time|date:"c"}}" title="{{notice.0.channel_content.created_time}}"></span>
+                </td>
+            </tr>
             {% endfor %}
-        </ul>
+            {% for post in post_list %}
+            <tr class="list list-post" data-order="{{ post.0.order }}">
+                {% if post.1 %}
+                {% if post.0.channel_content.modified_time >= post.1.last_read %}
+                <td width=5>U</td>
+                {% else %}
+                <td width=5> </td>
+                {% endif %}
+                {% else %}
+                <td width=5>N</td>
+                {% endif %}
+                <td width=90 class="text-center">{{post.0.author.nickname}}</td>
+                <td width=30><img src={{post.0.get_thumbnail_url}} width=50 height=50 /></td>
+                <td width=290 class="title title-post">
+                    <a href="/channel/{{current_channel.url}}/{{post.0.order}}">
+                        {% if post.0.channel_content.is_deleted %}
+                        --deleted--
+                        {% else %}
+                        {{post.0.title}} [{{post.0.channel_comment.count}}]
+                        {% endif %}
+                    </a>
+                </td>
+                <td width=80 class="text-center">
+                    <span class="post-vote-up-result" data-order="{{post.0.order}}">+{{post.0.get_vote}}</span>
+                </td>
+                <td width=80 class="text-center">
+                    <span class="timeago" timeago="{{post.0.channel_content.created_time|date:"c"}}" title="{{post.0.channel_content.created_time}}"></span>
+                </td>
+            </tr>
+            {% endfor %}
+            </ul>
+        </table>
+        <div class="pull-right">
+            <a class="btn btn-default"
+                href="/channel/{{current_channel.url}}/write">글 쓰기</a>
+        </div>
+        <div style="text-align: center;">
+            <ul class="pagination pagination-sm">
+                {% for page in pages %}
+                {% if page == current_page %}
+                <li class="active"><a href="/channel/{{current_channel.url}}/?page={{page}}"
+                    >{{page}} <span class="sr-only"></span></a></li>
+                {% else %}
+                <li><a href="/channel/{{current_channel.url}}/?page={{page}}">{{page}}</a></li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% if is_admin %}
+    <div class="pull-right">
+        {% csrf_token %}
+        <a class="btn btn-warning" href="./modify/">채널 수정</a>
+        <button class="btn btn-danger channel-delete">채널 삭제</button>
     </div>
+    {% endif %}
 </div>
+{% endblock %}

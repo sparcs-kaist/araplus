@@ -3,23 +3,20 @@
 <link rel="stylesheet" type="text/css" href="/media/css/channel/list.css"> 
 {% endblock %}
 {% block content %}
-<div class="container">
-<table class="table post-list" width=700>
-    <tr class="list" id="list-header">
-        <td width=90><p align=center>User</p></td>
-        <td width=30><p>thumbnail</p></td>
-        <td width=320 class="title"><p>Title<p></td>
-    </tr>
-    <ul>
-            {% for channel in channel_list %}
-            <tr class="list list-post" id="channel-row-{{channel.url}}"}>
-                <td width=90><p align=center>{{channel.admin.nickname}}</p></td>
-                <td width=30><img src={{channel.get_thumbnail_url}} width=50 height=50 /></td>
-                <td width=290 class="title title-post" id="channel-title-{{channel.url}}"
-                    id><a href="/channel/{{channel.url}}/">{{channel.kor_name}}</a></td>
-            </tr>
-            {% endfor %}
-        </ul>
-    </table>
+<div id="content-wrapper">
+    <div id="app-title-wrapper">
+        <span id="app-title">채널</span>
+        <span id="app-explain">연재 모음</span>
+    </div>
+    <ul id="total-channel-wrapper">
+        {% for channel in channel_list %}
+        <li>
+            <a href="/channel/{{channel.url}}/"><img src={{channel.get_thumbnail_url}}></a>
+            <span class="channel-title"><a href="/channel/{{channel.url}}/">{{channel.kor_name}}</a></span>
+            <span class="channel-category">썰 / 칼럼</span>
+            <span class="channel-admin">{{channel.admin.nickname}}</span>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}

@@ -1,10 +1,93 @@
-.list-notice:hover, .list-post:hover{
-    background-color: #E6E6FF;
+style{
+    display: none;
 }
 
-.selected{
-    background-color: #EFE6FF;
+html{
+    min-width: 1100px;
 }
 
-.comment_preview{
+#content-wrapper{
+    width: 1087px;
+    float: left;
+    background: #fafafa;
+    padding-top: 35px;
+    padding-left: 75px;
+    margin-bottom: 100px;
+}
+
+#app-title-wrapper{
+    width: 912px;
+    height: 40px;
+    border-bottom-color: #c0c0c0;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    margin-bottom: 35px;
+}
+
+#app-title{
+    float: left;
+    font-size: 16px;
+    line-height: 16px;
+    padding-top: 12px;
+    font-weight: bold;
+    padding-right: 40px;
+}
+
+#app-explain{
+    float: left;
+    font-size: 12px;
+    line-height: 12px;
+    padding-top: 14px;
+    color: #c0c0c0;
+}
+
+#total-channel-wrapper{
+    width: 100%;
+    height: 100%;
+    float: left;
+    margin: -12px 0px 0px -12px;
+}
+
+#total-channel-wrapper li{
+    display: inline;
+    float: left;
+    width: 296px;
+    height: 296px;
+    margin-top: 12px;
+    margin-left: 12px;
+    padding: 9px;
+    border-color: #c0c0c0;
+    border-style: solid;
+    border-width: 1px;
+    background: #fff;
+}
+
+#total-channel-wrapper li img{
+    width: 276px;
+    height: 194px;
+}
+
+.channel-title{
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.channel-title:hover{
+    text-decoration: underline;
+}
+
+.channel-category{
+    margin-top: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #40e0d0;
+}
+
+.channel-admin{
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #c0c0c0;
 }

@@ -1,0 +1,97 @@
+style{
+    display: none;
+}
+
+html{
+    min-width: 1100px;
+}
+
+#channel-content-wrapper{
+    width: calc(100% - 200px);
+    height: 100%;
+    float: left;
+    background: #fff;
+    padding: 40px 0px 100px 35px;
+    border-top: #d6d6d6 solid 1px;
+    border-left: #d6d6d6 solid 1px;
+}
+
+#channel-info-wrapper{
+    border: #d6d6d6 solid 1px;
+    width: calc(100% - 45px);
+    height: 170px;
+}
+
+#channel-info-wrapper img{
+    width: 250px;
+    height: 169px;
+    float: left;
+}
+
+#channel-info{
+    float: left;
+    width: calc(100% - 250px);
+    height: 100%;
+    padding: 23px 30px 15px 30px;
+}
+
+#channel-title-wrapper{
+    height: 30px;
+}
+
+#channel-title{
+    float: left;
+    font-size: 20px;
+    line-height: 20px;
+    height: 30px;
+    padding-top: 5px;
+}
+
+#channel-admin{
+    float: left;
+    margin-left: 20px;
+    height: 30px;
+    font-size: 11px;
+    line-height: 11px;
+    padding-top: 12px;
+    color: #adadad;
+}
+
+#channel-category{
+    height: 21px;
+    font-size: 13px;
+    line-height: 13px;
+    color: #40e0d0;
+    font-weight: bold;
+    margin: 4px 0px 0px 1px;
+}
+
+#channel-explain{
+    height: 45px;
+    font-size: 13px;
+    line-height: 13px;
+    color: #4b4b4b;
+    margin: 4px 0px 0px 1px;
+}
+
+#buton-wrapper{
+    height: 26px;
+}
+
+.button{
+    border: #e8e8e8 1px solid;
+    color: #4b4b4b;
+    font-size: 12px;
+    line-height: 12px;
+    padding: 6px 10px 0px 10px;
+    height: 26px;
+}
+
+#first-button{
+    float: left;
+}
+
+#list-button{
+    float: left;
+    margin-left: 10px;
+}

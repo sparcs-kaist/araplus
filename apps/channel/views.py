@@ -59,7 +59,7 @@ def list(request, channel_url):
 
     notice_list, post_list, pages, page = _get_post_list(request, channel)
     querystring = _get_querystring(request, 'page')
-    return render(request, 'channel/list.html',
+    return render(request, 'channel/list_core.html',
                   {'notice_list': notice_list,
                    'post_list': post_list,
                    'channel_list': channel_list,
