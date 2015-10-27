@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'notifications',
     'apps.board',
     'apps.grill',
     'apps.session',
@@ -112,6 +113,6 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-
 # TO BE REFACTORED!
 UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
+

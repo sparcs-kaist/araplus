@@ -3,14 +3,106 @@
     <head>
         <meta charset="utf-8">
         <title>{% block title %}ARA Plus{% endblock %}</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="/media/css/base.css">
         {% block css %}{% endblock %}
         <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/media/js/base.js"></script>
         {% block js %}{% endblock %}
     </head>
     <body>
+        <div id="title-wrapper">
+            <div id="title">
+                <h1 id="sparcs-title">
+                    SPARCS SSO
+                </h1>
+            </div>
+        </div>
+        <div id="header-wrapper">
+            <div id="logo-wrapper">
+                <a href="/main">
+                    <h1 id="logo">
+                        ARAPLUS
+                    </h1>
+                </a>
+                <button id="menu-button-wrapper" type="button" onclick="menuHide()">
+                    <span id="menu-button"></span>
+                </button>
+            </div>
+            <ul id="nav-list">
+                <li class="nav-item">
+                    <a href="/session/notifications">
+                        <h3>반응보기
+                            {% load notifications_tags %}
+                            {% notifications_unread as unread_count %}
+                            {% if unread_count %} {{ unread_count }}
+                            {% endif %}
+                        </h3>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <h3>내글보기</h3>
+                </li>
+                <li class="nav-item">
+                    <h3>갈피모음</h3>
+                </li>
+                <li class="nav-item">
+                    <a href="/session"><h3>쪽지</h3></a>
+                </li>
+                <li class="nav-item">
+                    <h3>포인트관리</h3>
+                </li>
+            </ul>
+            <div id="user-wrapper">
+                <h1 id="nickname">
+                    {{ user }}
+                </h1>
+                <h1 id="point">
+                    1740 point
+                </h1>
+            </div>
+        </div>
+        <div id="menu-wrapper">
+            <div id="board-wrapper" class="menu-vertical">
+                <h1 class="menu-title">
+                    BOARD
+                </h1>
+                <ul id="board-list">
+                    <li class="board-item">
+                        <a href="/board/all"><h3>All</h3></a>
+                    </li>
+                    <li class="board-item">
+                       <a href="/board/garbage/"><h3>Garbage</h3></a>
+                   </li>
+                   <li class="board-item">
+                        <h3>Buy & Sell</h3>
+                    </li>
+                    <li class="board-item">
+                        <h3>Gallery</h3>
+                    </li>
+                    <li class="board-item">
+                        <h3>Political</h3>
+                    </li>
+                    <li class="board-item">
+                        <h3>Annoymous</h3>
+                    </li>
+                </ul>
+            </div>
+            <div id="division-line"></div>
+            <div id="specials-wrapper" class="menu-vertical">
+                <h1 class="menu-title">
+                    SPECIALS
+                </h1>
+                <ul id="board-list">
+                    <li class="board-item">
+                        <a href="/grill/"><h3>불판</h3></a>
+                    </li>
+                    <li class="board-item">
+                        <h3>연재</h3>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    <!--
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -43,8 +135,8 @@
                 </div>
             </div>
         </nav>
-        {% block content %}
-        {% endblock %}
+
+
         <div id="footer" class="text-center">
             <p>
                 <a href="/main/credit/">Credit</a>
@@ -54,5 +146,8 @@
                 <span>Copyright &copy; 2015 <a href="http://sparcs.org/">SPARCS</a>. All rights reserved.</span>
             </p>
         </div>
+    -->
+        {% block content %}
+        {% endblock %}
     </body>
 </html>

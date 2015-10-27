@@ -1,54 +1,94 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from apps.session.models import UserProfile, Message
 from django.contrib.auth.decorators import login_required
+import re
+import json
+import urllib
+
+
+# Session main page
+def main(request):
+    return render(request, 'session/main.html')
+
+
+def validate_nickname(nickname):
+    if not re.match(r'[\w_-]{5,30}', nickname):
+        return False
+
+    user_profile = UserProfile.objects.filter(nickname=nickname)
+    if len(user_profile) > 0:
+        return False
+    return True
+
+
+def nickname_check(request):
+    if validate_nickname(request.GET.get('nickname', '')):
+        return HttpResponse(status=200)
+    return HttpResponse(status=400)
 
 
 def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
+    if request.user.is_authenticated():
+        return redirect('/')
+    return redirect('http://bit.sparcs.org:22223/oauth/requirecallback=\
+                     http://bit.sparcs.org:23232/session/login/callback')
 
-        if user is not None and user.is_active:
-            login(request, user)
-            return redirect(request.POST['next'])
+
+def user_login_callback(request):
+    if request.method == "GET":
+        nexturl = request.GET.get('next', '/')
+        uid = request.GET['uid']
+        sso_profile = urllib.urlopen('http://bit.sparcs.org:22223/\
+                                      oauth/info?uid=' + uid)
+        sso_profile = json.load(sso_profile)
+        username = sso_profile['username']
+        user_list = User.objects.filter(username=username)
+        if len(user_list) == 0:
+            request.session['info'] = sso_profile
+            return redirect('/session/register')
         else:
-            error = "Invalid login"
-        return render(request, 'session/login.html', {'error': error})
-    return render(request, 'session/login.html',
-                  {'next': request.GET.get('next', '/')})
+            user_list[0].backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user_list[0])
+            return redirect(nexturl)
+    return render('/session/login.html', {'error': "Invalid login"})
 
 
 def user_logout(request):
     if request.user.is_authenticated():
         logout(request)
-    return redirect('/session/login')
+    return redirect('/session/login/')
 
 
 def user_register(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        if password != request.POST['password_confirmation']:
-            error = "Password doesn't match the confirmation"
-            return render(request, "session/register.html", {'error': error})
-        email = request.POST['email']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        new_user = User.objects.create_user(username=username,
-                                            email=email,
-                                            password=password,
-                                            first_name=first_name,
-                                            last_name=last_name)
+    if 'info' not in request.session:
+        return redirect('/session/login/')
+
+    info = request.session['info']
+    if len(User.objects.filter(username=info['username'])) > 0:
+        del request.session['info']
+        return redirect('/session/login/')
+
+    if request.method == 'POST':
         nickname = request.POST['nickname']
-        new_user_profile = UserProfile(user=new_user,
+        password = request.POST['password']
+        if validate_nickname(nickname):
+            user = User.objects.create_user(username=info['username'],
+                                            email=info['email'],
+                                            password=password,
+                                            first_name=info['first_name'],
+                                            last_name=info['last_name'])
+
+            user_profile = UserProfile(user=user,
+                                       gender=info['gender'],
+                                       birthday=info['birthday'],
                                        nickname=nickname)
-        new_user_profile.save()
+        user_profile.save()
 
         return render(request, 'session/register_complete.html')
-    return render(request, 'session/register.html')
+    return render(request, 'session/register.html', {'info': info})
 
 
 @login_required(login_url='/session/login/')
@@ -82,3 +122,13 @@ def check_message(request):
     messages = Message.objects.filter(receiver=sender)
     return render(request,
                   'session/check_message.html', {'messages': messages})
+
+
+@login_required(login_url='/session/login/')
+def view_notifications(request):
+    user = request.user
+    unread_noti = user.notifications.unread()
+    read_noti = user.notifications.read()
+    return render(request,
+                  'session/notification_view.html',
+                  {'unread': unread_noti, 'read': read_noti})

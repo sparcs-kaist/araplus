@@ -70,5 +70,7 @@ db.*
 # Mac OS Env
 .DS_Store
 
+*.orig
+
 # Temp upload dir
 upload/
