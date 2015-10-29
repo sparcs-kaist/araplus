@@ -24,7 +24,7 @@ html{
 
 #channel-info-wrapper img{
     width: 250px;
-    height: 169px;
+    height: 168px;
     float: left;
 }
 
@@ -94,4 +94,122 @@ html{
 #list-button{
     float: left;
     margin-left: 10px;
+}
+
+#channel-post-wrapper{
+    width: calc(100% - 45px);
+    float: left;
+    margin-top: 35px;
+}
+
+.line{
+    width: 100%;
+    height: 1px;
+    background: #d6d6d6;
+}
+
+.post{
+    width: 100%;
+    height: 70px;
+    border-bottom: #d6d6d6 solid 1px;
+    padding: 8px 1px;
+}
+
+.notice{
+    background: #f2f2f2;
+}
+
+.post img{
+    width: 110px;
+    height: 54px;
+    float: left;
+}
+
+.post div{
+    width: calc(100% - 280px);
+    height: 100%;
+    margin-left: 20px;
+    float: left;
+}
+
+.post a{
+   font-size: 12px;
+   line-height: 12px;
+   margin-top: 22px;
+   float: left;
+}
+
+.post a:hover{
+    text-decoration: underline;
+}
+
+.post-order{
+    width: 50px;
+    height: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 18px;
+    padding-top: 18px;
+    text-align: center;
+    margin-left: 10px;
+    float: left;
+}
+
+.post-date{
+    width: 70px;
+    height: 100%;
+    font-size: 12px;
+    line-height: 12px;
+    padding-top: 22px;
+    margin-left: 20px;
+    float: left;
+    text-align: center;
+}
+
+#pagination-wrapper{
+    width: 100%;
+    padding: 30px 45px 0 0;
+    display: block;
+    text-align: center;
+    clear: both;
+}
+
+#pagination-wrapper a, #pagination-wrapper span{
+    height: 21px;
+    width: 15px;
+    font-size: 11px;
+    line-height: 11px;
+    padding-top: 5px;
+    margin-right: 10px;
+    text-align: center;
+    display: inline-block;
+}
+
+.active, #pagination-wrapper a:hover{
+    background: #333;
+    color: #fff;
+}
+
+#admin-wrapper{
+    width: 100%;
+    height: 50px;
+    margin: 30px 0;
+}
+
+#write-button{
+    width: 65px;
+    float: left;
+}
+
+#modify-button{
+    width: 75px;
+    float: left;
+    margin-left: 10px;
+}
+
+#delete-button{
+    width: 75px;
+    float: left;
+    margin-left: 10px;
+    cursor: pointer;
 }
