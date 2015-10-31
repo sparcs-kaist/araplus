@@ -124,14 +124,14 @@
             </div>
         </div>
 		{% endfor %}
-		<div style="text-align: center;" class="post-pagination>
+		<div style="text-align: center;" class="post-pagination">
 			<ul style="display:inline-block;"> 
 				{% if comment_page_left != 0 %}
-				<li><a href="{{querystring}}comment_page={{comment_page_left}}"">&laquo;</a></li>
+				<li><a href="{{querystring}}comment_page={{comment_page_left}}">&laquo;</a></li>
 				{% endif %}
 				{% for comment_page in comment_pages%}
-				{% if comment_page == comment_current_page %}					
-				<li style="display:inline-block;" class="active">
+				{% if comment_page == comment_current_page %}
+				<li style="display:inline-block" class="active">
 				<a href="{{querystring}}comment_page={{comment_page}}">{{comment_page}}<span class="sr-only"></span></a>
 				</li>
 				{% else %}
@@ -139,11 +139,11 @@
 				{% endif %}
 				{% endfor %}
 				{% if comment_page_right != 0 %}
-				<li style="display:inline-block;"><a href="{{querystring}}comment_page={{comment_page_right}}"">&raquo;</a></li>
+				<li style="display:inline-block;"><a href="{{querystring}}comment_page={{comment_page_right}}">&raquo;</a></li>
 				{% endif %}
-			</ul
+			</ul>
 		</div>
-	</div>   
+	</div>
 
 	{%if not post.deleted%}
         <div id="comment-write-wrapper">

@@ -113,6 +113,12 @@ def read_post(request, channel_url, post_order):
     notice_list, post_list, pages, page = _get_post_list(request, channel)
     report_form = ChannelReportForm()
 
+    next_post = int(post_order) + 1
+    prev_post = int(post_order) - 1
+    print next_post, prev_post
+    if next_post > len(post_list):
+        next_post = 0
+
     querystring = _get_querystring(request, 'page')
     return render(request, 'channel/read.html',
                   {
@@ -127,7 +133,9 @@ def read_post(request, channel_url, post_order):
                       'current_c_page': c_page,
                       'channel_list': channel_list,
                       'current_channel': channel,
-                      'report_form': report_form
+                      'report_form': report_form,
+                      'next_post' : next_post,
+                      'prev_post' : prev_post
                   })
 
 
@@ -258,6 +266,7 @@ def mark19_comment(request, channel_url, post_order, comment_order):
 @require_POST
 @login_required(login_url='/session/login')
 def vote_post(request, channel_url, post_order):
+    print 1
     channel, post = _parse_post(channel_url, post_order)
     result = _vote_post(request.user.userprofile, post)
     return JsonResponse(result)
