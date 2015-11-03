@@ -91,7 +91,7 @@ def write_post(request, channel_url):
                   {'content_form': form_content,
                    'post_form': form_post,
                    'attachment_form': form_attachment,
-                   'channel': channel.id})
+                   'channel': channel})
 
 
 @require_POST

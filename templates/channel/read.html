@@ -7,7 +7,7 @@
 <script type="text/javascript" src="/media/js/channel/hover.js"></script>
 -->
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
-<script type="text/javasciprt" src="/media/js/channel/channel.js"></script>
+<script type="text/javascript" src="/media/js/channel/channel.js"></script>
 {% endblock %}
 {% block content %}
 <div id="channel-content-wrapper">
@@ -16,7 +16,7 @@
         <div id="post-title-wrapper">
             <div id="post-info">
                 <!-- 성인글 처리? -->
-                <span id="post-title">{{ post.order }}. {{ post.title }}</span>
+                <span id="post-title" data="{{ post.order }}">{{ post.order }}. {{ post.title }}</span>
                 <span id="post-date">{{ post.created_time }}</span>
             </div>
             {% if prev_post > 0 %}

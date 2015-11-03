@@ -1,34 +1,47 @@
 {% extends "base.html" %}
 {% load bootstrap %}
-{% block js %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/channel/channel_write.css">
 {% endblock %}
 {% block content %}
-<div class="container">
+<div id="content-wrapper">
     <form method="POST" enctype="multipart/form-data">
-		{% csrf_token %}
-		<div class="row">
-        	<div class="col-xs-9">
-            	{{ post_form.title|bootstrap }}
-        	</div>
-        	<div class="col-xs-3">
-            	<div class="col-xs-6">
-               		{{ content_form.is_adult|bootstrap }}
-                </div>
-                <div class="col-xs-6"> 
-                	{{ post_form.is_notice|bootstrap }}
-                </div>
-			</div>
-		</div>
-        <div id="content">
-        	{{ content_form.content|bootstrap }}
-       	</div>
-        <div id="attachment">
-            {{ attachment_form.file|bootstrap }}
+        {% csrf_token %}
+        <div id="board-title">
+            {{channel.kor_name}} | ㅁㄴㅇㄹ
         </div>
-        <div id="thumbnail">
-            {{ post_form.thumbnail|bootstrap }}
+        <div class="line"></div>
+        <div id="board-write-info">
+            <div class="info-nav-item">
+                <h3>ATTRIBUTES</h3>
+                <div id="info-select">
+                    <div id="adult" class="col-xs-2">
+                        {{ content_form.is_adult }}
+                        <span>성인글</span>
+                    </div>
+                    {% if post_form.is_notice %}
+                    <div id="notice" class="col-xs-2"> 
+                        {{ post_form.is_notice }}
+                        <span>공지글</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-nav-item">
+                <h3>TITLE</h3>
+                {{ post_form.title }}
+            </div>
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
+        {{ content_form.content }}
+        <!-- attachment -->
+        {{ attachment_form }} 파일
+        {{ post_form.thumbnail }} 썸네일
+
+        <div id="board-write-tail">
+            <button type="submit" id="board-write-btn">글 작성 완료</button>
+        </div>
+        <!-- error -->
     </form>
 </div>
 {% endblock %}
+

@@ -1,6 +1,6 @@
 $(document).ready(function(){
     $("span.timeago").timeago();
-    var post_order = {{ post.order }};
+    var post_order = $("#post-title").attr("data");
     var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
 
     $(".list-post[data-order=" + post_order + "]").addClass('selected');
