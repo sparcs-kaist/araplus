@@ -14,7 +14,8 @@ class Grill(models.Model):
 
     def get_absolute_url(self):
         return reverse_lazy('view_grill', kwargs={'grill_id': self.id})
-
+    def get_comment(self):
+        return self.grill_comment.count();
 
 class GrillComment(models.Model):
 
@@ -26,7 +27,7 @@ class GrillComment(models.Model):
             self.order = 1
         super(GrillComment, self).save(*args, **kwargs)
 
-    grill = models.ForeignKey(Grill)
+    grill = models.ForeignKey(Grill, related_name="grill_comment")
     author = models.ForeignKey(UserProfile)
     content = models.TextField(max_length=140)
     created_time = models.DateTimeField(auto_now_add=True)

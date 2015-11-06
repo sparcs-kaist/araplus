@@ -1,13 +1,24 @@
 {% extends "base.html" %}
-{% load bootstrap %}
+{%block css%}
+<link rel="stylesheet" type="text/css" href="/media/css/grill/grill.css">
+{%endblock%}
+
 {% block content %}
-<div class="container">
-    <form method="POST" action="{% url 'add_grill' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form|bootstrap }}
-        <p>
-            <input class="btn btn-default" type="submit" />
-        </p>
+<div class="grill-add-container">
+	<form method="POST" action="{% url 'add_grill' %}" enctype="multipart/form-data"> 
+		{% csrf_token %}
+		<div class="grill_write_title">
+			<span style="display:inline; margin: 20px;">Title</span>
+			<input class="form-control" id="id_title" maxlength="80" name="title" type="text" style="display:inline; margin :10px; width : calc(100% - 100px);" >
+		</div>
+		<div class="grill_write_content">
+			<textarea class=" form-control" cols="40" id="id_content" name="content" rows="10" style="display:inline; margin :15px; width : calc(100% - 400px); height: 500px;" 
+				></textarea>
+		</div>
+
+		<div style=" margin : 0 auto;text-align:center;width:calc(100% - 400px);"> 
+			<input class="grill-write-button" style=" margin : 0 auto;"type="submit" />
+        </div>
     </form>
 </div>
 {% endblock %}
