@@ -119,7 +119,7 @@ STATICFILES_DIRS = (
 UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
 NOTIFICATIONS_USE_JSONFIELD = True
-=======
+
 # define media root path
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/upload/'
