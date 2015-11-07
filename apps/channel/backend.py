@@ -8,7 +8,11 @@ from django.db.models import Q
 from apps.channel.forms import *
 from itertools import izip
 from notifications import notify
-
+import StringIO
+from PIL import Image, ImageOps
+import os
+import hashlib
+from django.core.files import File
 
 def _get_querystring(request, *args):
     query_list = []
@@ -61,6 +65,13 @@ def _write_channel(request, channel=None):
 
     if form_channel.is_valid():
         channel = form_channel.save(admin=request.user.userprofile)
+        try:
+            thumbnail = _handle_uploaded_image(request.FILES['thumbnail'], 300, 200)
+            default_post_thumbnail = _handle_uploaded_image(request.FILES['defualt_post_thumbnail'], 300, 200)
+            channel.thumbnail.save(thumbnail[0], thumbnail[1])
+            channel.default_post_thumbnail.save(default_post_thumbnail[0], default_post_thumbnail[1])
+        except KeyError:
+            channel.save()
         return {'success': channel}
     else:
         return {'fail': form_channel}
@@ -222,6 +233,12 @@ def _write_post(request, channel, post=None):
         post = form_post.save(channel=channel,
                 author=request.user.userprofile,
                 content=content)
+
+        try:
+            thumbnail = _handle_uploaded_image(request.FILES['thumbnail'], 120, 60)
+            post.thumbnail.save(thumbnail[0], thumbnail[1])
+        except:
+            post.save()
 
         HashTag.objects.filter(channel_post=post).delete()
         hashs = content.get_hashtags()
@@ -454,3 +471,62 @@ def _report(request, content):
         report_form.save(user=request.user.userprofile, content=content)
         return True
     return False
+
+
+def _handle_uploaded_image(i, x, y):
+    # read image from InMemoryUploadedFile
+    image_str = ""
+    for c in i.chunks():
+        image_str += c
+
+    # create PIL Image instance
+    imagefile  = StringIO.StringIO(image_str)
+    image = Image.open(imagefile)
+
+    # if not RGB, convert
+    if image.mode not in ("L", "RGB"):
+        image = image.convert("RGB")
+
+    #get orginal image ratio
+    img_ratio = float(image.size[0]) / image.size[1]
+
+    # resize but constrain proportions?
+    if x==0.0:
+        x = y * img_ratio
+    elif y==0.0:
+        y = x / img_ratio
+
+    # output file ratio
+    resize_ratio = float(x) / y
+    x = int(x); y = int(y)
+
+    # get output with and height to do the first crop
+    if(img_ratio > resize_ratio):
+        output_width = x * image.size[1] / y
+        output_height = image.size[1]
+        originX = image.size[0] / 2 - output_width / 2
+        originY = 0
+    else:
+        output_width = image.size[0]
+        output_height = y * image.size[0] / x
+        originX = 0
+        originY = image.size[1] / 2 - output_height / 2
+
+    #crop
+    cropBox = (originX, originY, originX + output_width, originY + output_height)
+    image = image.crop(cropBox)
+
+    # resize (doing a thumb)
+    image.thumbnail([x, y], Image.ANTIALIAS)
+
+    # re-initialize imageFile and set a hash (unique filename)
+    imagefile = StringIO.StringIO()
+    filename = hashlib.md5(imagefile.getvalue()).hexdigest()+'.jpg'
+
+    #save to disk
+    imagefile = open(os.path.join(UPLOAD_DIR,filename), 'w')
+    image.save(imagefile,'JPEG', quality=90)
+    imagefile = open(os.path.join(UPLOAD_DIR,filename), 'r')
+    content = File(imagefile)
+
+    return (filename, content)
