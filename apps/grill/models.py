@@ -47,8 +47,11 @@ class GrillComment(models.Model):
     # 일단 두 번째 방법으로 구현
     def replace_tags(self):
         return re.sub(r'@(?P<target>\d+)',
-                      '<a href="#comment_\g<target>">@\g<target></a>',
+                     # '<a href="#comment_\g<target>">@\g<target></a>'
+                       '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>',
                       self.content)
+
+
 
 
 class GrillCommentVote(models.Model):

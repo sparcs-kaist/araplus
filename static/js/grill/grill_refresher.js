@@ -164,4 +164,19 @@ $(document).ready(function(){
                 $(this).parent().children(".hate-content").css('display', 'none');
                 $(this).parent().children(".open-comment").css('display', 'none');
             });
-        });
+		   	var hoverHTMLDemoBasic = '<p></p><p class="tempSpace"></p>';
+			$(".comment_preview").hovercard({
+				detailsHTML : hoverHTMLDemoBasic,
+				width: 400,
+				onHoverIn: function() {
+					console.log($(".comment_preview_content")[0]);
+					if(typeof($(".comment_preview_content")[0]) != "undefined") $(".comment_preview_content").remove();
+					var order = $(this).children('a').attr('title').split('_')[1];
+					var content = document.getElementById('comment'+order).textContent;
+					$(".tempSpace").append('<span class="comment_preview_content">' + content + '</span>');
+				},
+				onHoverOut: function() {
+            /*$(".comment_preview_content").remove();*/
+				}
+			});
+});

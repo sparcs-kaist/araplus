@@ -117,8 +117,7 @@
 
                    <button class="comment-button function-btn report" id="report_{{comment.content_id}}">[신고]</button>
                    <button class="comment-button function-btn vote" id="adult_{{comment.content_id}}">[성인글]</button>
-                   <button class="comment-button function-btn vote" id="political_{{comment.content_id}}">[정치글]</button>
-                
+                   <button class="comment-button function-btn vote" id="political_{{comment.content_id}}">[정치글]</button>   
                     {% if request.user.userprofile == comment.board_comment.author %}
                    <button class="comment-button function-btn comment" type="submit" id="btn-{{comment.order}}-{{comment.id}}">[수정]</button>
                    <button class="comment-button function-btn delete" id="delete_{{comment.content_id}}">[삭제]</button>
