@@ -651,7 +651,7 @@ def _change_permission(request, board):
 
 
 def _check_valid(request, board_url, write=False):
-    if board_url.lower() == 'all':
+    if board_url.lower() in ['all', 'garbage']:
         return True
     try:
         board = Board.objects.get(url=board_url)
@@ -666,9 +666,6 @@ def _check_valid(request, board_url, write=False):
     try:
         board_member = BoardMember.objects.get(
             board=board, member=request.user.userprofile)
-        if write and not board_member.write:
-            return False
-        return True
+        return not (write and not board_member.write)
     except:
-        pass
-    return False
+        return False
