@@ -7,6 +7,7 @@ import re
 import cgi
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 numtag_regex = re.compile(r'@(?P<target>\d+)')
+nicktag_regex = re.compile(ur'@(?P<target>\w+)', re.UNICODE)
 
 class Channel(models.Model):
     kor_name = models.CharField(max_length=45, unique=True)
@@ -67,7 +68,15 @@ class ChannelContent(models.Model):
         return [tag[1] for tag in hashtag_regex.findall(self.content)]
 
     def get_numtags(self):
-        return [tag[1] for tag in numtag_regex.findall(self.content)]
+        return [int(tag) for tag in numtag_regex.findall(self.content)]
+
+    def get_tagged_order(self, comment_nickname_list):
+        tag_list = [tag for tag in nicktag_regex.findall(self.content)]
+        tag_list = set(tag_list)
+        comment_nickname_list = dict(comment_nickname_list)
+        order = [comment_nickname_list[item]
+                 for item in comment_nickname_list if item in tag_list]
+        return order
 
 
 class Attachment(models.Model):
@@ -222,6 +231,13 @@ class ChannelPost(models.Model):
         elif self.channel.default_post_thumbnail:
             return '/upload/'+self.channel.default_post_thumbnail.url.split('/')[-1]
         return '/upload/default.jpg'
+
+    def get_notify_target(self):
+        x = self.channel_post_trace.filter(is_notified=True)
+        print x
+        x = x.select_related("userprofile").prefetch_related("userprofile__user")
+        print x
+        return x
 
     def __unicode__(self):
         title = self.title

@@ -7,7 +7,7 @@ import diff_match_patch
 from django.db.models import Q
 from apps.channel.forms import *
 from itertools import izip
-#from notifications import notify
+from notifications import notify
 
 
 def _get_querystring(request, *args):
@@ -249,9 +249,53 @@ def _write_comment(request, channel_url="", post=None, comment=None):
 
     comment.channel_content = content_form.save()
     comment.save()
+    notify_target = comment.channel_post.get_notify_target()
+
+    for target in notify_target:
+        target = target.userprofile.user
+        if request.user != target:
+            notify.send(request.user,
+                        recipient=target,
+                        verb='가 댓글을 달았습니다.'.decode('utf-8'))
+    numtags = comment.channel_content.get_numtags()
+    if numtags:
+        comments = comment.channel_post.channel_comment.all()
+        comments = comments.order_by('id')
+        for num in numtags:
+            try:
+                if num == 0:
+                    target = comment.channel_post.author.user
+                else:
+                    target = comments[num - 1].author.user
+                if request.user != target:
+                    notify.send(request.user,
+                                recipient=target,
+                                verb='님이 태그했습니다.'.decode('utf-8'))
+            except:
+                pass
 
     comment.channel_post.save()
 
+    comment_list = []
+    comment_nickname_list = [(comment.channel_post.author.nickname, 0)]
+    order = 1
+    for channel_comment in comment.channel_post.channel_comment.all():
+        username = channel_comment.author.nickname
+        comment_list.append(channel_comment)
+        comment_nickname_list.append((username, order))
+        order = order + 1
+    orders = comment.channel_content.get_tagged_order(comment_nickname_list)
+    for order in orders:
+        order = order - 1
+        if order == -1:
+            target = comment.channel_post.author.user
+        else:
+            target = comment_list[order].author.user
+        if request.user != target:
+            notify.send(request.user,
+                        recipient=target,
+                        verb='님이 태그했습니다.'.decode('utf-8'))
+    '''
     content = comment.channel_content.content
     index = 0
     while index < len(content):
@@ -273,7 +317,7 @@ def _write_comment(request, channel_url="", post=None, comment=None):
                 #            verb='님이 태그했습니다.'.decode('utf-8'))
             except:
                 pass
-
+    '''
     return True
 
 

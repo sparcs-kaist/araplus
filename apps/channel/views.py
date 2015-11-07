@@ -79,6 +79,11 @@ def write_post(request, channel_url):
     if request.method == 'POST':
         result = _write_post(request, channel)
         if 'success' in result:
+            channel_post_trace = ChannelPostTrace(
+                    channel_post=result['success'],
+                    userprofile=request.user.userprofile)
+            print "XXXXXX"
+            channel_post_trace.save()
             return redirect('../' + str(result['success'].order) + '/')
 
         form_content, form_post, form_attachment = result['fail']
@@ -115,15 +120,22 @@ def read_post(request, channel_url, post_order):
 
     next_post = int(post_order) + 1
     prev_post = int(post_order) - 1
-    print next_post, prev_post
     if next_post > len(post_list):
         next_post = 0
+
+    try:
+        channel_post_trace = ChannelPostTrace.objects.get(
+                userprofile=request.user.userprofile,
+                channel_post__id=post_id)
+    except:
+        channel_post_trace = None
 
     querystring = _get_querystring(request, 'page')
     return render(request, 'channel/read.html',
                   {
                       'querystring': querystring,
                       'post': post_rendered,
+                      'channel_post_trace': channel_post_trace,
                       'comment_list': comments,
                       'notice_list': notice_list,
                       'post_list': post_list,
@@ -298,3 +310,52 @@ def report_comment(request, channel_url, post_order, comment_order):
     channel, post, comment = _parse_comment(channel_url, post_order, comment_order)
     _report(request, comment.channel_content)
     return HttpResponse(status=200)
+
+@login_required(login_url='/session/login')
+def trace(request, channel_url, post_id):
+    if not _check_valid(request, channel_url):
+        return HttpResponse('Invalid access')
+    request_type = request.POST.get('type', '')
+    try:
+        channel_post_trace = ChannelPostTrace.objects.get(
+                userprofile=request.user.userprofile,
+                channel_post__id=post_id)
+        if request_type == 'trace':
+            channel_post_trace.is_trace = not(channel_post_trace.is_trace)
+        elif request_type == 'alarm':
+            channel_post_trace.is_notified = not(channel_post_trace.is_notified)
+        else:
+            result = {'message': 'failed'}
+            return HttpResponse(json.dumps(result),
+                    content_type='application/json')
+    except:
+        channel_post_trace = ChannelPostTrace(
+                userprofile=request.user.userprofile,
+                channel_post_id=post_id)
+        if request_type == 'alarm':
+            channel_post_trace.is_notified = True
+        channel_post_trace.save()
+        result = {
+            'message': 'success',
+            'alarm': channel_post_trace.is_notified,
+            'trace': channel_post_trace.is_trace}
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@login_required(login_url='/session/login')
+def trace_list(request, channel_url, item_per_page=20):
+    if not _check_valid(request, channel_url):
+        return HttpResponse('Invalid access')
+    channel_post = ChannelPost.objects.filter(
+            channel_post_trace__userprofile=request.user.userprofile,
+            channel_post_trace__is_trace=True)
+    page = int(request.GET.get('page', 1))
+    post_paginator = Paginator(channel_post, item_per_page)
+    post_list = []
+    for post in post_paginator.page(page):
+        post_list += [[post, post.get_is_read(request)]]
+    return render(request,
+                  'channel/channel_list.html',
+                  {'post_list': post_list,
+                   'current_page': page,
+                   'pages': post_paginator.page_range})
