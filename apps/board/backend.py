@@ -299,6 +299,8 @@ def _write_comment(request, post_id, is_modify=False):
                 board_post=target_post)
             content_form = BoardContentForm(request.POST,
                                             author=request.user.userprofile)
+
+
         except:
             return  # no post
     if content_form.is_valid():
@@ -336,7 +338,11 @@ def _write_comment(request, post_id, is_modify=False):
                         verb='가 댓글을 달았습니다.'.decode('utf-8'),
                         post_title=target_post.title,
                         comment_content=board_comment.board_content.content,
-                        board_name=target_post.board.eng_name)
+                        board_name=target_post.board.url,
+                        noti_category='reply',
+                        app_title='board',
+                        post_id=target_post.id,
+                        comment_page=1)
     numtags = board_comment.board_content.get_numtags()
     if numtags:
         comments = board_comment.board_post.board_comment.all()
@@ -347,17 +353,27 @@ def _write_comment(request, post_id, is_modify=False):
                     notify.send(request.user,
                                 recipient=board_comment.board_post.author.user,
                                 verb='님이 태그했습니다.'.decode('utf-8'),
-                                post_title=target_post.title,
-                                comment_content=board_comment.board_content.content,
-                                board_name=target_post.board.eng_name)
+                                post_title=board_comment.board_content.content,
+#                                post_title=target_post.title,
+#                                comment_content=board_comment.board_content.content,
+                                board_name=target_post.board.url,
+                                noti_category='mention',
+                                app_title='board',
+                                post_id=target_post.id,
+                                comment_page=1)
                 else:
                     target = comments[num - 1].author.user
                     notify.send(request.user,
                                 recipient=target,
                                 verb='님이 태그했습니다.'.decode('utf-8'),
-                                post_title=target_post.title,
-                                comment_content=board_comment.board_content.content,
-                                board_name=target_post.board.eng_name)
+                                post_title=board_comment.board_content.content,
+#                                post_title=target_post.title,
+#                                comment_content=board_comment.board_content.content,
+                                board_name=target_post.board.url,
+                                noti_category='mention',
+                                app_title='board',
+                                post_id=target_post.id,
+                                comment_page=1)
             except:
                 pass
     comment_list = []
@@ -385,9 +401,14 @@ def _write_comment(request, post_id, is_modify=False):
             notify.send(request.user,
                         recipient=target,
                         verb='님이 태그했습니다.'.decode('utf-8'),
-                        post_title=target_post.title,
-                        comment_content=board_comment.board_content.content,
-                        board_name=target_post.board.eng_name)
+                        post_title=board_comment.board_content.content,
+#                        post_title=target_post.title,
+#                        comment_content=board_comment.board_content.content,
+                        board_name=target_post.board.url,
+                        noti_category='mention',
+                        app_title='board',
+                        post_id=target_post.id,
+                        comment_page=1)
     return board_comment.board_post.id, order - 1
 
 
