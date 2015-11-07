@@ -6,6 +6,8 @@ from django.db.models import Q
 
 @login_required(login_url='/session/login/')
 def send_message(request):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     if request.method != "POST":
         to = request.GET.get('to', '')
         return render(request, 'session/write_message.html', {'to': to})
@@ -26,6 +28,8 @@ def send_message(request):
 
 @login_required(login_url='/session/login/')
 def check_message(request):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     receiver = request.user.userprofile
     blocks = Block.objects.filter(receiver=receiver)
     messages = Message.objects.filter(receiver=receiver)
@@ -39,6 +43,8 @@ def check_message(request):
 
 @login_required(login_url='/session/login/')
 def go_thread(request):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     if request.method != "POST":
         messages = Message.objects.filter(Q(sender=request.user.userprofile) |
                                           Q(receiver=request.user.userprofile))
@@ -57,6 +63,8 @@ def go_thread(request):
 
 @login_required(login_url='/session/login/')
 def check_thread(request, nickname):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     me = request.user.userprofile
     try:
         you = UserProfile.objects.get(nickname=nickname)
@@ -83,6 +91,8 @@ def check_thread(request, nickname):
 
 @login_required(login_url='/session/login/')
 def check_sent_message(request):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     messages = Message.objects.filter(sender=request.user.userprofile)
     return render(request,
                   'session/check_sent_message.html', {'messages': messages})
@@ -90,6 +100,8 @@ def check_sent_message(request):
 
 @login_required(login_url='/session/login')
 def block(request):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     if request.method != "POST":
         return render(request, 'session/block.html')
     receiver = request.user.userprofile
@@ -111,6 +123,8 @@ def block(request):
 
 @login_required(login_url='/session/login')
 def show_block_list(request):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     if request.method != "POST":
         blocks = Block.objects.filter(receiver=request.user.userprofile)
         return render(request, 'session/block_list.html', {'blocks': blocks})

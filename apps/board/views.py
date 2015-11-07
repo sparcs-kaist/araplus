@@ -31,6 +31,8 @@ def home(request):
 
 @login_required(login_url='/session/login')
 def create_board(request):
+    if request.user.userprofile.permission < 2:
+        return redirect('../')
     if request.method == 'POST':
         result = _create_board(request)
         if 'save' in result:
@@ -101,6 +103,8 @@ def delete_member(request, board_url):
 def post_write(request, board="All"):
     if not _check_valid(request, board, True):
         return HttpResponse('Invalid access')
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
     if request.method == 'POST':
         result = _write_post(request, board=board)
         if 'save' in result:
@@ -286,6 +290,8 @@ def post_list(request, board_url):
 def content_vote(request, board_url):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
+    if request.user.userprofile.permission < 2:
+        return redirect('../')
     result = {}
     result['response'] = 'fail'
     if request.method == 'POST':
@@ -312,6 +318,8 @@ def delete(request, board_url):
 def report(request, board_url):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
+    if request.user.userprofile.permission < 2:
+        return redirect('../')
     if request.method == 'POST':
         message = _report(request)
     return HttpResponse(json.dumps(message), content_type='application/json')

@@ -281,7 +281,7 @@ def _write_comment(request, post_id, is_modify=False):
             content_before = board_comment.board_content.content
             form_attachment = AttachmentFormSet(
                 queryset=Attachment.objects.none())
-            if board_comment.author != user_profile:
+            if board_comment.author != user_profile and user_profile.permission < 4:
                 return  # wrong request
             content_form = BoardContentForm(
                 request.POST,
@@ -425,7 +425,7 @@ def _delete_post(request):
         author = board_content.board_comment.author
     else:
         return 'invalid content'
-    if author != request.user.userprofile:
+    if author != request.user.userprofile and request.user.userprofile.permission < 4:
         return 'not allowed'
     board_content.is_deleted = True
     board_content.save()
@@ -660,6 +660,8 @@ def _check_valid(request, board_url, write=False):
     if board.is_deleted:
         return False
     if board.is_public:
+        return True
+    if request.user.userprofile.permission > 3:
         return True
     if board.admin == request.user.userprofile:
         return True
