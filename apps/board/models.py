@@ -67,7 +67,8 @@ class BoardContent(models.Model):
         return vote
 
     def replace_content_tags(self, type, comment_nickname_list):
-        result = cgi.escape(self.content)
+        # result = cgi.escape(self.content)
+        result = self.content
         result = result.replace("\n", "<br />")
         if type == 'Comment':
             # 댓글 숫자 태그

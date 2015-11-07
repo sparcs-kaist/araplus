@@ -6,6 +6,7 @@ from django.db.models import Q
 import random
 from django.forms.models import modelformset_factory
 import datetime
+from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
 
 prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
@@ -79,7 +80,8 @@ class BoardContentForm(ModelForm):
         model = BoardContent
         exclude = ['is_deleted', 'modify_log']
         widgets = {
-            'content': Textarea(attrs={'rows': 15, }),
+            #'content': Textarea(attrs={'rows': 15, }),
+            'content': SummernoteWidget(),
         }
 
     def __init__(self, *args, **kwargs):
