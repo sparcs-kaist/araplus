@@ -100,7 +100,7 @@ def _get_content(request, post_id, comment_per_page=10):
     post = _get_post(request, board_post, 'Post')
     ##pagination of comments##
     board_comments = board_post.board_comment.all()
-    comment_page = int(request.GET.get('comment_page',1))
+    comment_page = int(request.GET.get('comment_page', 1))
     comment_paginator = Paginator(board_comments, comment_per_page)
     comment_paged = comment_paginator.page(comment_page)
     current_page = comment_page
@@ -108,15 +108,15 @@ def _get_content(request, post_id, comment_per_page=10):
     page_left = 0
     page_right = 0
     if len(page_range) == 1:
-        page_range.remove(1)       
+        page_range.remove(1)
     if len(page_range) > 5:
         last_page = len(page_range)
-        page_target = (current_page-1)/5
+        page_target = (current_page - 1) / 5
         page_range = []
         page_left = page_target * 5
         page_right = page_target * 5 + 6
-        for i in range(page_left+1,page_right):
-            if i>last_page:
+        for i in range(page_left + 1, page_right):
+            if i > last_page:
                 page_right = 0
                 break
             page_range.append(i)
@@ -128,7 +128,7 @@ def _get_content(request, post_id, comment_per_page=10):
     for board_comment in comment_paged:
         comment = _get_post(request, board_comment, 'Comment',
                             comment_nickname_list)
-        comment['order'] = comment_per_page*(current_page-1)+order
+        comment['order'] = comment_per_page * (current_page - 1) + order
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
         if comment['is_anonymous'] is None:
@@ -210,9 +210,9 @@ def _write_post(request, is_modify=False, post=None,
         instance=post,
         is_staff=request.user.is_staff)  # get form from post and instance
     form_attachment = AttachmentFormSet(request.POST, request.FILES)
-    # Get board instance, if failed return fail 
+    # Get board instance, if failed return fail
     try:
-        board_instance = Board.objects.get(url = board)
+        board_instance = Board.objects.get(url=board)
     except:
         return {'failed': [form_content, form_post, form_attachment]}
     try:  # for modify log, get title and content before modify.
@@ -252,7 +252,7 @@ def _write_post(request, is_modify=False, post=None,
         board_post = form_post.save(
             author=request.user.userprofile,
             content=form_content.save(post=post),
-            board = board_instance)  # save
+            board=board_instance)  # save
         board_content = board_post.board_content
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
@@ -290,10 +290,11 @@ def _write_comment(request, post_id, is_modify=False):
             return  # no comment
     else:
         form_attachment = AttachmentFormSet(request.POST, request.FILES)
+        target_post = BoardPost.objects.get(id=post_id)
         try:
             board_comment = BoardComment(
                 author=user_profile,
-                board_post=BoardPost.objects.get(id=post_id))
+                board_post=target_post)
             content_form = BoardContentForm(request.POST,
                                             author=request.user.userprofile)
         except:
@@ -330,7 +331,10 @@ def _write_comment(request, post_id, is_modify=False):
         if request.user != target:
             notify.send(request.user,
                         recipient=target,
-                        verb='가 댓글을 달았습니다.'.decode('utf-8'))
+                        verb='가 댓글을 달았습니다.'.decode('utf-8'),
+                        post_title=target_post.title,
+                        comment_content=board_comment.board_content.content,
+                        board_name=target_post.board.eng_name)
     numtags = board_comment.board_content.get_numtags()
     if numtags:
         comments = board_comment.board_post.board_comment.all()
@@ -340,12 +344,18 @@ def _write_comment(request, post_id, is_modify=False):
                 if num == 0:
                     notify.send(request.user,
                                 recipient=board_comment.board_post.author.user,
-                                verb='님이 태그했습니다.'.decode('utf-8'))
+                                verb='님이 태그했습니다.'.decode('utf-8'),
+                                post_title=target_post.title,
+                                comment_content=board_comment.board_content.content,
+                                board_name=target_post.board.eng_name)
                 else:
                     target = comments[num - 1].author.user
                     notify.send(request.user,
                                 recipient=target,
-                                verb='님이 태그했습니다.'.decode('utf-8'))
+                                verb='님이 태그했습니다.'.decode('utf-8'),
+                                post_title=target_post.title,
+                                comment_content=board_comment.board_content.content,
+                                board_name=target_post.board.eng_name)
             except:
                 pass
     comment_list = []
@@ -372,7 +382,10 @@ def _write_comment(request, post_id, is_modify=False):
         if request.user != target:
             notify.send(request.user,
                         recipient=target,
-                        verb='님이 태그했습니다.'.decode('utf-8'))
+                        verb='님이 태그했습니다.'.decode('utf-8'),
+                        post_title=target_post.title,
+                        comment_content=board_comment.board_content.content,
+                        board_name=target_post.board.eng_name)
     return board_comment.board_post.id, order - 1
 
 
