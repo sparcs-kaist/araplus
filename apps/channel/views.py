@@ -11,6 +11,7 @@ from apps.channel.backend import (
     _parse_post,
     _parse_comment,
     _write_channel,
+    _subscribe_channel,
     _render_content,
     _get_post_list,
     _get_comment_list,
@@ -71,6 +72,19 @@ def list(request, channel_url):
 
 
 @login_required(login_url='/session/login')
+def subscribe_channel(request, channel_url):
+    channel = _parse_channel(channel_url)
+    _subscribe_channel(request, channel, True)
+    return redirect('http://naver.com')
+
+
+@login_required(login_url='/session/login')
+def unsubscribe_channel(request, channel_url):
+    channel = _parse_channel(channel_url)
+    _subscribe_channel(request, channel, False)
+    return redirect('http://naver.com')
+
+@login_required(login_url='/session/login')
 def write_post(request, channel_url):
     channel = _parse_channel(channel_url)
     if channel.admin.user != request.user:
@@ -82,7 +96,6 @@ def write_post(request, channel_url):
             channel_post_trace = ChannelPostTrace(
                     channel_post=result['success'],
                     userprofile=request.user.userprofile)
-            print "XXXXXX"
             channel_post_trace.save()
             return redirect('../' + str(result['success'].order) + '/')
 

@@ -66,6 +66,21 @@ def _write_channel(request, channel=None):
         return {'fail': form_channel}
 
 
+def _subscribe_channel(request, channel=None, subscribe=False):
+    userprofile = request.user.userprofile
+    try:
+        channel_subscribe = ChannelSubscribe.objects.get(userprofile=userprofile,
+                channel=channel)
+        channel_subscribe.delete()
+    except:
+        pass
+    if subscribe and userprofile != channel.admin:
+        channel_subscribe = ChannelSubscribe(userprofile=userprofile,
+                channel=channel)
+        channel_subscribe.save()
+    return True
+
+
 def _render_content(userprofile, post=None, comment=None):
     if not post and not comment:
         return None
@@ -217,6 +232,11 @@ def _write_post(request, channel, post=None):
         if form_attachment.is_valid():
             form_attachment.save(file=request.FILES['file'],
                                  content=content)
+        for subscribe in ChannelSubscribe.objects.filter(channel=channel):
+            target = subscribe.userprofile.user
+            notify.send(request.user,
+                        recipient=target,
+                        verb='님이 연재 게시판에 새로운 글을 작성했습니다.'.decode('utf-8'))
         return {'success': post}
     else:
         return {'fail': [form_content, form_post, form_attachment]}

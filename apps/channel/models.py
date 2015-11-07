@@ -269,6 +269,13 @@ class ChannelPostTrace(models.Model):
     last_created = models.DateTimeField(auto_now=True)
 
 
+class ChannelSubscribe(models.Model):
+    userprofile = models.ForeignKey('session.UserProfile',
+                                    related_name='channel_subscribe')
+    channel = models.ForeignKey('Channel',
+                                related_name='channel_post_trace')
+
+
 class HashTag(models.Model):
     tag_name = models.TextField(db_index=True)
     channel_post = models.ForeignKey('ChannelPost',

@@ -36,6 +36,9 @@ urlpatterns = [
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/delete/$',
         'apps.channel.views.delete_comment'),
 
+    url(r'^([A-z0-9]*)/subscribe/$', 'apps.channel.views.subscribe_channel'),
+    url(r'^([A-z0-9]*)/unsubscribe/$', 'apps.channel.views.unsubscribe_channel'),
+
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/log/$', 'apps.channel.views.log_post'),
     url(r'^([A-z0-9]*)/([1-9][0-9]*)/([1-9][0-9]*)/log/$',
         'apps.channel.views.log_comment'),
