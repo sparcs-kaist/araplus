@@ -15,7 +15,6 @@ GENDER = (
 class UserProfile(models.Model):
     user = models.OneToOneField(User,
                                 primary_key=True, related_name='userprofile')
-    user = models.OneToOneField(User)
     gender = models.CharField(max_length=1, choices=GENDER, default=ETC)
     birthday = models.DateTimeField(blank=True, null=True)
     signiture = models.CharField(max_length=20, null=True)
