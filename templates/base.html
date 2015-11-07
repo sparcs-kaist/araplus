@@ -2,7 +2,10 @@
 <html lang="ko">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}ARA Plus{% endblock %}</title>
+        {% load notifications_tags %}
+        {% notifications_unread as unread_count %}
+        <title>{% block title %} {% if unread_count %} ({{ unread_count }})
+                            {% endif %}ARA Plus{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="/media/css/base.css">
         {% block css %}{% endblock %}
         <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -32,8 +35,6 @@
                 <li class="nav-item">
                     <a href="/session/notifications">
                         <h3>반응보기
-                            {% load notifications_tags %}
-                            {% notifications_unread as unread_count %}
                             {% if unread_count %} {{ unread_count }}
                             {% endif %}
                         </h3>
