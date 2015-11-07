@@ -7,8 +7,13 @@
                 <abbr class="timeago" timeago="{{comment.created_time|date:"c"}}" title="{{comment.created_time}}" style="display:inline;"></abbr>
             </span>
             <div class="comment-vote-container">
-                <button class="vote-up btn btn-default">추천(+{{comment.like}})</button>
-                <button class="vote-down btn btn-default">반대(-{{comment.hate}})</button>
+                {% if comment.vote_disable %}
+                <button class="vote-up btn btn-default" disabled> 추천 (+{{ comment.like }}) </button>
+                <button class="vote-down btn btn-default" disabled> 반대 (-{{ comment.hate }}) </button>
+                {% else %}
+                <button class="vote-up btn btn-default"> 추천 (+{{ comment.like }})</button>
+                <button class="vote-down btn btn-default"> 반대 (-{{ comment.hate }})</button>
+                {% endif %}
             </div>
             <!--<strong>{{ comment.author.nickname }}</strong>
             <span class="pull-right">{{ comment.created_time }}</span>-->
@@ -28,7 +33,7 @@
                     <button class="vote-down btn btn-default" disabled> 반대 (-{{ comment.hate }}) </button>
                     {% else %}
                     <button class="vote-up btn btn-default"> 추천 (+{{ comment.like }})</button>
-                    <button class="vote-down btn btn-default"> 반대 (-{{ comment.hate }})</button>
+                    <button class=:"vote-down btn btn-default"> 반대 (-{{ comment.hate }})</button>
                     {% endif %}
                 </div>-->
             </div>

@@ -81,7 +81,7 @@ var add_comment = function(grill_id, socket){
             return false;
         };
         $("#new-content").val('');
-        $("#text-counter").text('140');
+        $("#text-counter").text('0');
         $.ajax({
             type: 'POST',
             url: '/grill/'+grill_id+'/add_comment/',
@@ -115,7 +115,7 @@ $(document).ready(function(){
             $(document).on('click','button.vote-up',function(){
                 $(this).attr('disabled',true);
                 $(this).parent().children("button.vote-down").attr('disabled', true);
-                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, true);
+                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[3].id.split("-")[1]*1, true);
                 var target_new_like = $(this).text().trim().split('+')[1].slice(0, -1)*1 + 1;
 				$(this).text("추천 (+"+target_new_like+")")
             })
@@ -125,8 +125,7 @@ $(document).ready(function(){
             $(document).on('click','button.vote-down',function(){
                 $(this).attr('disabled',true);
                 $(this).parent().children("button.vote-up").attr('disabled', true);
-                console.log($(this).parentsUntil("#comment-content-list"));
-                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[4].id.split("-")[1]*1, false);
+                vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[3].id.split("-")[1]*1, false);
                 var target_new_like = $(this).text().trim().split('-')[1].slice(0, -1)*1 + 1;
                 $(this).text("반대 (-"+target_new_like+")")
             })
