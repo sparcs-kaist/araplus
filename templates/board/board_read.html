@@ -9,6 +9,7 @@
 <script type="text/javascript" src="/media/js/board/upload_handling.js"></script>
 {% endblock %}
 {% block content %}
+
 <div id="content-wrapper">
     <div id="board-title">
         {{current_board|default:'All'}} | ㅁㄴㅇㄹ
@@ -113,11 +114,15 @@
                 {% if not comment.deleted %}
                 <div class="comment-function">
                     <!-- 신고 기능 작동 -->
+
                    <button class="comment-button function-btn report" id="report_{{comment.content_id}}">[신고]</button>
                    <button class="comment-button function-btn vote" id="adult_{{comment.content_id}}">[성인글]</button>
                    <button class="comment-button function-btn vote" id="political_{{comment.content_id}}">[정치글]</button>
+                
+                    {% if request.user.userprofile == comment.board_comment.author %}
                    <button class="comment-button function-btn comment" type="submit" id="btn-{{comment.order}}-{{comment.id}}">[수정]</button>
                    <button class="comment-button function-btn delete" id="delete_{{comment.content_id}}">[삭제]</button>
+                   {% endif %}
                    <a class="comment-button function-btn" href="../{{comment.id}}/comment-log/?board={{post.board_id}}" id="log_{{comment.content_id}}">[로그]</a>
                 </div>
                 {% endif %}

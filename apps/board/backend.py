@@ -147,11 +147,11 @@ def _get_content(request, post_id, comment_per_page=10):
     return (post, comment_list, page_range, current_page, page_left, page_right)
 
 
-def _get_post(request, board_post, type, comment_nickname_list=[]):
+def _get_post(request, board_post, target_type, comment_nickname_list=[]):
     post = {}
-    if type == 'Comment':
+    if target_type == 'Comment':
         pass
-    elif type == 'Post':
+    elif target_type == 'Post':
         post['title'] = board_post.title
         post['board'] = board_post.board.kor_name
         post['board_id'] = board_post.board.id
@@ -168,7 +168,7 @@ def _get_post(request, board_post, type, comment_nickname_list=[]):
         post['content'] = '--Deleted--'
     else:
         post['content'] = board_content.replace_content_tags(
-            type, comment_nickname_list)
+            target_type, comment_nickname_list)
     post['id'] = board_post.id
     post['deleted'] = board_content.is_deleted
     post['content_id'] = board_content.id
@@ -181,6 +181,8 @@ def _get_post(request, board_post, type, comment_nickname_list=[]):
     post['vote'] = board_content.get_vote()
     post['vote']['is_up'] = False
     post['vote']['is_down'] = False
+    if target_type == 'Comment':
+        post['board_comment'] = board_content.board_comment
     if board_content.use_signiture:
         post['signiture'] = request.user.userprofile.signiture
     else:
