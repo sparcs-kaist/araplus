@@ -19,29 +19,29 @@
 	<div>
 		<table id="post-list-wrapper">
 			<tr id="list-header" class="list">
-			<td width=50><p align=center></p></td>
-			<td width=600><p align=center>불판</p></td>
-			<td width=100><p align=center>고기수</p></td>
-			<td width=120><p align=center>불판 세운 날짜</p></td>
-			<td width=180><p align=center>글쓴이</p></td>
-		</tr>
+				<td width=3%><p align=center></p></td>
+				<td width=55%><p align=center>불판</p></td>
+				<td width=9%><p align=center>고기수</p></td>
+				<td width=11%><p align=center>불판 세운 날짜</p></td>
+				<td width=15%><p align=center>글쓴이</p></td>
+			</tr>
 		{% if grills|length %}
 		<ul>
 			{% for grill in grills %}
 			<tr class="list">
-				<td width=50><p align=center></p></td>
-				<td width=600 style="padding-left: 10px">
+				<td width=3%><p align=center></p></td>
+				<td width=55% style="padding-left: 10px">
 					<p align=left>
 						<a href="{% url 'view_grill' grill.id %}">{{ grill.title }}</a>
 					</p>
 				</td>
-				<td width=100 style="color: #40e0d0"><p align=center>{{ grill.comment }}</p></td>
-				<td width=120>
+				<td width=9% style="color: #40e0d0"><p align=center>{{ grill.comment }}</p></td>
+				<td width=11%>
 					<p align=center>
 					<abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
 					</p>
 				</td>
-				<td width=180 style="color: #adadad;"><p align=left style="padding-left: 10%;">{{grill.author}}</p></td>
+				<td width=15% style="color: #adadad;"><p align=left style="padding-left: 10%;">{{grill.author}}</p></td>
 			</tr>
 			{% endfor %}
 		</ul>
