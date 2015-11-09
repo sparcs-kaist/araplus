@@ -35,9 +35,9 @@ def user_login(request):
 def user_login_callback(request):
     if request.method == "GET":
         nexturl = request.GET.get('next', '/')
-        uid = request.GET['uid']
+        tokenid = request.GET['tokenid']
         sso_profile = urllib.urlopen('https://sso.sparcs.org/' + \
-                                     'oauth/info?uid='+uid)
+                                     'oauth/info?tokenid='+tokenid)
         sso_profile = json.load(sso_profile)
         username = sso_profile['username']
         user_list = User.objects.filter(username=username)
