@@ -33,18 +33,18 @@ def nickname_check(request):
 def user_login(request):
     if request.user.is_authenticated():
         return redirect('/')
-    return redirect('http://bit.sparcs.org:22223/oauth/requirecallback=\
-                     http://bit.sparcs.org:23232/session/login/callback')
+    return redirect('https://sso.sparcs.org/oauth/require/?url=' + \
+                    request.build_absolute_uri('/session/login/callback/'))
 
 
 def user_login_callback(request):
     if request.method == "GET":
         nexturl = request.GET.get('next', '/')
-        uid = request.GET['uid']
-        sso_profile = urllib.urlopen('http://bit.sparcs.org:22223/\
-                                      oauth/info?uid=' + uid)
+        tokenid = request.GET['tokenid']
+        sso_profile = urllib.urlopen('https://sso.sparcs.org/' + \
+                                     'oauth/info?tokenid='+tokenid)
         sso_profile = json.load(sso_profile)
-        username = sso_profile['username']
+        username = sso_profile['sid']
         user_list = User.objects.filter(username=username)
         if len(user_list) == 0:
             request.session['info'] = sso_profile
@@ -67,7 +67,7 @@ def user_register(request):
         return redirect('/session/login/')
 
     info = request.session['info']
-    if len(User.objects.filter(username=info['username'])) > 0:
+    if len(User.objects.filter(username=info['sid'])) > 0:
         del request.session['info']
         return redirect('/session/login/')
 
@@ -75,7 +75,7 @@ def user_register(request):
         nickname = request.POST['nickname']
         password = request.POST['password']
         if validate_nickname(nickname):
-            user = User.objects.create_user(username=info['username'],
+            user = User.objects.create_user(username=info['sid'],
                                             email=info['email'],
                                             password=password,
                                             first_name=info['first_name'],
@@ -83,7 +83,7 @@ def user_register(request):
 
             user_profile = UserProfile(user=user,
                                        gender=info['gender'],
-                                       birthday=info['birthday'],
+                                       # birthday=info['birthday'],
                                        nickname=nickname)
         user_profile.save()
 
