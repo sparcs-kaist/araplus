@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Avg
-from araplus.settings import UPLOAD_DIR
+from araplus.settings import UPLOAD_DIR, MEDIA_ROOT
 import json
 import re
 import cgi
@@ -16,8 +16,8 @@ class Channel(models.Model):
     description = models.TextField()
     admin = models.ForeignKey('session.UserProfile',
                               related_name="channel")
-    thumbnail = models.ImageField(null=True, blank=True, upload_to=UPLOAD_DIR)
-    default_post_thumbnail = models.ImageField(null=True, blank=True, upload_to=UPLOAD_DIR)
+    thumbnail = models.ImageField(null=True, blank=True, upload_to=MEDIA_ROOT)
+    default_post_thumbnail = models.ImageField(null=True, blank=True, upload_to=MEDIA_ROOT)
     is_deleted = models.BooleanField(default=False)
 
     def get_thumbnail_url(self):
@@ -80,7 +80,7 @@ class ChannelContent(models.Model):
 
 
 class Attachment(models.Model):
-    file = models.FileField(upload_to=UPLOAD_DIR)
+    file = models.FileField(upload_to=MEDIA_ROOT)
     channel_content = models.ForeignKey('ChannelContent',
                                         related_name="attachment")
 
@@ -176,7 +176,7 @@ class ChannelPost(models.Model):
     channel_content = models.OneToOneField('ChannelContent',
                                            related_name='channel_post')
     modify_log = models.TextField(default='[]')
-    thumbnail = models.ImageField(null=True, blank=True, upload_to=UPLOAD_DIR)
+    thumbnail = models.ImageField(null=True, blank=True, upload_to=MEDIA_ROOT)
 
     class Meta:
         ordering = ['-id']

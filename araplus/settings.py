@@ -122,11 +122,12 @@ UPLOAD_DIR = os.path.join(BASE_DIR, 'media/upload')
 NOTIFICATIONS_USE_JSONFIELD = True
 
 # define media root path
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/upload')
-MEDIA_URL = '/media/upload/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
+MEDIA_URL = '/upload/'
 
 # Upload function, return name for upload path
 def file_path(instance, filename):
+    print filename
     return filename
 
 # django summernote configuration
