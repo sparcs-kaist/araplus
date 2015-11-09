@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/channel/post_read.css">
+{% endblock %}
+{% block js %}
+<!--
+<script type="text/javascript" src="/media/js/channel/hover.js"></script>
+-->
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script type="text/javascript" src="/media/js/channel/channel.js"></script>
+{% endblock %}
+{% block content %}
+<div id="channel-content-wrapper">
+    {% include "channel/list.html" %}
+    <div id="channel-post-wrapper">
+        <div id="post-title-wrapper">
+            <div id="post-info">
+                <!-- 성인글 처리? -->
+                <span id="post-title" data="{{ post.order }}">{{ post.order }}. {{ post.title }}</span>
+                <span id="post-date">{{ post.created_time }}</span>
+            </div>
+            {% if prev_post > 0 %}
+                <a class="button moveBtn" style="margin-left: 5px" href="/channel/{{ current_channel.url }}/{{ prev_post }}">
+                    <span>&#60;</span>
+                    <span>PREV</span>
+                </a>
+            {% else %}
+                <div class="whiteBtn"></div>
+            {% endif %}
+            {% if next_post > 0 %}
+                <a class="button moveBtn" style="margin-left: 5px" href="/channel/{{ current_channel.url }}/{{ next_post }}">
+                    <span>&#62;</span>
+                    <span>NEXT</span>
+                </a>
+            {% else %}
+                <div class="whiteBtn"></div>
+            {% endif %}
+        </div>
+        <div id="post-view-wrapper">
+           {{ post.content | safe }} 
+        </div>
+        <!-- 작가의 말 -->
+        <div id="post-footer-wrapper">
+            {% if prev_post > 0 %}
+                <a class="button moveBtn" style="margin-top: 28px" href="/channel/{{ current_channel.url }}/{{ prev_post }}">
+                   <span>&#60;</span>
+                   <span>PREV</span>
+               </a>
+           {% else %}
+               <div class="whiteBtn" style="margin-left: 0px"></div>
+           {% endif %}
+           <div id="post-vote-wrapper">
+               <span class="post-vote-number">{{ post.vote_up }}</span>
+               <button class="post-vote-button up-button post-vote-up-result post-vote-up">▲ GOOD</button>
+           </div>
+           {% if next_post > 0 %}
+               <a class="button moveBtn" style="margin-top: 28px" href="/channel/{{ current_channel.url }}/{{ next_post }}">
+                   <span>&#62;</span>
+                   <span>NEXT</span>
+               </a>
+           {% else %}
+               <div class="whiteBtn" style="margin-left: 0px"></div>
+           {% endif %}
+        </div>
+
+		{% if not post.deleted %}
+            <div id="comment-write-wrapper">
+                <form action="./write/{{querystring}}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="channel_post_id" value="{{ post.id }}">
+                    <textarea class="comment-textarea" rows="5" name="content" placeholder="댓글을 입력하세요."></textarea>
+                    <div id="comment-write-footer">
+                        <button type="submit" class="comment-write-button">댓글 남기기</button>
+                        <h3>성인</h3>
+                        <input type="checkbox" name="is_adult">
+                        <h3>익명</h3>
+                        <input type="checkbox" name="is_anonymous">
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        
+        <!-- 댓글 태그 기능 처리 -->
+        <div id="post-comment-wrapper">
+            {% for comment in comment_list %}
+            {% if comment.best_comment %}
+            <!-- best 댓글 기능-->
+            {% else %}
+            {% endif %}
+            <div class="post-comment">
+                <div class="comment-info">
+                    <span class="comment-order" id="comment_order_{{comment.order}}">{{ comment.order }}</span>
+                    <span class="comment-nickname">
+                    {% if comment.is_anonymous %}
+                    {{ comment.username }}
+                    {% else %}
+                    {{ comment.username }}
+                    <!-- message send 기능 -->
+                    {% endif %}
+                    </span>
+                    <span class="comment-time">{{ comment.created_time }}</span>
+                    <div class="comment-vote-wrapper">
+                        <!-- 삭제된 글이면 추천반대 안되게 해야함-->
+                        <button class="vote-up-color inblock vote comment-button" data-order="{{ comment.order }}">▲추천</button>
+                        <span class="inblock comment-vote-up-result" data-order="{{ comment.order }}">{{comment.vote_up}}</span>
+                        <button style="margin-left: 10px" class="vote-down-color inblock vote comment-button" data-order="{{ comment.order }}">▼반대</button>
+                        <span class="inblock comment-vote-down-result" data-order="{{ comment.order }}">{{comment.vote_down}}</span>
+                    </div>
+                </div>
+                <div id="comment_content{{ comment.order }}">
+                    <!-- 성인댓글, 익명댓글 처리 -->
+                    {% if request.user.userprofile.adult_filter and comment.adult %}
+                    <div class="comment-content hiddenContent" id="comment{{comment.order}}" value="{{ comment.content | safe }}">
+                        성인 댓글 입니다.
+                    </div>
+                    {% else %}
+                    <div class="comment-content" id="comment{{comment.order}}">{{ comment.content | safe}}</div>
+                    {% endif %}
+                    <!--
+                    {% if not comment.deleted %}
+                    <div class="comment-function">
+                       <button class="comment-button function-btn report" id="report_{{comment.content_id}}">[신고]</button>
+                       <button class="comment-button function-btn vote" id="adult_{{comment.content_id}}">[성인글]</button>
+                       <button class="comment-button function-btn vote" id="political_{{comment.content_id}}">[정치글]</button>
+                       <button class="comment-button function-btn comment" type="submit" id="btn-{{comment.order}}-{{comment.id}}">[수정]</button>
+                       <button class="comment-button function-btn delete" id="delete_{{comment.content_id}}">[삭제]</button>
+                       <a class="comment-button function-btn" href="../{{comment.id}}/comment-log/?board={{post.board_id}}" id="log_{{comment.content_id}}">[로그]</a>
+                    </div>
+                    {% endif %}
+                    -->
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- pagination 디자인 수정 -->
+            <div style="text-align: center;" class="post-pagination">
+                <ul style="display:inline-block;"> 
+                    {% for c_page in c_pages%}
+                    {% if c_page == current_c_page %}
+                    <li style="display:inline-block" class="active">
+                    <a href="./?cpage={{c_page}}">{{c_page}}<span class="sr-only"></span></a>
+                    </li>
+                    {% else %}
+                    <li style="display:inline-block;"><a href="./?cpage={{c_page}}">{{c_page}}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!--
+		<div class="text-center">
+        	<ul class="pagination pagination-sm">
+            	{% for c_page in c_pages %}
+            	{% if c_page == current_c_page %}
+            	<li class="active"><a href="./?cpage={{c_page}}">{{c_page}}</a></li>
+            	{% else %}
+            	<li><a href="./?cpage={{c_page}}">{{c_page}}</a></li>
+            	{% endif %}
+            	{% endfor %}
+        	</ul>
+    	</div>
+        -->
+    </div>   
+</div>
+
+<!--
+{% include "channel/modal.html" %}
+-->
+{% endblock %}

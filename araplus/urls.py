@@ -25,8 +25,8 @@ urlpatterns = [
     url(r'^board/', include('apps.board.urls')),
     url(r'^grill/', include('apps.grill.urls')),
     url(r'^session/', include('apps.session.urls')),
+    url(r'^channel/', include('apps.channel.urls')),
     url(r'^main/', include('apps.main.urls')),
-
     url(r'^$', lambda x: HttpResponseRedirect('main/')),
     url(r'^inbox/notifications/', include(notifications.urls)),
 
@@ -42,5 +42,4 @@ urlpatterns = [
 
     #summernote url
     url(r'^summernote/', include('django_summernote.urls')),
-
 ]

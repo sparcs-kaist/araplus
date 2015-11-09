@@ -117,9 +117,8 @@ $(document).ready(function(){
                 $(this).parent().children("button.vote-down").attr('disabled', true);
                 vote(grill_id, $($(this)).parentsUntil("#comment-content-list")[3].id.split("-")[1]*1, true);
                 var target_new_like = $(this).text().trim().split('+')[1].slice(0, -1)*1 + 1;
-				$(this).text("추천 (+"+target_new_like+")")
+                  $(this).text("추천 (+"+target_new_like+")")
             })
-
 
 
             $(document).on('click','button.vote-down',function(){
@@ -131,14 +130,14 @@ $(document).ready(function(){
             })
 
             $("#new-content").on('keyup',function(event){
-				var typeable = 140-$($("#new-content")[0]).val().length;
-				$(".text-counter").text(typeable);
-				if(typeable<0){
-					$("#btn-add-comment").attr('disabled',false);
-					$(".text-counter").css('color','black');
-				}
-				
-					//$("#text-counter").text(140-$($("#new-content")[0]).val().length);
+                  var typeable = 140-$($("#new-content")[0]).val().length;
+                  $(".text-counter").text(typeable);
+                  if(typeable<0){
+                      $("#btn-add-comment").attr('disabled',false);
+                      $(".text-counter").css('color','black');
+                  }
+                  
+                      //$("#text-counter").text(140-$($("#new-content")[0]).val().length);
             })   
 
             // websocket Initialize
@@ -164,19 +163,19 @@ $(document).ready(function(){
                 $(this).parent().children(".hate-content").css('display', 'none');
                 $(this).parent().children(".open-comment").css('display', 'none');
             });
-		   	var hoverHTMLDemoBasic = '<p></p><p class="tempSpace"></p>';
-			$(".comment_preview").hovercard({
-				detailsHTML : hoverHTMLDemoBasic,
-				width: 400,
-				onHoverIn: function() {
-					console.log($(".comment_preview_content")[0]);
-					if(typeof($(".comment_preview_content")[0]) != "undefined") $(".comment_preview_content").remove();
-					var order = $(this).children('a').attr('title').split('_')[1];
-					var content = document.getElementById('comment'+order).textContent;
-					$(".tempSpace").append('<span class="comment_preview_content">' + content + '</span>');
-				},
-				onHoverOut: function() {
+                var hoverHTMLDemoBasic = '<p></p><p class="tempSpace"></p>';
+             $(".comment_preview").hovercard({
+                  detailsHTML : hoverHTMLDemoBasic,
+                  width: 400,
+                  onHoverIn: function() {
+                      console.log($(".comment_preview_content")[0]);
+                      if(typeof($(".comment_preview_content")[0]) != "undefined") $(".comment_preview_content").remove();
+                      var order = $(this).children('a').attr('title').split('_')[1];
+                      var content = document.getElementById('comment'+order).textContent;
+                      $(".tempSpace").append('<span class="comment_preview_content">' + content + '</span>');
+                  },
+                  onHoverOut: function() {
             /*$(".comment_preview_content").remove();*/
-				}
-			});
+                  }
+             });
 });

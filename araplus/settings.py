@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'apps.board',
     'apps.grill',
     'apps.session',
+    'apps.channel',
     'bootstrapform',
     # 'apps.main',
     # added django_summernote package
@@ -116,13 +117,13 @@ STATICFILES_DIRS = (
 )
 
 # TO BE REFACTORED!
-UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
+UPLOAD_DIR = os.path.join(BASE_DIR, 'media/upload')
 
 NOTIFICATIONS_USE_JSONFIELD = True
 
 # define media root path
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/upload/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/upload')
+MEDIA_URL = '/media/upload/'
 
 # Upload function, return name for upload path
 def file_path(instance, filename):
@@ -130,11 +131,10 @@ def file_path(instance, filename):
 
 # django summernote configuration
 SUMMERNOTE_CONFIG = {
-    'ifrae': False,
     'width': "100%",
     'toolbar': [
         ['insert', ['picture', 'video']],
-    ], 
+    ],
     'height': 600,
     'attachment_upload_to': file_path,
     'attachment_filesize_limit': 1024 * 1024,

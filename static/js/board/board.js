@@ -114,9 +114,9 @@ $(document).ready(function(){
         return false
     });
     
-	var hoverHTMLDemoBasic = '<p></p><p class="tempSpace"></p>';
-    
-	$(".comment_preview").hovercard({
+    var hoverHTMLDemoBasic = '<p></p><p class="tempSpace"></p>';
+
+    $(".comment_preview").hovercard({
         detailsHTML : hoverHTMLDemoBasic,
         width: 400,
         onHoverIn: function() {
@@ -131,7 +131,6 @@ $(document).ready(function(){
             /*$(".comment_preview_content").remove();*/
         }
     });
-
 
     // for trace post
     $(".trace, .alarm").click(function(){

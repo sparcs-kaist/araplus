@@ -11,51 +11,51 @@ ARA Plus Grill
 <script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
-	jQuery(document).ready(function() {
-		jQuery("abbr.timeago").timeago();
-	});
-	setInterval(function() {
-		jQuery("abbr.timeago").timeago();
-	}, 1000);
+    jQuery(document).ready(function() {
+        jQuery("abbr.timeago").timeago();
+    });
+    setInterval(function() {
+        jQuery("abbr.timeago").timeago();
+    }, 1000);
 </script>
 {% endblock %}
 {% block content %}
 <div class="content-wrapper">
     <div class="header">
-		<div class="title">
+        <div class="title">
             <span>{{ grill.title }}</span>
-		</div>
-		<div class="subtitle">
-			<span class="nickname">{{ grill.author.nickname }}</span>
-			<span class="bar">|</span>
-			<span class="created_time">작성일:</span>
-			<span>
-				<abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
-			</span>
-			<span class="bar">|</span>
-		</div>
-		</div>
-		<div class="content">
-			<span>{{ grill.content }}</span>
-		</div>
-		<div class="comment-input-container">
-			<div class="comment-input">
-				<form class="input-form " method="POST">
-					{% csrf_token %}
-					<textarea id="new-content" class="form-control" rows="3" placeholder="고기를 구워주세요." style="resize: none;"></textarea>
-					<div class="button-line">
-						<span class="text-counter">140</span>
-						<button id="btn-add-comment" type="submit" class="btn btn-default">고기 올리기</button>
-					</div>
-				</form>
-			</div>
+        </div>
+        <div class="subtitle">
+            <span class="nickname">{{ grill.author.nickname }}</span>
+            <span class="bar">|</span>
+            <span class="created_time">작성일:</span>
+            <span>
+                <abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
+            </span>
+            <span class="bar">|</span>
+        </div>
+        </div>
+        <div class="content">
+            <span>{{ grill.content }}</span>
+        </div>
+        <div class="comment-input-container">
+            <div class="comment-input">
+                <form class="input-form " method="POST">
+                    {% csrf_token %}
+                    <textarea id="new-content" class="form-control" rows="3" placeholder="고기를 구워주세요." style="resize: none;"></textarea>
+                    <div class="button-line">
+                        <span class="text-counter">140</span>
+                        <button id="btn-add-comment" type="submit" class="btn btn-default">고기 올리기</button>
+                    </div>
+                </form>
+            </div>
     </div>
     <div class="comment-list-container">
         <ul id="comment-content-list" class="list-group">
             {% for comment in comments %}
-            	{% include 'grill/comments.html' %}
+                {% include 'grill/comments.html' %}
             {% endfor %}
         </ul>
-	</div>
+    </div>
 </div>
 {% endblock %}

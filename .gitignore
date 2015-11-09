@@ -71,4 +71,6 @@ db.*
 .DS_Store
 
 *.orig
+
+# Temp upload dir
 upload/

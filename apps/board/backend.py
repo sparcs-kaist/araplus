@@ -299,8 +299,6 @@ def _write_comment(request, post_id, is_modify=False):
                 board_post=target_post)
             content_form = BoardContentForm(request.POST,
                                             author=request.user.userprofile)
-
-
         except:
             return  # no post
     if content_form.is_valid():

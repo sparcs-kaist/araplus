@@ -16,12 +16,12 @@
 		{% for noti in unread %}
             <div class="noti">
                 <div class="noti-category">
-                    {{noti.data.noti_category}}
+                    {{ noti.data.noti_category }}
                 </div>
                 <div class="noti-content-wrapper">
-                    <a class="noti-content" href="/board/{{noti.data.board_name}}/{{noti.data.post_id}}/?comment_page={{noti.data.comment_page}}"> {{noti.data.post_title}} <a>
+                    <a class="noti-content" href="/board/{{ noti.data.board_name }}/{{ noti.data.post_id }}/?comment_page={{ noti.data.comment_page }}"> {{ noti.data.post_title }} <a>
                     <a class="noti-time">
-                        <span class="timeago" timeago="{{noti.timestamp|date:'c'}}" title="{{noti.timestamp}}"> </span>
+                        <span class="timeago" timeago="{{ noti.timestamp|date:'c' }}" title="{{ noti.timestamp }}"> </span>
                     </a>
                 </div>
             </div>
@@ -33,12 +33,12 @@
 		{% for noti in read %}
             <div class="noti">
                 <div class="noti-category">
-                    {{noti.data.noti_category}}
+                    {{ noti.data.noti_category }}
                 </div>
                 <div class="noti-content-wrapper">
-                    <a class="noti-content" href="/board/{{noti.data.board_name}}/{{noti.data.post_id}}/?comment_page={{noti.data.comment_page}}"> {{noti.data.post_title}} <a>
+                    <a class="noti-content" href="/board/{{ noti.data.board_name }}/{{ noti.data.post_id}}/?comment_page={{ noti.data.comment_page }}"> {{ noti.data.post_title }} <a>
                     <a class="noti-time">
-                        <span class="timeago" timeago="{{noti.timestamp|date:'c'}}" title="{{noti.timestamp}}"> </span>
+                        <span class="timeago" timeago="{{ noti.timestamp|date:'c' }}" title="{{ noti.timestamp }}"> </span>
                     </a>
                 </div>
             </div>

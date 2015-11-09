@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/channel/list.css"> 
+{% endblock %}
+{% block content %}
+<div id="content-wrapper">
+    <div id="app-title-wrapper">
+        <span id="app-title">채널</span>
+        <span id="app-explain">연재 모음</span>
+    </div>
+    <ul id="total-channel-wrapper">
+        {% for channel in channel_list %}
+        <li>
+            <a href="/channel/{{channel.url}}/"><img src={{channel.get_thumbnail_url}}></a>
+            <span class="channel-title"><a href="/channel/{{channel.url}}/">{{channel.kor_name}}</a></span>
+            <span class="channel-category">썰 / 칼럼</span>
+            <span class="channel-admin">{{channel.admin.nickname}}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

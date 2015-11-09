@@ -1,0 +1,15 @@
+<div id="channel-info-wrapper">
+    <img src={{current_channel.get_thumbnail_url}}>
+    <div id="channel-info">
+        <div id="channel-title-wrapper">
+            <span id="channel-title">{{ current_channel.kor_name }}</span>
+            <span id="channel-admin">{{ current_channel.admin.nickname }}</span>
+        </div>
+        <span id="channel-category">썰 / 칼럼</span>
+        <span id="channel-explain">{{ current_channel.description|safe }}</span>
+        <div id="button-wrapper">
+            <a id="first-button" class="button" href="/channel/{{ current_channel.url }}/1/">첫화보기</a>
+            <a id="list-button" class="button" href="/channel/{{ current_channel.url }}/">LIST</a>
+        </div>
+    </div>
+</div>

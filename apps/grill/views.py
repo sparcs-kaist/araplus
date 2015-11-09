@@ -15,7 +15,7 @@ from django.core.paginator import Paginator
 @login_required(login_url='/session/login/')
 #def home(request):
 #    grills = Grill.objects.all().order_by('created_time')  # 나중에 업데이트 순서로 바꾸기?
-    
+
 def home(request,item_per_page=10):
     page = int(request.GET.get('page',1))
     grills = Grill.objects.all().order_by('created_time').reverse()  # 나중에 업데이트 순서로 바꾸기
@@ -36,7 +36,7 @@ def home(request,item_per_page=10):
         grills.append(grill_dict)
     if len(page_range) > 10 :
         last_page = len(page_range)
-        page_target = (current_page-1)/10 
+        page_target = (current_page-1)/10
         page_range = []
         page_left = page_target * 10
         page_right = page_target * 10 + 11
@@ -78,7 +78,7 @@ def view_grill(request, grill_id):
 
         if user_vote.filter(grill_comment=comment):
             comment.vote_disable = True
-        else: 
+        else:
             comment.vote_disable = False
 
     return render(request,
@@ -144,9 +144,6 @@ def add_comment(request, grill_id):
     ms += '<span>'+ new_comment.replace_tags().encode('utf8') +'</span>'
     ms += '</div></div></div></div>'
 
-
-
-
     #ms += '<span class="col-md-1">' + str(new_comment.order) + '</span>'
     #ms += '<strong>' + new_comment.author.nickname.encode('utf-8')
     #ms += '</strong>'
@@ -154,7 +151,7 @@ def add_comment(request, grill_id):
     #ms += new_comment.created_time.isoformat()
     #ms += ' title='+str(new_comment.created_time)+'>'
     #ms += '</abbr></span></div>'
-    
+
     #ms += '<span class="pull-right">' + str(new_comment.created_time)
     #ms += '</span></div>'
     #ms += '<div class="comment-content-container">'
@@ -195,10 +192,6 @@ def refresh_comment(request, grill_id):
                         content_type="application/json")
 
 
-
-
-
-
 def vote_comment(request, grill_id):
     # Input : Grill, GrillCommentOrder, User, is_up이 담긴 POST
     # Process : 1. User가 이 코멘트에 대해 투표했었는지 확인 - 했다면 exception?
@@ -221,9 +214,3 @@ def vote_comment(request, grill_id):
                                 is_up=is_up)
     new_vote.save()
     return HttpResponse("1")
-
-
-
-
-
-

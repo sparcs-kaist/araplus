@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/channel/listInChannel.css"> 
+<!--<link rel="stylesheet" type="text/css" href="/media/rateit/rateit.css">-->
+{% endblock %}
+{% block js %}
+<!--<script type="text/javascript" src="/media/rateit/rateit.min.js"></script>-->
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function(){
+        jQuery("span.timeago").timeago();
+        var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+
+        $(".channel-delete").click(function() {
+            var result = confirm("주의! 채널을 삭제하면 채널 내의 모든 글과 댓글에 접근할 수 없습니다. 계속하시겠습니까?");
+            if (result != true) return;
+
+            $.ajax({
+                url: './delete/',
+                type: 'POST',
+                data: {csrfmiddlewaretoken: csrf_token},
+                success: function(data) {
+                    location.replace('../');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<div id="channel-content-wrapper">
+    {% include "channel/list.html" %}
+    <ul id="channel-post-wrapper">
+        {% if notice_list %}
+            <div class="line"></div>
+        {% endif %}
+        {% for notice in notice_list %}
+        <li class="post notice" data-order="{{ notice.0.order }}">
+            <!--
+            업데이트 알림
+            {% if notice.1 %}
+            {% if notice.0.channel_content.modified_time >= notice.1.last_read %}
+            <td width=5>U</td>
+            {% else %}
+            <td width=5> </td>
+            {% endif %}
+            {% else %}
+            <td width=5>N</td>
+            {% endif %}
+            공감 표시
+            <td width=80 class="text-center">
+                <span class="post-vote-up-result" data-order="{{notice.0.order}}">+{{notice.0.get_vote}}</span>
+            </td>
+            삭제된 글
+            <a href="/channel/{{current_channel.url}}/{{post.0.order}}">
+                {% if post.0.channel_content.is_deleted %}
+                --deleted--
+                {% else %}
+                {{post.0.title}} [{{post.0.channel_comment.count}}]
+                {% endif %}
+            </a>-->
+           <img src={{ notice.0.get_thumbnail_url }}> 
+           <span class="post-order"></span>
+           <div><a href="/channel/{{ current_channel.url }}/{{ notice.0.order }}">{{ notice.0.title }}</a></div>
+           <span class="post-date timeago" timeago="{{ notice.0.channel_content.created_time|date:"c" }}" title="{{ notice.0.channel_content.created_time }}"></span>
+        </li>
+        {% endfor %}
+        {% for post in post_list %}
+        <li class="post" data-order="{{ post.0.order }}">
+           <img src={{ post.0.get_thumbnail_url }}> 
+           <span class="post-order">{{ post.0.order }}</span>
+           <div><a href="/channel/{{ current_channel.url }}/{{ post.0.order }}">{{ post.0.title }}</a></div>
+           <span class="post-date timeago" timeago="{{ post.0.channel_content.created_time|date:"c" }}" title="{{ post.0.channel_content.created_time }}"></span>
+        </li>
+        {% endfor %}
+    </ul>
+    <!-- page 넘어가는 <> 만들기 -->
+    <div id="pagination-wrapper"> 
+        {% for page in pages %}
+        {% if page == current_page %}
+        <span class="active">{{ page }}</span>
+        {% else %}
+        <a href="/channel/{{ current_channel.url }}/?page={{ page }}">{{ page }}</a>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <div id="admin-wrapper">
+        <a id="write-button" class="button" href="/channel/{{ current_channel.url }}/write">글 쓰기</a>
+        {% if is_admin %}
+        <div>
+            {% csrf_token %}
+            <a id="modify-button" class="button" href="./modify/">채널 수정</a>
+            <a id="delete-button" class="button channel-delete">채널 삭제</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

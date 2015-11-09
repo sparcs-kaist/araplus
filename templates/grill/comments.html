@@ -17,7 +17,6 @@
             </div>
             <!--<strong>{{ comment.author.nickname }}</strong>
             <span class="pull-right">{{ comment.created_time }}</span>-->
-    
         </div>
         <div class="comment-content-container">
             {% if comment.hate %}
@@ -27,7 +26,7 @@
             <button class="open-comment btn btn-default">보기</button> 
             <div class="hate-comment-content" style="display: none;">
                 <span>{{ comment.content|safe }}</span>
-               <!-- <div class="comment-vote-container">
+                <!-- <div class="comment-vote-container">
                     {% if comment.vote_disable %}
                     <button class="vote-up btn btn-default" disabled> 추천 (+{{ comment.like }}) </button>
                     <button class="vote-down btn btn-default" disabled> 반대 (-{{ comment.hate }}) </button>
@@ -49,4 +48,3 @@
         </div>
     </div>
 </div>
-
