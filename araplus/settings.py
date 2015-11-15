@@ -121,7 +121,7 @@ UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 NOTIFICATIONS_USE_JSONFIELD = True
 
 # define media root path
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
 MEDIA_URL = '/upload/'
 
 # Upload function, return name for upload path
@@ -134,7 +134,7 @@ SUMMERNOTE_CONFIG = {
     'width': "100%",
     'toolbar': [
         ['insert', ['picture', 'video']],
-    ], 
+    ],
     'height': 600,
     'attachment_upload_to': file_path,
     'attachment_filesize_limit': 1024 * 1024,
