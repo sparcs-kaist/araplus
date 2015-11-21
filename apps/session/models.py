@@ -22,8 +22,8 @@ class UserProfile(models.Model):
     nickname = models.TextField(max_length=12)
     points = models.IntegerField(default=0)
     adult_filter = models.BooleanField(default=True)
-    permission = models.IntegerField(default=0) #  0: 일반 유저 1: 외부 업체
-                                                #  2: KAIST 유저 4: 스태프
+    permission = models.IntegerField(default=2)  # 0: 일반 유저 1: 외부 업체
+    #  2: KAIST 유저 4: 스태프
 
     def __str__(self):
         return "User %s (%s)'s profile object" % (self.user, self.nickname)
