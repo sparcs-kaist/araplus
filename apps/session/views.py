@@ -59,7 +59,7 @@ def user_login_callback(request):
 def user_logout(request):
     if request.user.is_authenticated():
         logout(request)
-    return redirect('/session/login/')
+    return redirect('/main/')
 
 
 def user_register(request):
