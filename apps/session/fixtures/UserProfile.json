@@ -3,7 +3,8 @@
 	"fields": {
 		"user": 1,
         "nickname": "admin",
-		"points": 0
+		"points": 0,
+		"uid": "0"
 	},
 	"model": "session.UserProfile",
 	"pk": 1
@@ -12,7 +13,8 @@
 	"fields": {
 		"user": 2,
         "nickname": "guest",
-		"points": 0
+		"points": 0,
+		"uid": "1"
 	},
 	"model": "session.UserProfile",
 	"pk": 2

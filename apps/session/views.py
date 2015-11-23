@@ -81,6 +81,7 @@ def user_register(request):
 
             user_profile = UserProfile(user=user,
                                        gender=info['gender'],
+                                       uid=info['uid'],
                                        # birthday=info['birthday'],
                                        nickname=nickname)
             user_profile.save()

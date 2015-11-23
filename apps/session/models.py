@@ -22,6 +22,7 @@ class UserProfile(models.Model):
     nickname = models.TextField(max_length=12)
     points = models.IntegerField(default=0)
     adult_filter = models.BooleanField(default=True)
+    uid = models.CharField(max_length=20)
     permission = models.IntegerField(default=2)  # 0: 일반 유저 1: 외부 업체
     #  2: KAIST 유저 4: 스태프
 
