@@ -33,7 +33,7 @@ def nickname_check(request):
 def user_login(request):
     if request.user.is_authenticated():
         return redirect('/')
-    return redirect('https://sso.sparcs.org/oauth/require/?url=' + \
+    return redirect('https://sso.sparcs.org/oauth/require/?url=' +
                     request.build_absolute_uri('/session/login/callback/'))
 
 
@@ -41,8 +41,8 @@ def user_login_callback(request):
     if request.method == "GET":
         nexturl = request.GET.get('next', '/')
         tokenid = request.GET['tokenid']
-        sso_profile = urllib.urlopen('https://sso.sparcs.org/' + \
-                                     'oauth/info?tokenid='+tokenid)
+        sso_profile = urllib.urlopen('https://sso.sparcs.org/' +
+                                     'oauth/info?tokenid=' + tokenid)
         sso_profile = json.load(sso_profile)
         username = sso_profile['sid']
         user_list = User.objects.filter(username=username)
@@ -73,11 +73,9 @@ def user_register(request):
 
     if request.method == 'POST':
         nickname = request.POST['nickname']
-        password = request.POST['password']
         if validate_nickname(nickname):
             user = User.objects.create_user(username=info['sid'],
                                             email=info['email'],
-                                            password=password,
                                             first_name=info['first_name'],
                                             last_name=info['last_name'])
 
@@ -85,9 +83,10 @@ def user_register(request):
                                        gender=info['gender'],
                                        # birthday=info['birthday'],
                                        nickname=nickname)
-        user_profile.save()
-
-        return render(request, 'session/register_complete.html')
+            user_profile.save()
+            return render(request, 'session/register_complete.html')
+        else:  # invalid nickname
+            return render(request, 'session/register.html', {'info': info})
     return render(request, 'session/register.html', {'info': info})
 
 
