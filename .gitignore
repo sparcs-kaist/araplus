@@ -74,3 +74,4 @@ db.*
 
 # Temp upload dir
 upload/
+media/
