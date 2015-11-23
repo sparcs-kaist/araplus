@@ -18,6 +18,15 @@
                 <h1 id="sparcs-title">
                     SPARCS SSO
                 </h1>
+                {% if user.is_authenticated %}
+                    <a href="/session/logout">
+                        로그아웃
+                    </a>
+                {% else %}
+                    <a href="/session/login">
+                        로그인
+                    </a>
+                {% endif %}
             </div>
         </div>
         <div id="header-wrapper">

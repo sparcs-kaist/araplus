@@ -31,10 +31,20 @@ style{
     background: #5b5b5b;
 }
 #title{
-    width: 150px;
+    width: 100%;
     height: 100%;
     margin-left: 10px;
     overflow: visible;
+    float: left;
+}
+#title a{
+    width: 80px;
+    height: 35px;
+    font-size: 12px;
+    line-height: 12px;
+    padding-top: 11px;
+    color: #fff;
+    float: right;
 }
 #sparcs-title{
     width: 150px;
