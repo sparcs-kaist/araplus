@@ -1,0 +1,132 @@
+<div id="content-wrapper">
+    {% if not pages %}
+    "Invalid access"
+    {% endif %}
+    <div id="board-title">
+        {{current_board|default:'All'}} | ㅁㄴㅇㄹ
+    </div>
+    <table id="post-list-wrapper">
+        <tr id="list-header" class="list">
+            <th width=90>카테고리</th>
+            <th class="list-header-title">제목</th>
+            <th width=215>글쓴이</th>
+            <th width=60>작성일</th>
+            <th width=50>조회</th>
+            <th width=60>추천/반대</th>
+        </tr>
+        {% for notice in notice_list %}
+            <tr class="list list-notice" id="notice-row-{{notice.0.id}}">
+                <td width=90 style="padding-left: 25px">공지</td>
+                {% if notice.1 %}
+                <span style="display: inline; color: 00ff00">
+                {% if notice.0.board_content.modified_time >= notice.1.last_read %}
+                <td width=5><span style="display: inline; color: #000">U</span></td>
+                {% else %}
+                <td width=5> </td>
+                {% endif %}
+                {% else %}
+                <td width=5><span style="display: inline; color: #000">N</span></td>
+                {% endif %}
+                </span>
+                <td class="list-title" id="notice-title-{{notice.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}">{{notice.0.title}}</a></td>
+                {% if notice.0.board_content.is_anonymous %}
+                <td width=215 style="padding-left: 20px">{{notice.0.board_content.is_anonymous}}</td>
+                {% else %}
+                <td width=215 style="padding-left: 20px">{{notice.0.author.nickname}}</td>
+                {% endif %}
+                <td width=60 align=center>
+                    <span class="timeago" timeago="{{notice.0.board_content.created_time|date:"c"}}"
+                        title="{{notice.0.board_content.created_time}}"></span>
+                </td>
+                <td width=50 align=center> 224 </td>
+                <td width=60 align=center>
+                    {% if notice.0.board_content.get_vote.up > 0 %}
+                    <span id="post-vote-up">{{notice.0.board_content.get_vote.up}}</span>
+                    {% else %}
+                    {{notice.0.board_content.get_vote.up}}
+                    {% endif %}
+                    /
+                    {% if notice.0.board_content.get_vote.down > 0 %}
+                    <span id="post-vote-down">{{notice.0.board_content.get_vote.down}}</span>
+                    {% else %}
+                    {{notice.0.board_content.get_vote.down}}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        {% for post in post_list %}
+            <tr class="list list-post" id="post-row-{{post.0.id}}">
+                <td width=90 style="padding-left: 25px">{{post.0.board_category.name}}</td>
+                {% if post.1 %}
+                <span style="display: inline; color: 00ff00">
+                {% if post.0.board_content.modified_time >= post.1.last_read %}
+                <td width=5><span style="display: inline; color: #000">U</span></td>
+                {% else %}
+                <td width=5> </td>
+                {% endif %}
+                {% else %}
+                <td width=5><span style="display: inline; color: #000">N</span></td>
+                {% endif %}
+                </span>
+                {% if request.user.userprofile.adult_filter and post.0.board_content.is_adult %}
+                <td class="list-title" id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">성인글</a></td>
+                {% else %}
+                <td class="list-title" id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">{{post.0.title}}</a></td>
+                {% endif %}
+                {% if post.0.board_content.is_anonymous %}
+                <td width=215 style="padding-left: 20px">{{post.0.board_content.is_anonymous}}</td>
+                {% else %}
+                <td width=215 style="padding-left: 20px">{{post.0.author.nickname}}</td>
+                {% endif %}
+                <td width=60 align=center>
+                    <span class="timeago" timeago="{{post.0.board_content.created_time|date:"c"}}"
+                        title="{{post.0.board_content.created_time}}"></span>
+                </td>
+                <td width=50 align=center> 224 </td>
+                <td width=60 align=center>
+                    {% if post.0.board_content.get_vote.up > 0 %}
+                    <span id="post-vote-up">{{post.0.board_content.get_vote.up}}</span>
+                    {% else %}
+                    {{post.0.board_content.get_vote.up}}
+                    {% endif %}
+                    /
+                    {% if post.0.board_content.get_vote.down > 0 %}
+                    <span id="post-vote-down">{{post.0.board_content.get_vote.down}}</span>
+                    {% else %}
+                    {{post.0.board_content.get_vote.down}}
+                    {% endif %}
+                    <img src={{post.0.board_content.get_thumbnail}}>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <!-- page 넘어가는 <> 넣기 -->
+    <div id="board-pagination">
+        <ul id="board-pagination-number">
+            {% for page in pages %}
+            {% if page == current_page %}
+            <li class="active">{{page}}</li>
+            {% else %}
+            <li><a href="/board/{{current_board.url|default:'all'}}/?page={{page}}">{{page}}</a></li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+        <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
+        <input id="board-search" placeholder="Search" type="text">
+    </div>
+    {% if request.user.userprofile.adult_filter %}
+    <!-- 성인글 부분 수정 -->
+    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block" href="set_adult_filter/">성인글 필터링 해제</a>
+    {% else %}
+    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block"href="set_adult_filter/">성인글 필터링</a>
+    {% endif %}
+<div>
+
+<!--
+    <div class="pull-right btn-group" role="group">
+        <a class="btn btn-default" href="?best=true">Best</a>
+        <a class="btn btn-default"
+            href="/board/{{current_board.url|default:'all'}}/post">글 쓰기</a>
+    </div>
+</div>
+-->

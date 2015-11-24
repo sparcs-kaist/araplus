@@ -110,6 +110,12 @@ class BoardContent(models.Model):
                  for item in comment_nickname_list if item in tag_list]
         return order
 
+    def get_thumbnail(self):
+        if self.attachment.exists():
+            return self.attachment.all()[0].file.url
+        else:
+            return 'media/image/default.jpg'
+
 
 # 이미지 경로를 지정해주기 위한 함수
 def get_path(instance, filename):
@@ -196,6 +202,7 @@ class Board(models.Model):
                               related_name="board",
                               null=False)
     is_official = models.BooleanField(default=False)
+    is_gallery = models.BooleanField(default=False)
     is_public = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
 
