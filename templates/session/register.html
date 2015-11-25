@@ -1,32 +1,26 @@
 {% extends "session/base.html" %}
 {% block content %}
-<h1>ARA Plus Signup</h1>
-<p>SPARCS SSO 계정으로 ARA에 가입합니다.</p>
-<form id="register" class="form-horizontal" action="/session/register/" method="post">
-	<fieldset>
-		{% csrf_token %}
-		<div class="form-group">
-			<label class="col-xs-2 control-label">Name <span class="required"></span></label>
-			<div class="form-group col-xs-5">
-				<p class="form-control-static">{{info.last_name}}</p>
-			</div>
-			<div class="form-group col-xs-3">
-				<p class="form-control-static">{{info.first_name}}</p>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="col-xs-2 control-label">Nickname <span class="required"></span></label>
-			<div class="col-xs-8">
-                <input type="text" class="form-control" name="nickname" placeholder="nickname" required="required" maxlength="30" data-remote="/session/nickname-check/">
+<div id="register-wrapper">
+    <!--<h1>ARA Plus Signup</h1>-->
+    <p>SPARCS SSO 계정으로 ARA에 가입합니다.</p>
+    <form id="register" action="/session/register/" method="post">
+        <fieldset>
+            {% csrf_token %}
+            <div class="div-default">
+                <label class="col-xs-2 control-label">Name: <span class="required"></span></label>
+                <span class="form-control-static">{{info.last_name}}</span>
+                <span class="form-control-static">{{info.first_name}}</span>
             </div>
-        </div>
-		<div class="form-group">
-            <div class="col-xs-12">
+            <div class="div-default">
+                <label class="col-xs-2 control-label">Nickname: <span class="required"></span></label>
+                <input type="text" class="form-control" name="nickname" placeholder="닉네임을 입력하세요" required="required" maxlength="30" data-remote="/session/nickname-check/">
+            </div>
+            <div class="div-default">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
-        </div>
-    </fieldset>
-</form>
+        </fieldset>
+    </form>
+</div>
 
 <script type="text/javascript">
 $(function() {
