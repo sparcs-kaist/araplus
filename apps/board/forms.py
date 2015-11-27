@@ -9,8 +9,15 @@ import datetime
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
 
-prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
-name = [u'양아치', u'루저', u'외톨', u'올빼미', u'밤비']
+prefix = [u'멋진',u'듬직한',u'한결같은',u'성실한',u'지혜로운',
+u'활발한',u'자상한',u'용감한',u'친절한',u'철저한',u'똑똑한',
+u'수수한',u'순수한',u'털털한',u'신선한',u'단호한',u'튼튼한',
+u'특별한',u'귀여운',u'예리한']
+name = [u'고양이', u'강아지',u'사자',u'호랑이',u'늑대',
+u'펭귄',u'여우',u'올빼미',u'돼지',u'코끼리',u'오리',u'거위',
+u'토끼',u'풍뎅이',u'도마뱀',u'오징어',u'돌고래',u'흰고래',u'범고래',
+u'다람쥐',u'기니피그',u'코알라',
+u'캥거루',u'침팬지',u'개코원숭이',u'아르마딜로',u'호저',u'비둘기']
 
 
 class BoardForm(ModelForm):
