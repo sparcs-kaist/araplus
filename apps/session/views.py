@@ -15,9 +15,10 @@ def main(request):
 
 
 def validate_nickname(nickname):
-    if not re.match(r'[\w_-]{5,30}', nickname):
+    print nickname
+    if not re.match(ur'[\w_-\uAC00\uD7AF]{5,30}', nickname, re.UNICODE):
         return False
-
+    print 'ki'
     user_profile = UserProfile.objects.filter(nickname=nickname)
     if len(user_profile) > 0:
         return False
