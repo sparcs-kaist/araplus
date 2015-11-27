@@ -8,6 +8,8 @@
 			"description": "Trash, Garbage, Non-recyclable",
             "is_official": "True",
             "is_public": "True",
+            "is_gallery": "False",
+            "is_deleted": "False",
             "admin": 1
 		},
 		"pk": 1
@@ -21,6 +23,8 @@
 			"description": "Notices",
             "is_official": "True",
             "is_public": "True",
+            "is_gallery": "False",
+            "is_deleted": "False",
             "admin": 1
 		},
 		"pk": 2
@@ -34,6 +38,8 @@
 			"description": "Honey tips provided",
             "is_official": "True",
             "is_public": "True",
+            "is_gallery": "False",
+            "is_deleted": "False",
             "admin": 1
 		},
 		"pk": 3
@@ -47,8 +53,25 @@
 			"description": "political issues",
             "is_official": "True",
             "is_public": "True",
+            "is_gallery": "False",
+            "is_deleted": "False",
             "admin": 1
 		},
 		"pk": 4
+	},
+	{
+		"model": "board.Board",
+		"fields": {
+            "kor_name": "갤러리",
+			"eng_name": "Gallery",
+            "url": "gallery",
+			"description": "사건사고에 관련된 사진을 업로드해야 합니다.",
+            "is_official": "True",
+            "is_public": "True",
+            "is_gallery": "True",
+            "is_deleted": "False",
+            "admin": 1
+		},
+		"pk": 5
 	}
 ]

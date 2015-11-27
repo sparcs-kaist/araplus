@@ -114,7 +114,7 @@ class BoardContent(models.Model):
         if self.attachment.exists():
             return self.attachment.all()[0].file.url
         else:
-            return 'media/image/default.jpg'
+            return '/media/image/default.jpg'
 
 
 # 이미지 경로를 지정해주기 위한 함수
