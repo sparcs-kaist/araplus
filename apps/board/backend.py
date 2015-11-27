@@ -7,7 +7,13 @@ from django.db.models import Q
 from apps.board.forms import *
 from itertools import izip
 from notifications import notify
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import re
+import os
 
+
+imtag_regex = re.compile("<img.+?src=[\"'](.+?)[\"'].*?>")
 
 POINTS_POST_WRITE = 5
 POINTS_COMMENT_WRITE = 3
@@ -258,6 +264,26 @@ def _write_post(request, is_modify=False, post=None,
         board_content = board_post.board_content
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
+        # 위지귁으로 업로드 된 이미지 처리 
+        content = board_content.content
+        for img_src in imtag_regex.findall(content):
+            src = img_src.split('/')[2]
+            print src
+            path_origin = unicode(default_storage.path(src))
+            file_origin = open(path_origin, "r")
+            file_content = ContentFile(file_origin.read())
+            attachment = Attachment(board_content=board_content)
+            new_path = unicode(str(board_post.id) + '/' + src)
+            attachment.file.save(new_path, file_content)
+            attachment.save()
+            file_origin.close()
+            if file_origin.closed:
+                os.remove(unicode(file_origin.name))
+                del file_origin
+            content = content.replace(src, attachment.file.name)
+            print content
+        board_content.content = content
+        board_content.save()
         for tag in hashs:
             HashTag(tag_name=tag, board_post=board_post).save()
         attachments = form_attachment.save(commit=False)

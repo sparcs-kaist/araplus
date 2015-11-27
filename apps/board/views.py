@@ -274,6 +274,17 @@ def post_list(request, board_url):
     except:
         current_category = None
     querystring = _get_querystring(request, 'best', 'page')
+    if current_board != None and current_board.is_gallery:
+        return render(request,
+                      'board/board_list_gallery.html',
+                      {'notice_list':  notice_list,
+                       'post_list': post_list,
+                       'board_list': board_list,
+                       'current_board': current_board,
+                       'pages': pages,
+                       'current_page': page,
+                       'querystring': querystring,
+                       'current_category': current_category})
     return render(request,
                   'board/board_list.html',
                   {'notice_list':  notice_list,

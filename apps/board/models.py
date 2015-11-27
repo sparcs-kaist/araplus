@@ -5,9 +5,14 @@ from araplus.settings import UPLOAD_DIR
 import json
 import re
 import cgi
+from django.core.files.storage import default_storage
+from django.core.files import File
+
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 numtag_regex = re.compile(r'@(?P<target>\d+)')
 nicktag_regex = re.compile(ur'@(?P<target>\w+)', re.UNICODE)
+# regular expression for matching img src
+imtag_regex = re.compile("<img.+?src=[\"'](.+?)[\"'].*?>")
 
 
 def nick_to_order(nick, comment_nickname_list):
@@ -79,6 +84,14 @@ class BoardContent(models.Model):
                                        nicksub_regex_helper(
                                            match, comment_nickname_list),
                                        result)
+        """else:
+            # 글 작성 완료 했을 때 Image tag가 남아있는지 확인
+            img_tags = imtag_regex.findall(result)
+            print img_tags
+            for img_src in img_tags:
+                img_src = img_src.split('/')[2]
+                print default_storage.url(img_src)
+                print default_storage.path(img_src) """
         return hashtag_regex.sub(
             '\1<a href="../?tag=\g<target>">#\g<target></a>',
             result)
@@ -97,12 +110,24 @@ class BoardContent(models.Model):
                  for item in comment_nickname_list if item in tag_list]
         return order
 
+    def get_thumbnail(self):
+        if self.attachment.exists():
+            return self.attachment.all()[0].file.url
+        else:
+            return 'media/image/default.jpg'
+
+
+# 이미지 경로를 지정해주기 위한 함수
+def get_path(instance, filename):
+    return filename
+
 
 class Attachment(models.Model):
-    file = models.FileField(null=False, upload_to=UPLOAD_DIR)
+    file = models.FileField(null=False, upload_to=get_path)
     board_content = models.ForeignKey('BoardContent',
                                       related_name="attachment",
                                       null=False)
+
 
 
 class BoardComment(models.Model):
@@ -177,6 +202,7 @@ class Board(models.Model):
                               related_name="board",
                               null=False)
     is_official = models.BooleanField(default=False)
+    is_gallery = models.BooleanField(default=False)
     is_public = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
 

@@ -1,0 +1,63 @@
+<div id="content-wrapper">
+    {% if not pages %}
+    "Invalid access"
+    {% endif %}
+    <ul id="total-gallery-wrapper">
+        {% for post in post_list %}
+        <li class="image">
+            <img src={{post.0.board_content.get_thumbnail}}></img>
+            <a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">
+            <div class="hovered">
+                <span class="title">
+                    {{post.0.title}}
+                </span>
+                <span class="timeago" style="float: left; margin-top: 10px" timeago="{{post.0.board_content.created_time|date:"c"}}" title="{{post.0.board_content.created_time}}"></span>
+                <div class="vote" style="float: right; margin-top: 6px">
+                    <span>{{post.0.board_content.get_vote.up}}</span>
+                    <span>/ {{post.0.board_content.get_vote.down}}</span>
+                </div>
+                <span class="nickname" style="clear: both; padding-top: 6px">
+                    {% if post.0.board_content.is_anonymous %}
+                        {{post.0.board_content.is_anonymous}}
+                    {% else %}
+                        {{post.0.author.nickname}}
+                    {% endif %}
+                </span>
+            </div>
+        </a>
+        </li>
+        {% endfor %}
+    </ul>
+    <!-- page 넘어가는 <> 넣기 -->
+    <div id="board-pagination">
+        <ul id="board-pagination-number">
+            {% for page in pages %}
+            {% if page == current_page %}
+            <li class="active">{{page}}</li>
+            {% else %}
+            <li><a href="/board/{{current_board.url|default:'all'}}/?page={{page}}">{{page}}</a></li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+        <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
+        <input id="board-search" placeholder="Search" type="text">
+    </div>
+</div>
+    <!-- 성인글 부분 수정 -->
+    <!--
+    {% if request.user.userprofile.adult_filter %}
+    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block" href="set_adult_filter/">성인글 필터링 해제</a>
+    {% else %}
+    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block"href="set_adult_filter/">성인글 필터링</a>
+    {% endif %}
+    -->
+<div>
+
+<!--
+    <div class="pull-right btn-group" role="group">
+        <a class="btn btn-default" href="?best=true">Best</a>
+        <a class="btn btn-default"
+            href="/board/{{current_board.url|default:'all'}}/post">글 쓰기</a>
+    </div>
+</div>
+-->
