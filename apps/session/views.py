@@ -16,7 +16,7 @@ def main(request):
 
 def validate_nickname(nickname):
     print nickname
-    if not re.match(ur'[\w_-\uAC00\uD7AF]{5,30}', nickname, re.UNICODE):
+    if not re.match(ur'[\w_-\uAC00\uD7AF]{2,30}', nickname, re.UNICODE):
         return False
     print 'ki'
     user_profile = UserProfile.objects.filter(nickname=nickname)
@@ -34,7 +34,7 @@ def nickname_check(request):
 def user_login(request):
     if request.user.is_authenticated():
         return redirect('/')
-    return redirect('https://sso.sparcs.org/oauth/require/?url=' +
+    return redirect('https://sso.sparcs.org/oauth/require/?app=araplus&url=' +
                     request.build_absolute_uri('/session/login/callback/'))
 
 

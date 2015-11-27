@@ -111,7 +111,10 @@
             {% endfor %}
         </ul>
         <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
-        <input id="board-search" placeholder="Search" type="text">
+        <form name="searchbox" target="./" method="get">
+	<input name="title" placeholder="검색" type="text" />
+	<input hidden id="board-search" placeholder="Search" type="submit" style="visibility:hidden"/>
+    	</form>
     </div>
     {% if request.user.userprofile.adult_filter %}
     <!-- 성인글 부분 수정 -->

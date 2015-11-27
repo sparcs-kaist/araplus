@@ -6,7 +6,7 @@ ARA Plus Grill
 <link rel="stylesheet" href="/media/css/grill/grill.css">
 {% endblock %}
 {% block js %}
-<script src="http://bit.sparcs.org:9779/socket.io/socket.io.js"></script>
+<script src="http://araplus.sparcs.org:9779/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
 <script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
@@ -40,7 +40,7 @@ ARA Plus Grill
         </div>
         <div class="comment-input-container">
             <div class="comment-input">
-                <form class="input-form " method="POST">
+                <form class="input-form" id="reply-form" method="POST">
                     {% csrf_token %}
                     <textarea id="new-content" class="form-control" rows="3" placeholder="고기를 구워주세요." style="resize: none;"></textarea>
                     <div class="button-line">

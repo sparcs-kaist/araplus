@@ -138,10 +138,17 @@ $(document).ready(function(){
                   }
                   
                       //$("#text-counter").text(140-$($("#new-content")[0]).val().length);
-            })   
+            })
+
+	    $("#new-content").keydown(function (e){
+		if(e.ctrlKey && e.keyCode == 13){
+		   event.preventDefault();
+               	   add_comment(grill_id, socket);
+		}
+	    });   
 
             // websocket Initialize
-            var socket = io.connect('http://bit.sparcs.org:9779');
+            var socket = io.connect('http://araplus.sparcs.org:9779');
 
             socket.emit('adduser', grill_id);
 
