@@ -28,7 +28,7 @@
                 <td width=5><span style="display: inline; color: #000">N</span></td>
                 {% endif %}
                 </span>
-                <td class="list-title" id="notice-title-{{notice.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}">{{notice.0.title}}</a></td>
+                <td class="list-title" id="notice-title-{{notice.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{notice.0.id}}">{{notice.0.title}} [{{notice.0.get_comment_count}}]</a></td>
                 {% if notice.0.board_content.is_anonymous %}
                 <td width=215 style="padding-left: 20px">{{notice.0.board_content.is_anonymous}}</td>
                 {% else %}
@@ -71,7 +71,7 @@
                 {% if request.user.userprofile.adult_filter and post.0.board_content.is_adult %}
                 <td class="list-title" id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">성인글</a></td>
                 {% else %}
-                <td class="list-title" id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">{{post.0.title}}</a></td>
+                <td class="list-title" id="post-title-{{post.0.id}}" style="padding-left: 10px"><a href="/board/{{current_board.url|default:'all'}}/{{post.0.id}}">{{post.0.title}} [{{post.0.get_comment_count}}]</a></td>
                 {% endif %}
                 {% if post.0.board_content.is_anonymous %}
                 <td width=215 style="padding-left: 20px">{{post.0.board_content.is_anonymous}}</td>

@@ -275,6 +275,9 @@ class BoardPost(models.Model):
     def get_notify_target(self):
         return self.board_post_trace.filter(is_notified=True).select_related("userprofile").prefetch_related("userprofile__user")
 
+    def get_comment_count(self):
+        return self.board_comment.count()
+
 
 class BoardPostIs_read(models.Model):
     userprofile = models.ForeignKey('session.UserProfile',
