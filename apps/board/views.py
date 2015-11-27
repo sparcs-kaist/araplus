@@ -105,8 +105,12 @@ def post_write(request, board="All"):
         return HttpResponse('Invalid access')
     if request.user.userprofile.permission < 1:
         return redirect('../')
+    try:
+        board = Board.objects.get(url=board)
+    except:
+        board = Board.objects.get(id=1)
     if request.method == 'POST':
-        result = _write_post(request, board=board)
+        result = _write_post(request, board=board.url)
         if 'save' in result:
             board_post_trace = BoardPostTrace(
                 board_post=result['save'],
@@ -116,10 +120,6 @@ def post_write(request, board="All"):
         else:
             form_content, form_post, form_attachment = result['failed']
     else:
-        try:
-            board = Board.objects.get(url=board)
-        except:
-            board = Board.objects.get(id=1)
         form_content = BoardContentForm()
         form_post = BoardPostForm(initial={'board': board.id},
                                   is_staff=request.user.is_staff)
