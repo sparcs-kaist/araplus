@@ -9,6 +9,7 @@ from itertools import izip
 from notifications import notify
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.utils import timezone
 import re
 import os
 
@@ -98,49 +99,36 @@ def _get_content(request, post_id, comment_per_page=10):
         board_post_is_read = BoardPostIs_read.objects.get(
             board_post=board_post,
             userprofile=request.user.userprofile)
+        last_read = board_post_is_read.last_read
     except ObjectDoesNotExist:
         board_post_is_read = BoardPostIs_read()
         board_post_is_read.board_post = board_post
         board_post_is_read.userprofile = request.user.userprofile
-    board_post_is_read.save()
+        last_read = timezone.now()
+    recent_comment = True
     post = _get_post(request, board_post, 'Post')
     ##pagination of comments##
     board_comments = board_post.board_comment.all()
-    comment_page = int(request.GET.get('comment_page', 1))
-    comment_paginator = Paginator(board_comments, comment_per_page)
-    comment_paged = comment_paginator.page(comment_page)
-    current_page = comment_page
-    page_range = comment_paginator.page_range
-    page_left = 0
-    page_right = 0
-    if len(page_range) == 1:
-        page_range.remove(1)
-    if len(page_range) > 5:
-        last_page = len(page_range)
-        page_target = (current_page - 1) / 5
-        page_range = []
-        page_left = page_target * 5
-        page_right = page_target * 5 + 6
-        for i in range(page_left + 1, page_right):
-            if i > last_page:
-                page_right = 0
-                break
-            page_range.append(i)
     comment_list = []
     comment_nickname_list = []
     if board_post.board_content.is_anonymous is None:
         comment_nickname_list = [(board_post.author.nickname, 0)]
     order = 1
-    for board_comment in comment_paged:
+    for board_comment in board_comments:
         comment = _get_post(request, board_comment, 'Comment',
                             comment_nickname_list)
-        comment['order'] = comment_per_page * (current_page - 1) + order
+        comment['order'] = order
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
         if comment['is_anonymous'] is None:
             username = comment['username']
             comment_nickname_list.append((username, order))
         order = order + 1
+        if board_comment.board_content.created_time > last_read:
+            comment['recent_comment'] = recent_comment
+            recent_comment = False
+        else:
+            comment['recent_comment'] = False
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
@@ -150,7 +138,8 @@ def _get_content(request, post_id, comment_per_page=10):
     if best_comment:
         best_comment['best_comment'] = True
         comment_list.insert(0, best_comment)
-    return (post, comment_list, page_range, current_page, page_left, page_right)
+    board_post_is_read.save()
+    return (post, comment_list)
 
 
 def _get_post(request, board_post, target_type, comment_nickname_list=[]):

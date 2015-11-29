@@ -85,6 +85,9 @@
         {% endif %}
         <div class="post-comment">
             <div class="comment-info">
+                {% if comment.recent_comment %}
+                <a name="recent_comment"></a>
+                {% endif %}
                 <span class="comment-order" id="comment_order_{{comment.order}}">{{ comment.order }}</span>
                 <span class="comment-nickname">
                 {% if comment.is_anonymous %}

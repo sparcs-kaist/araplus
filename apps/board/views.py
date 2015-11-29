@@ -164,7 +164,7 @@ def post_modify(request, board_url, post_id=0):
 def post_read(request, board_url, post_id):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
-    post, comment_list, comment_page_range, comment_current_page, comment_page_left, comment_page_right = _get_content(request, post_id)
+    post, comment_list= _get_content(request, post_id)
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     search_category = request.GET.get('category', '')
@@ -206,10 +206,6 @@ def post_read(request, board_url, post_id):
                       'current_category': current_category,
                       # Below, there are things for comment_list
                       'comment_list': comment_list,
-                      'comment_pages': comment_page_range,
-                      'comment_current_page': comment_current_page,
-                      'comment_page_left': comment_page_left,
-                      'comment_page_right': comment_page_right,
                        # Below thing is for attachment form for comment
                       'attachment_form': attachment_form
                   })
