@@ -388,3 +388,7 @@ def set_adult_filter(request):
     userprofile.adult_filter = not userprofile.adult_filter
     userprofile.save()
     return redirect('../')
+
+
+def check_upload(request):
+    print request.FILES.getlist('files')

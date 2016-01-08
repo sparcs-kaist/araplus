@@ -10,6 +10,7 @@ from notifications import notify
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.utils.encoding import uri_to_iri
 import re
 import os
 
@@ -243,6 +244,7 @@ def _write_post(request, is_modify=False, post=None,
                           category_diff]]
             post.set_log(post_diff + post.get_log())
             content.set_log(content_diff + content.get_log())
+            # 위지윅으로 저장된 이미지들 확인
         else:
             request.user.userprofile.points += POINTS_POST_WRITE
             request.user.userprofile.save()
@@ -253,16 +255,15 @@ def _write_post(request, is_modify=False, post=None,
         board_content = board_post.board_content
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
-        # 위지귁으로 업로드 된 이미지 처리 
+        # 위지윅으로 업로드 된 이미지 처리 
         content = board_content.content
         for img_src in imtag_regex.findall(content):
             src = img_src.split('/')[2]
-            print src
-            path_origin = unicode(default_storage.path(src))
+            path_origin = uri_to_iri(default_storage.path(src))
             file_origin = open(path_origin, "r")
             file_content = ContentFile(file_origin.read())
             attachment = Attachment(board_content=board_content)
-            new_path = unicode(str(board_post.id) + '/' + src)
+            new_path = unicode(str(board_post.id) + '/' + uri_to_iri(src))
             attachment.file.save(new_path, file_content)
             attachment.save()
             file_origin.close()

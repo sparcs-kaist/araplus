@@ -39,4 +39,5 @@ urlpatterns = [
     url(r'^([A-z]*)/([1-9][0-9]*)/trace/$', 'apps.board.views.trace'),
     url(r'^([A-z]*)/trace/$', 'apps.board.views.trace_list'),
     url(r'^[A-z]*/set_adult_filter/$', 'apps.board.views.set_adult_filter'),
+    url(r'^upload/$', 'apps.board.views.check_upload')
 ]
