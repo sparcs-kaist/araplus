@@ -10,7 +10,8 @@ from notifications import notify
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.utils import timezone
-from django.utils.encoding import uri_to_iri
+from django.utils.encoding import uri_to_iri, iri_to_uri
+from django.utils.http import urlquote
 import re
 import os
 
@@ -224,6 +225,14 @@ def _write_post(request, is_modify=False, post=None,
         category_before = ""
     if (form_post.is_valid() and form_content.is_valid()
             and form_attachment.is_valid()):
+        print '-----------cleaned_data-----------'
+        print form_content.cleaned_data['content']
+        images = imtag_regex.findall((form_content.cleaned_data['content']))
+        images = iri_to_uri(','.join(images))
+        images = images.split(iri_to_uri(','))
+        print '---------------regex----------------'
+        print images
+        print '------------------------------------'
         if is_modify:
             try:
                 category_after = post.board_category.name
@@ -245,6 +254,20 @@ def _write_post(request, is_modify=False, post=None,
             post.set_log(post_diff + post.get_log())
             content.set_log(content_diff + content.get_log())
             # 위지윅으로 저장된 이미지들 확인
+            stored_image = Attachment.objects.filter(board_content=content)
+            delete_list = list(stored_image)
+            for image in stored_image:
+                name = image.file.url
+                if name in images:
+                    images.remove(name)
+                    delete_list.remove(image)
+            ##### 삭제된 이미지 클래스 삭제하기 (todo)
+            for image in delete_list:
+                print 'asdfasdf'
+                if image.file:
+                    if os.path.isfile(image.file.path):
+                        os.remove(image.file.path)
+                image.delete()
         else:
             request.user.userprofile.points += POINTS_POST_WRITE
             request.user.userprofile.save()
@@ -257,13 +280,15 @@ def _write_post(request, is_modify=False, post=None,
         hashs = board_content.get_hashtags()
         # 위지윅으로 업로드 된 이미지 처리 
         content = board_content.content
-        for img_src in imtag_regex.findall(content):
-            src = img_src.split('/')[2]
-            path_origin = uri_to_iri(default_storage.path(src))
+        for img_src in images:
+            if len(img_src) == 0:
+                continue
+            src = img_src.split(urlquote('/'))[-1]
+            path_origin = uri_to_iri(default_storage.path(uri_to_iri(src)))
             file_origin = open(path_origin, "r")
             file_content = ContentFile(file_origin.read())
             attachment = Attachment(board_content=board_content)
-            new_path = unicode(str(board_post.id) + '/' + uri_to_iri(src))
+            new_path = '/'.join([str(board_post.id), path_origin.split('/')[-1]])
             attachment.file.save(new_path, file_content)
             attachment.save()
             file_origin.close()
@@ -271,7 +296,6 @@ def _write_post(request, is_modify=False, post=None,
                 os.remove(unicode(file_origin.name))
                 del file_origin
             content = content.replace(src, attachment.file.name)
-            print content
         board_content.content = content
         board_content.save()
         for tag in hashs:

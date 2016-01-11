@@ -8,6 +8,7 @@ import cgi
 from django.core.files.storage import default_storage
 from django.core.files import File
 
+
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 numtag_regex = re.compile(r'@(?P<target>\d+)')
 nicktag_regex = re.compile(ur'@(?P<target>\w+)', re.UNICODE)
