@@ -140,7 +140,7 @@ def post_modify(request, board_url, post_id=0):
         return redirect('../')
     if request.method == "POST":
         result = _write_post(request, True, post_instance,
-                             post_instance.board_content)
+                             post_instance.board_content, board=board_url)
         if 'save' in result:  # success modify
             return redirect('../')
         else:
