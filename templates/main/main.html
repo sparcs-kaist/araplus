@@ -1,3 +1,34 @@
 {% extends "base.html" %}
+{% block css %}
+<link type="text/css" rel="stylesheet" href="/media/css/main/main.css" />
+{% endblock %}
 {% block content %}
+<div id="today" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">today best</th>
+		</thead>
+		<tbody>
+			{% for tl in today_best_list %}
+			<tr>
+				<td class="best_list"><a href="/board/{{tl.category}}/{{tl.id}}/"><span class="vote">{{tl.vote}}</span>  {{tl.title}}</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+<div id="weekly" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">weekly best</th>
+		</thead>
+		<tbody>
+			{% for tl in week_best_list %}
+			<tr>
+				<td class="best_list"><a href="/board/{{tl.category}}/{{tl.id}}/"><span class="vote">{{tl.vote}}</span>  {{tl.title}}</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
 {% endblock %}

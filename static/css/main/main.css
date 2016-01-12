@@ -1,0 +1,39 @@
+#today {
+	float: left;
+	margin-left: 120px;
+	margin-top: 70px;
+	width: calc(50% - 270px);
+	height: 200px;
+}
+
+#weekly {
+	float: right;
+	margin-right: 140px;
+	margin-top: 70px;
+	width: calc(50% - 270px);
+	height: 200px;
+}
+
+.best {
+	background-color: white;
+}
+
+.vote {
+	color: #40E0D0;
+	display: inline;
+}
+
+.best_head {
+	color: #40E0D0;
+	text-align: left;
+	font-size: 13px;
+	margin-bottom: 15px;
+}
+
+.best_table {
+	padding: 10px;
+}
+
+.best_list {
+	margin-bottom: 10px;
+}
