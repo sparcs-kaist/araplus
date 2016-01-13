@@ -1,21 +1,30 @@
 #today {
 	float: left;
-	margin-left: 120px;
-	margin-top: 70px;
-	width: calc(50% - 270px);
-	height: 200px;
+	margin-left: 30px;
+	margin-top: 10px;
+	width: calc(50% - 70px);
+	height: 250px;
 }
 
 #weekly {
 	float: right;
-	margin-right: 140px;
-	margin-top: 70px;
-	width: calc(50% - 270px);
+	margin-right: 30px;
+	margin-top: 10px;
+	width: calc(50% - 70px);
+	height: 250px;
+}
+#gallery{
+	float: left;
+	margin-left: 30px;
+	margin-top: 10px;
+	width: calc(50% - 70px);
 	height: 200px;
 }
 
 .best {
 	background-color: white;
+        margin-bottom: 40px;
+        margin-top:5px;
 }
 
 .vote {
@@ -35,5 +44,77 @@
 }
 
 .best_list {
-	margin-bottom: 10px;
+        font-size: 20px;
+        margin-top: 12px;
+	margin-bottom: 6px;
+}
+
+#content-wrapper{
+    width: 1087px;
+    float: left;
+    background: #fafafa;
+    padding-top: 35px;
+    padding-left: 100px;
+    margin-bottom: 100px;
+}
+
+#gallery_header{
+    margin-left:10px;
+    margin-top: 10px;
+}
+
+#total-gallery-wrapper{
+    width: 100%;
+    height: 250px;
+    float: left;
+    margin: -12px 0px 0px -12px;
+}
+#total-gallery-wrapper li{
+    display: inline;
+    float: left;
+    width: 25%;
+    height: 40%;
+    margin-top: 30px;
+    margin-left: 30px;
+    padding: 9px;
+    border: none;
+    position: relative;
+}
+.image img{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+}
+.hovered{
+    width: 100%;
+    height:  100%;
+    background: rgba(0, 0, 0, 0.3);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 10;
+    display: none;
+    padding: 10px;
+}
+.image:hover .hovered{
+    display: block;
+}
+.hovered span{
+    font-size: 12px;
+    color: #f2f2f2;
+}
+.title{
+    padding: 0px 0px 0px 0px;
+    width: 100%;
+    border-bottom: 1px solid #fff;
+}
+.vote span{
+    display: inline-block;
+}
+.active{
+    background: #333;
+    color: #fff;
 }
