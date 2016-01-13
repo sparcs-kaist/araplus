@@ -22,10 +22,8 @@ from apps.board.backend import (
 )
 import json
 from apps.board.forms import *
-from django.core.paginator import Paginator
 
 from datetime import datetime, date, timedelta, time
-
 from django.utils import timezone
 
 def home(request):
@@ -103,11 +101,17 @@ def home(request):
 		one_article['category'] = weeklist[tempmax].board_post.board.url
 		one_article['id'] = weeklist[tempmax].board_post.id
 		week_best_list += [one_article]
+        all_board = Board.objects.all()
+        for bd in all_board:
+            if bd.is_gallery:
+                board = bd
+        main_gallery = BoardPost.objects.filter(board=board)[:3] 
 
 	return render(request,
 				'main/main.html',
 				{'today_best_list' : today_best_list,
 				'week_best_list' : week_best_list,
+                                'post_list': main_gallery,
 					})
 
 
