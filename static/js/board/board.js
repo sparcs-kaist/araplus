@@ -171,4 +171,9 @@ $(document).ready(function(){
     $(".hiddenContent").click(function(){
         $(this).html($(this).attr("value"));
     });
+
+    $('.comment-write-button').click(function(){
+        $(this).parent().parent().submit();
+        $(this).attr('disabled', 'disabled');
+    });
 });

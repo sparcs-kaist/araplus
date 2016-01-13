@@ -154,7 +154,7 @@
 
 	{%if not post.deleted%}
         <div id="comment-write-wrapper">
-			<form action="./comment/{{querystring}}comment_page={{comment_current_page}}" method="POST" enctype="multipart/form-data">
+			<form id='comment-write' action="./comment/{{querystring}}comment_page={{comment_current_page}}" method="POST" enctype="multipart/form-data">
                 {%csrf_token%}
                 <input type="hidden" name="board_post_id" value="{{ post.id }}">
                 <textarea class="comment-textarea" rows="5" name="content" placeholder="댓글을 입력하세요."></textarea>
