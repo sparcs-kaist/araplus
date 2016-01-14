@@ -102,10 +102,7 @@ def home(request):
 		one_article['category'] = weeklist[tempmax].board_post.board.url
 		one_article['id'] = weeklist[tempmax].board_post.id
 		week_best_list += [one_article]
-        all_board = Board.objects.all()
-        for bd in all_board:
-            if bd.is_gallery:
-                board = bd
+        board = Board.objects.get(is_gallery=True)
         main_gallery = BoardPost.objects.filter(board=board)[:3]
         pre_grill_list = Grill.objects.filter(updated_time__range=[today-timedelta(1), today]).order_by('-id')[:2]
         grill_list = []
