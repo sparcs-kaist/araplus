@@ -13,9 +13,21 @@
 	width: calc(50% - 70px);
 	height: 250px;
 }
-#gallery{
+
+#grill{
+
 	float: left;
 	margin-left: 30px;
+	margin-top: 10px;
+	width: calc(50% - 70px);
+	height: 200px;
+
+
+}
+
+#gallery{
+	float: right;
+	margin-right: 30px;
 	margin-top: 10px;
 	width: calc(50% - 70px);
 	height: 200px;
@@ -48,6 +60,17 @@
         margin-top: 12px;
 	margin-bottom: 6px;
 }
+
+.sub_list {
+        color: #adadad;
+        font-size: 16px;
+        margin-top: 12px;
+	margin-bottom: 0px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+        
+}
+
 
 #content-wrapper{
     width: 1087px;

@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from apps.board.models import *
+from apps.grill.models import *
 from apps.board.backend import (
     _get_post_list,
     _get_querystring,
@@ -105,13 +106,32 @@ def home(request):
         for bd in all_board:
             if bd.is_gallery:
                 board = bd
-        main_gallery = BoardPost.objects.filter(board=board)[:3] 
+        main_gallery = BoardPost.objects.filter(board=board)[:3]
+        pre_grill_list = Grill.objects.filter(updated_time__range=[today-timedelta(1), today]).order_by('-id')[:2]
+        grill_list = []
+        count=0
+        if pre_grill_list:
+            for gr in pre_grill_list:
+                chosen_grill = {}
+                if len(gr.title) > 25:
+                    chosen_grill['title'] = gr.title[:22]+" ..."
+                else:
+                    chosen_grill['title'] = gr.title
+                chosen_grill['comment'] = gr.grill_comment.filter().order_by('-id')[0]
+                
+                chosen_grill['id'] = gr.id
+                
+                grill_list += [chosen_grill]
+
+        
+
 
 	return render(request,
 				'main/main.html',
 				{'today_best_list' : today_best_list,
 				'week_best_list' : week_best_list,
                                 'post_list': main_gallery,
+                                'grill_list': grill_list,
 					})
 
 
