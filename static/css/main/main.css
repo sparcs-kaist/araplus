@@ -1,36 +1,42 @@
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
 #today {
-	float: left;
-	margin-left: 30px;
+        font-family: 'Nanum Gothic', sans-serif;
+        float: left;
 	margin-top: 10px;
-	width: calc(50% - 70px);
+	width:  45%;
 	height: 250px;
+        margin-right : 5%;
 }
 
 #weekly {
+        font-family: 'Nanum Gothic', sans-serif;
 	float: right;
-	margin-right: 30px;
 	margin-top: 10px;
-	width: calc(50% - 70px);
+	width: 45% ;
 	height: 250px;
+        margin-left: 5%;
 }
 
 #grill{
 
+        font-family: 'Nanum Gothic', sans-serif;
 	float: left;
-	margin-left: 30px;
 	margin-top: 10px;
-	width: calc(50% - 70px);
+	width: 45%;
 	height: 200px;
+        margin-right: 5%;
 
 
 }
 
 #gallery{
-	float: right;
-	margin-right: 30px;
+	font-family: 'Nanum Gothic', sans-serif;
+        float: right;
 	margin-top: 10px;
-	width: calc(50% - 70px);
+	width: 45%;
 	height: 200px;
+        margin-left: 5%;
 }
 
 .best {
@@ -73,11 +79,12 @@
 
 
 #content-wrapper{
-    width: 1087px;
+    width: calc(100% - 200px);
     float: left;
     background: #fafafa;
     padding-top: 35px;
     padding-left: 100px;
+    padding-right: 100px;
     margin-bottom: 100px;
 }
 
