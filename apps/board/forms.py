@@ -6,7 +6,7 @@ from django.db.models import Q
 import random
 from django.forms.models import modelformset_factory
 import datetime
-from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
+from django_summernote.widgets import SummernoteWidget
 
 
 prefix = [u'잔인한', u'츤츤대는', u'멋진', u'운좋은', u'귀여운']
@@ -80,7 +80,6 @@ class BoardContentForm(ModelForm):
         model = BoardContent
         exclude = ['is_deleted', 'modify_log']
         widgets = {
-            #'content': Textarea(attrs={'rows': 15, }),
             'content': SummernoteWidget(),
         }
 
@@ -110,11 +109,12 @@ class BoardContentForm(ModelForm):
         if cleaned_data.get('is_anonymous', ''):
             today = datetime.datetime.now().date()
             tomorrow = today + datetime.timedelta(1)
-            if BoardContent.objects.filter(~Q(is_anonymous=None),
-                                      Q(board_post__author=self.author)
-                                      | Q(board_comment__author=self.author),
-                                      created_time__gte=today,
-                                      created_time__lt=tomorrow).count() > 4:
+            if BoardContent.objects.filter(
+                    ~Q(is_anonymous=None),
+                    Q(board_post__author=self.author)
+                    | Q(board_comment__author=self.author),
+                    created_time__gte=today,
+                    created_time__lt=tomorrow).count() > 4:
                 msg = u'exceed anonymous post limits'
                 self.add_error('is_anonymous', msg)
         return cleaned_data

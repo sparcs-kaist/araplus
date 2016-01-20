@@ -164,7 +164,7 @@ def post_modify(request, board_url, post_id=0):
 def post_read(request, board_url, post_id):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
-    post, comment_list= _get_content(request, post_id)
+    post, comment_list = _get_content(request, post_id)
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     search_category = request.GET.get('category', '')
@@ -206,7 +206,7 @@ def post_read(request, board_url, post_id):
                       'current_category': current_category,
                       # Below, there are things for comment_list
                       'comment_list': comment_list,
-                       # Below thing is for attachment form for comment
+                      # Below thing is for attachment form for comment
                       'attachment_form': attachment_form
                   })
 
@@ -270,7 +270,7 @@ def post_list(request, board_url):
     except:
         current_category = None
     querystring = _get_querystring(request, 'best', 'page')
-    if current_board != None and current_board.is_gallery:
+    if current_board is not None and current_board.is_gallery:
         return render(request,
                       'board/board_list_gallery.html',
                       {'notice_list':  notice_list,

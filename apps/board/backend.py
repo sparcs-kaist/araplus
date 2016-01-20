@@ -28,7 +28,8 @@ POINTS_VOTED_DOWN = -2
 
 
 def _get_post_list(request, board_url='', item_per_page=15):
-    adult_filter = request.GET.get('adult_filter')
+    # Adult filter 현재 사용하지 않음.
+    # adult_filter = request.GET.get('adult_filter')
     best_filter = bool(request.GET.get('best', False))
     page = int(request.GET.get('page', 1))
     search_tag = request.GET.get('tag', '')
@@ -110,7 +111,7 @@ def _get_content(request, post_id, comment_per_page=10):
         last_read = timezone.now()
     recent_comment = True
     post = _get_post(request, board_post, 'Post')
-    ##pagination of comments##
+    # pagination of comments
     board_comments = board_post.board_comment.all()
     comment_list = []
     comment_nickname_list = []
@@ -257,7 +258,7 @@ def _write_post(request, is_modify=False, post=None,
                 if name in images:
                     images.remove(name)
                     delete_list.remove(image)
-            ##### 삭제된 이미지 클래스 삭제하기 (todo)
+            # 삭제된 이미지 클래스 삭제하기
             for image in delete_list:
                 if image.file:
                     if os.path.isfile(image.file.path):
@@ -273,7 +274,7 @@ def _write_post(request, is_modify=False, post=None,
         board_content = board_post.board_content
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
-        # 위지윅으로 업로드 된 이미지 처리 
+        # 위지윅으로 업로드 된 이미지 처리
         content = board_content.content
         for img_src in images:
             if len(img_src) == 0:
@@ -283,7 +284,8 @@ def _write_post(request, is_modify=False, post=None,
             with open(path_origin, "r") as file_origin:
                 file_content = ContentFile(file_origin.read())
                 attachment = Attachment(board_content=board_content)
-                new_path = '/'.join([str(board_post.id), path_origin.split('/')[-1]])
+                new_path = '/'.join([str(board_post.id),
+                                    path_origin.split('/')[-1]])
                 attachment.file.save(new_path, file_content)
                 attachment.save()
             if file_origin.closed:
@@ -317,7 +319,8 @@ def _write_comment(request, post_id, is_modify=False):
             content_before = board_comment.board_content.content
             form_attachment = AttachmentFormSet(
                 queryset=Attachment.objects.none())
-            if board_comment.author != user_profile and user_profile.permission < 4:
+            if (board_comment.author != user_profile
+                    and user_profile.permission < 4):
                 return  # wrong request
             content_form = BoardContentForm(
                 request.POST,
@@ -335,8 +338,6 @@ def _write_comment(request, post_id, is_modify=False):
                 board_post=target_post)
             content_form = BoardContentForm(request.POST,
                                             author=request.user.userprofile)
-
-
         except:
             return  # no post
     if content_form.is_valid():
@@ -390,8 +391,8 @@ def _write_comment(request, post_id, is_modify=False):
                                 recipient=board_comment.board_post.author.user,
                                 verb='님이 태그했습니다.'.decode('utf-8'),
                                 post_title=board_comment.board_content.content,
-#                                post_title=target_post.title,
-#                                comment_content=board_comment.board_content.content,
+                                # post_title=target_post.title,
+                                # comment_content=board_comment.board_content.content,
                                 board_name=target_post.board.url,
                                 noti_category='mention',
                                 app_title='board',
@@ -403,8 +404,8 @@ def _write_comment(request, post_id, is_modify=False):
                                 recipient=target,
                                 verb='님이 태그했습니다.'.decode('utf-8'),
                                 post_title=board_comment.board_content.content,
-#                                post_title=target_post.title,
-#                                comment_content=board_comment.board_content.content,
+                                # post_title=target_post.title,
+                                # comment_content=board_comment.board_content.content,
                                 board_name=target_post.board.url,
                                 noti_category='mention',
                                 app_title='board',
@@ -438,8 +439,8 @@ def _write_comment(request, post_id, is_modify=False):
                         recipient=target,
                         verb='님이 태그했습니다.'.decode('utf-8'),
                         post_title=board_comment.board_content.content,
-#                        post_title=target_post.title,
-#                        comment_content=board_comment.board_content.content,
+                        # post_title=target_post.title,
+                        # comment_content=board_comment.board_content.content,
                         board_name=target_post.board.url,
                         noti_category='mention',
                         app_title='board',
@@ -461,7 +462,8 @@ def _delete_post(request):
         author = board_content.board_comment.author
     else:
         return 'invalid content'
-    if author != request.user.userprofile and request.user.userprofile.permission < 4:
+    if (author != request.user.userprofile
+            and request.user.userprofile.permission < 4):
         return 'not allowed'
     board_content.is_deleted = True
     board_content.save()

@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 import apps.session.models
-from araplus.settings import UPLOAD_DIR
 import json
 import re
-import cgi
-from django.core.files.storage import default_storage
-from django.core.files import File
 
 
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
@@ -28,7 +24,9 @@ def nicksub_regex_helper(match, comment_nickname_list):
     nick = match.group(1)
     order = nick_to_order(nick, comment_nickname_list)
     if order:
-        return '<a title="comment_' + order + '" class="comment_preview" href="#comment_order_' + order + '">' + match.group() + '</a>'
+        return '<a title="comment_' + order + \
+               '" class="comment_preview" href="#comment_order_' + \
+               order + '">' + match.group() + '</a>'
     else:
         return match.group()
 
@@ -128,7 +126,6 @@ class Attachment(models.Model):
     board_content = models.ForeignKey('BoardContent',
                                       related_name="attachment",
                                       null=False)
-
 
 
 class BoardComment(models.Model):
