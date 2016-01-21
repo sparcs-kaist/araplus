@@ -392,3 +392,24 @@ def set_adult_filter(request):
 
 def check_upload(request):
     print request.FILES.getlist('files')
+
+
+@login_required(login_url='/session/login')
+def trace(request):
+    notice_list, post_list, pages, page = _get_post_list(request, 'all', trace=True)
+    board_list = Board.objects.filter(is_official=True)
+    current_board = None
+    current_category = None
+    querystring = _get_querystring(request, 'page')
+    return render(request,
+                  'board/board_list.html',
+                  {'notice_list':  notice_list,
+                   'post_list': post_list,
+                   'board_list': board_list,
+                   'current_board': current_board,
+                   'pages': pages,
+                   'current_page': page,
+                   'querystring': querystring,
+                   'current_category': current_category,
+                   'trace':True})
+

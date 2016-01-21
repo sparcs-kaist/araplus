@@ -18,6 +18,8 @@ from django.conf.urls import include, url
 urlpatterns = [
     url(r'^$', 'apps.board.views.home'),
     url(r'^create_board/$', 'apps.board.views.create_board'),
+    url(r'^upload/$', 'apps.board.views.check_upload'),
+    url(r'^trace/$', 'apps.board.views.trace'),
     url(r'^([A-z]*)/remove_board/$', 'apps.board.views.remove_board'),
     url(r'^([A-z]*)/add_member/$', 'apps.board.views.add_member'),
     url(r'^([A-z]*)/add_member/change_permission/$', 'apps.board.views.change_permission'),
@@ -39,5 +41,6 @@ urlpatterns = [
     url(r'^([A-z]*)/([1-9][0-9]*)/trace/$', 'apps.board.views.trace'),
     url(r'^([A-z]*)/trace/$', 'apps.board.views.trace_list'),
     url(r'^[A-z]*/set_adult_filter/$', 'apps.board.views.set_adult_filter'),
-    url(r'^upload/$', 'apps.board.views.check_upload')
+    url(r'^upload/$', 'apps.board.views.check_upload'),
+    url(r'^trace/$', 'apps.board.views.trace'),
 ]

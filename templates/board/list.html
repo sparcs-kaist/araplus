@@ -2,9 +2,11 @@
     {% if not pages %}
     "Invalid access"
     {% endif %}
+    {% if not trace %}
     <div id="board-title">
         {{current_board|default:'All'}} | ㅁㄴㅇㄹ
     </div>
+    {% endif %}
     <table id="post-list-wrapper">
         <tr id="list-header" class="list">
             <th width=90>카테고리</th>
@@ -110,8 +112,10 @@
             {% endif %}
             {% endfor %}
         </ul>
+        {% if not trace %}
         <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
         <input id="board-search" placeholder="Search" type="text">
+        {% endif %}
     </div>
     {% if request.user.userprofile.adult_filter %}
     <!-- 성인글 부분 수정 -->

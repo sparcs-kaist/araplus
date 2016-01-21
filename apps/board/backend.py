@@ -27,7 +27,7 @@ POINTS_VOTE_DOWN = -1
 POINTS_VOTED_DOWN = -2
 
 
-def _get_post_list(request, board_url='', item_per_page=15):
+def _get_post_list(request, board_url='', item_per_page=15, trace=False):
     # Adult filter 현재 사용하지 않음.
     # adult_filter = request.GET.get('adult_filter')
     best_filter = bool(request.GET.get('best', False))
@@ -42,16 +42,20 @@ def _get_post_list(request, board_url='', item_per_page=15):
             board = Board.objects.get(url=board_url)
         except:
             return ([], [], None, None)  # Wrong board request
-    if board_url == 'all':
-        board_post_notice = BoardPost.objects.filter(is_notice=True,
-                                                     board__is_deleted=False,
-                                                     board__is_official=True)
-        board_post = BoardPost.objects.filter(board__is_deleted=False,
-                                              board__is_official=True)
+    if trace:
+        board_post_notice = []
+        board_post = request.user.userprofile.board_post.all()
     else:
-        board_post_notice = BoardPost.objects.filter(is_notice=True,
-                                                     board=board)
-        board_post = BoardPost.objects.filter(board=board)
+        if board_url == 'all':
+            board_post_notice = BoardPost.objects.filter(is_notice=True,
+                                                         board__is_deleted=False,
+                                                         board__is_official=True)
+            board_post = BoardPost.objects.filter(board__is_deleted=False,
+                                                  board__is_official=True)
+        else:
+            board_post_notice = BoardPost.objects.filter(is_notice=True,
+                                                         board=board)
+            board_post = BoardPost.objects.filter(board=board)
     # search
     if best_filter:
         board_post = board_post.filter(is_best=True)
