@@ -27,7 +27,6 @@ a{
 
 #content-wrapper{
     width: calc(100% - 200px);
-    height: 100%;
     float: left;
     background: #fff;
     border-top-color: #d6d6d6;
@@ -38,6 +37,7 @@ a{
     border-left-width: 1px;
     padding-top: 35px;
     padding-left: 20px;
+    float: left;
 }
 
 #board-title{
