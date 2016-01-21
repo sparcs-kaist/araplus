@@ -172,8 +172,9 @@ $(document).ready(function(){
         $(this).html($(this).attr("value"));
     });
 
-    $('.comment-write-button').click(function(){
+    $('.comment-write-button, #board-write-btn').click(function(){
         $(this).parent().parent().submit();
         $(this).attr('disabled', 'disabled');
     });
+ 
 });
