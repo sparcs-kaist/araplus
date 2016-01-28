@@ -3,6 +3,7 @@ from django.db import models
 import apps.session.models
 import json
 import re
+import cgi
 
 
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
@@ -71,7 +72,7 @@ class BoardContent(models.Model):
         return vote
 
     def replace_content_tags(self, type, comment_nickname_list):
-        # result = cgi.escape(self.content)
+        result = cgi.escape(self.content)
         result = self.content
         result = result.replace("\n", "<br />")
         if type == 'Comment':
@@ -83,14 +84,6 @@ class BoardContent(models.Model):
                                        nicksub_regex_helper(
                                            match, comment_nickname_list),
                                        result)
-        """else:
-            # 글 작성 완료 했을 때 Image tag가 남아있는지 확인
-            img_tags = imtag_regex.findall(result)
-            print img_tags
-            for img_src in img_tags:
-                img_src = img_src.split('/')[2]
-                print default_storage.url(img_src)
-                print default_storage.path(img_src) """
         return hashtag_regex.sub(
             '\1<a href="../?tag=\g<target>">#\g<target></a>',
             result)

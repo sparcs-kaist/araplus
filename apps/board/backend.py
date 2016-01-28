@@ -276,6 +276,7 @@ def _write_post(request, is_modify=False, post=None,
             content=form_content.save(post=post),
             board=board_instance)  # save
         board_content = board_post.board_content
+        board_name = board_post.board.eng_name
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
         # 위지윅으로 업로드 된 이미지 처리
@@ -288,8 +289,9 @@ def _write_post(request, is_modify=False, post=None,
             with open(path_origin, "r") as file_origin:
                 file_content = ContentFile(file_origin.read())
                 attachment = Attachment(board_content=board_content)
-                new_path = '/'.join([str(board_post.id),
-                                    path_origin.split('/')[-1]])
+                new_path = '/'.join([board_name,
+                                     str(board_post.id),
+                                     path_origin.split('/')[-1]])
                 attachment.file.save(new_path, file_content)
                 attachment.save()
             if file_origin.closed:
