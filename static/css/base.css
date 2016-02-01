@@ -52,6 +52,8 @@ style{
 #main-wrapper{
     width: 100%;
     overflow: hidden;
+    background: #fff;
+    min-height: 550px;
 }
 #logo-wrapper{
     width: 200px;
@@ -143,10 +145,10 @@ style{
     background: #fff;
     margin-left: 0px;
     float: left;
-    margin-top: -9999px;
+    /*margin-top: -9999px;
     margin-bottom: -9999px;
     padding-top: 9999px;
-    padding-bottom: 9999px;
+    padding-bottom: 9999px;*/
     
 }
 .menu-vertical{
