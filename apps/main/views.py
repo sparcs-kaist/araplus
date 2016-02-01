@@ -114,8 +114,12 @@ def home(request):
                     chosen_grill['title'] = gr.title[:22]+" ..."
                 else:
                     chosen_grill['title'] = gr.title
-                chosen_grill['comment'] = gr.grill_comment.filter().order_by('-id')[0]
-                
+
+                if gr.grill_comment.filter().order_by('-id'):
+                    chosen_grill['comment'] = gr.grill_comment.filter().order_by('-id')[0]
+                else:
+                    chosen_grill['comment'] = None 
+
                 chosen_grill['id'] = gr.id
                 
                 grill_list += [chosen_grill]
