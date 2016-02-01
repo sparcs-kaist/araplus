@@ -1,5 +1,5 @@
 #content-wrapper{
-    width: 1087px;
+    width: calc(100% - 200px);
     float: left;
     background: #fafafa;
     padding-top: 35px;
