@@ -120,8 +120,7 @@ $(document).ready(function(){
         detailsHTML : hoverHTMLDemoBasic,
         width: 400,
         onHoverIn: function() {
-            console.log($(".comment_preview_content")[0]);
-            if(typeof($(".comment_preview_content")[0]) != "undefined") $(".comment_preview_content").remove();
+            if(typeof($(".comment_preview_content")[0]) !== "undefined") $(".comment_preview_content").remove();
 
             var order = $(this).children('a').attr('title').split('_')[1];
             var content = document.getElementById('comment'+order).textContent;
