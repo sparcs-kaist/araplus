@@ -47,11 +47,13 @@ def _get_post_list(request, board_url='', item_per_page=15, trace=False):
         board_post = request.user.userprofile.board_post.all()
     else:
         if board_url == 'all':
-            board_post_notice = BoardPost.objects.filter(is_notice=True,
-                                                         board__is_deleted=False,
-                                                         board__is_official=True)
-            board_post = BoardPost.objects.filter(board__is_deleted=False,
-                                                  board__is_official=True)
+            board_post_notice = BoardPost.objects.filter(
+                is_notice=True,
+                board__is_deleted=False,
+                board__is_official=True)
+            board_post = BoardPost.objects.filter(
+                board__is_deleted=False,
+                board__is_official=True)
         else:
             board_post_notice = BoardPost.objects.filter(is_notice=True,
                                                          board=board)

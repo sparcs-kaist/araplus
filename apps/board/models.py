@@ -78,7 +78,8 @@ class BoardContent(models.Model):
         if type == 'Comment':
             # 댓글 숫자 태그
             result = numtag_regex.sub(
-                '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
+                '<a title="comment_\g<target>" class="comment_preview" ' +
+                'href="#comment_order_\g<target>">@\g<target></a>', result)
             # 댓글 닉네임 태그
             result = nicktag_regex.sub(lambda match:
                                        nicksub_regex_helper(
@@ -264,7 +265,9 @@ class BoardPost(models.Model):
                                                              author)
 
     def get_notify_target(self):
-        return self.board_post_trace.filter(is_notified=True).select_related("userprofile").prefetch_related("userprofile__user")
+        return self.board_post_trace.filter(
+            is_notified=True).select_related(
+                "userprofile").prefetch_related("userprofile__user")
 
     def get_comment_count(self):
         return self.board_comment.count()

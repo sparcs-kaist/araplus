@@ -396,7 +396,8 @@ def check_upload(request):
 
 @login_required(login_url='/session/login')
 def trace(request):
-    notice_list, post_list, pages, page = _get_post_list(request, 'all', trace=True)
+    notice_list, post_list, pages, page = _get_post_list(
+        request, 'all', trace=True)
     board_list = Board.objects.filter(is_official=True)
     current_board = None
     current_category = None
@@ -411,5 +412,4 @@ def trace(request):
                    'current_page': page,
                    'querystring': querystring,
                    'current_category': current_category,
-                   'trace':True})
-
+                   'trace': True})
