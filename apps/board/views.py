@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from apps.session.models import UserProfile, Message
 from apps.board.models import *
 from apps.board.backend import (
     _get_post_list,
@@ -413,3 +414,25 @@ def trace(request):
                    'querystring': querystring,
                    'current_category': current_category,
                    'trace': True})
+
+
+@login_required(login_url='/session/login/')
+def send_message_popup(request):
+    if request.user.userprofile.permission < 1:
+        return redirect('../')
+    if request.method != "POST":
+        to = request.GET.get('to', '')
+        return render(request, 'board/message_popup.html', {'to': to})
+    sender = request.user.userprofile
+    content = request.POST['content']
+    try:
+        receiver = UserProfile.objects.get(nickname=request.POST['nickname'])
+    except UserProfile.DoesNotExist:
+        return render(request, 'board/message_popup.html',
+                      {'error': "The user doesn't exist"})
+    Message.objects.create(content=content,
+                           sender=sender,
+                           receiver=receiver,
+                           is_read=False)
+    success = "Successfully sent message"
+    return HttpResponse('<script type="text/javascript">alert("쪽지가 전달되었습니다.");window.close();</script>')
