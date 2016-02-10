@@ -9,7 +9,11 @@
     {% endif %}
     <table id="post-list-wrapper">
         <tr id="list-header" class="list">
-            <th width=90>카테고리</th>
+            {% if current_board|default:'All' == 'All' %}
+            <th width=90>게시판</th>
+            {% else %}
+			<th width=90>카테고리</th>
+            {% endif %}
             <th class="list-header-title">제목</th>
             <th width=215>글쓴이</th>
             <th width=60>작성일</th>
@@ -17,8 +21,12 @@
             <th width=60>추천/반대</th>
         </tr>
         {% for notice in notice_list %}
-            <tr class="list list-notice" id="notice-row-{{notice.0.id}}">
+		<tr class="list list-notice" id="notice-row-{{notice.0.id}}">
+                {% if current_board|default:'All' == 'All' %}
+                <td width=90 style="padding-left: 25px">{{notice.0.board|default:'All'}}</td>
+                {% else %}
                 <td width=90 style="padding-left: 25px">공지</td>
+                {% endif %}
                 {% if notice.1 %}
                 <span style="display: inline; color: 00ff00">
                 {% if notice.0.board_content.modified_time >= notice.1.last_read %}
@@ -65,8 +73,12 @@
             </tr>
         {% endfor %}
         {% for post in post_list %}
-            <tr class="list list-post" id="post-row-{{post.0.id}}">
-                <td width=90 style="padding-left: 25px">{{post.0.board_category.name}}</td>
+        <tr class="list list-post" id="post-row-{{post.0.id}}">
+                {% if current_board|default:'All' == 'All' %}
+                <td width=90 style="padding-left: 25px">{{post.0.board|default:'All'}}</td>
+                {% else %}
+				<td width=90 style="padding-left: 25px">{{post.0.board_category.name}}</td>
+                {% endif %}
                 {% if post.1 %}
                 <span style="display: inline; color: 00ff00">
                 {% if post.0.board_content.modified_time >= post.1.last_read %}
