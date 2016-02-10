@@ -162,35 +162,35 @@ a{
 }
 
 .nickname-link{
-	display : none;
-	position : relative;
-	z-index : 0;
-	background-color : white;
-	border-radius : 10px;
-	border-width : 3px;
-	border : solid #40E0D0;
-	margin-top : 5px;
-	margin-right : 100px;
-	padding-top : 2px;
-	padding-bottom : 2px;
+    display : none;
+    position : relative;
+    z-index : 0;
+    background-color : white;
+    border-radius : 10px;
+    border-width : 3px;
+    border : solid #40E0D0;
+    margin-top : 5px;
+    margin-right : 100px;
+    padding-top : 2px;
+    padding-bottom : 2px;
 }
 
 .nickname-link-toggle{
-	display: block;
+    display: block;
 }
 
 .nickname-link ul{
-	z-index : 1;
-	color : #40E0D0;
+    z-index : 1;
+    color : #40E0D0;
 }
 
 .nickname-link ul li{
-	margin: 10px;
+    margin: 10px;
 }
 
 .nickname_td span{
 }
 
 .nickname_td-toggle{
-	color : #40E0D0;
+    color : #40E0D0;
 }

@@ -61,19 +61,32 @@ def _get_post_list(request, board_url='', item_per_page=15, trace=False):
     # search
     if best_filter:
         board_post = board_post.filter(is_best=True)
+        board_post_notice = board_post_notice.filter(is_best=True)
+    
     if search_tag:
         board_post = board_post.filter(hashtag__tag_name=search_tag)
+        board_post_notice = board_post_notice.filter(hashtag__tag_name=search_tag)
+
     if search_title:
         board_post = board_post.filter(title__contains=search_title)
+        board_post_notice = board_post_notice.filter(title__contains=search_title)
+
     if search_content:
         board_post = board_post.filter(
             Q(board_content__content__contains=search_content)
             | Q(title__contains=search_content))
+        board_post_notice = board_post_notice.filter(
+            Q(board_content__content__contains=search_content)
+            | Q(title__contains=search_content))
+
     if search_nickname:
         board_post = board_post.filter(author__nickname=search_nickname,
                                        board_content__is_anonymous=None)
+        board_post_notice = board_post_notice.filter(author__nickname=search_nickname,
+                                       board_content__is_anonymous=None)
     if search_category:
         board_post = board_post.filter(board_category__name=search_category)
+        board_post_notice = board_post_notice.filter(board_category__name=search_category) 
     board_post_notice = board_post_notice[:5]
     post_paginator = Paginator(board_post, item_per_page)
     post_list = []
