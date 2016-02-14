@@ -3,10 +3,12 @@
 ARA Plus Grill
 {% endblock %}
 {% block css %}
+<link rel="stylesheet" href="/media/css/nickname-click.css">
 <link rel="stylesheet" href="/media/css/grill/grill.css">
 {% endblock %}
 {% block js %}
 <script src="http://bit.sparcs.org:9779/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/media/js/nickname-click.js"></script>
 <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
 <script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
@@ -26,7 +28,7 @@ ARA Plus Grill
             <span>{{ grill.title }}</span>
 		</div>
 		<div class="subtitle">
-			<span class="nickname">{{ grill.author.nickname }}</span>
+			<span class="nickname nickname-click">{{ grill.author.nickname }}</span>
 			<span class="bar">|</span>
 			<span class="created_time">작성일:</span>
 			<span>

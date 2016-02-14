@@ -42,15 +42,7 @@
                 {% if notice.0.board_content.is_anonymous %}
                 <td width=215 style="padding-left: 20px">{{notice.0.board_content.is_anonymous}}</td>
                 {% else %}
-                <td class="nickname_td" width=215 style="padding-left: 20px">
-                    <span>{{notice.0.author.nickname}}</span>
-                    <div class="nickname-link">
-                        <ul>
-                            <li><a href="../all/?nickname={{notice.0.author.nickname}}" >작성 글 보기</a></li>
-                            <li><a href="javascript:popupOpen('{{notice.0.author.nickname}}');">쪽지 보내기</a></li>
-                        </ul>
-                    </div>
-                </td>
+                <td class="nickname-click" width=215 style="padding-left: 20px">{{notice.0.author.nickname}}</td>
                 {% endif %}
                 <td width=60 align=center>
                     <span class="timeago" timeago="{{notice.0.board_content.created_time|date:"c"}}"
@@ -98,15 +90,7 @@
                 {% if post.0.board_content.is_anonymous %}
                 <td width=215 style="padding-left: 20px">{{post.0.board_content.is_anonymous}}</td>
                 {% else %}
-                <td class="nickname_td" width=215 style="padding-left: 20px">
-                    <span>{{post.0.author.nickname}}</span>
-                    <div class="nickname-link">
-                        <ul>
-                            <li><a href="../all/?nickname={{post.0.author.nickname}}" >작성 글 보기</a></li>
-                            <li><a href="javascript:popupOpen('{{post.0.author.nickname}}');">쪽지 보내기</a></li>
-                        </ul>
-                    </div>
-                </td>
+                <td class="nickname-click" width=215 style="padding-left: 20px">{{post.0.author.nickname}}</td>
                 {% endif %}
                 <td width=60 align=center>
                     <span class="timeago" timeago="{{post.0.board_content.created_time|date:"c"}}"

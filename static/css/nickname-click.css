@@ -1,0 +1,27 @@
+.nickname-link{
+    display: none;
+    position: absolute;
+    background-color: white;
+	width: 94px;
+    border-radius: 10px;
+    border-width: 3px;
+    border: solid #40E0D0;
+    margin-top: 5px;
+    margin-right: 100px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.display-block{
+    display: block;
+}
+
+.nickname-link ul{
+    line-height: 110%;
+}
+
+.nickname-link ul li{
+    margin: 10px;
+	font-weight: normal;
+	font-size: 12px;
+}

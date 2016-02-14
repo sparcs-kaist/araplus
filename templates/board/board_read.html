@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% load bootstrap %}
 {% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/nickname-click.css">
 <link rel="stylesheet" type="text/css" href="/media/css/board/board_read.css">
 {% endblock %}
 {% block js %}
+<script type="text/javascript" src="/media/js/nickname-click.js"></script>
 <script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/board/board.js"></script>
 <script type="text/javascript" src="/media/js/board/upload_handling.js"></script>
@@ -22,14 +24,11 @@
             {{post.title}}
         </div>
         <div id="post-information">
-            <h3>
             {% if post.is_anonymous %}
-            {{ post.username }}
+			<h3>{{ post.username }}</h3>
             {% else %}
-            {{ post.username }}
-            <!-- message send 기능 -->
+			<h3 class="nickname-click">{{ post.username }}</h3>
             {% endif %}
-            </h3>
             | {{ post.created_time }} | 조회 224 | 추천
             {% if post.vote.up > 0 %}
             <span class="post-vote vote-color-up" id="post-vote-up-{{post.content_id}}">{{post.vote.up}}</span>
@@ -89,14 +88,11 @@
                 <a name="recent_comment"></a>
                 {% endif %}
                 <span class="comment-order" id="comment_order_{{comment.order}}">{{ comment.order }}</span>
-                <span class="comment-nickname">
                 {% if comment.is_anonymous %}
-                {{ comment.username }}
+                <span class="comment-nickname">{{ comment.username }}</span>
                 {% else %}
-                {{ comment.username }}
-                <!-- message send 기능 -->
+				<span class="comment-nickname nickname-click">{{ comment.username }}</span>
                 {% endif %}
-                </span>
                 <span class="comment-time" >{{ comment.created_time }}</span>
                 <div class="comment-vote-wrapper">
                     <!-- 삭제된 글이면 추천반대 안되게 해야함-->

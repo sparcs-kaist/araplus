@@ -2,7 +2,7 @@
     <div class="comment-container">
         <div class="comment-meta">
             <span id="comment_order_{{comment.order}}">{{ comment.order }}</span>
-            <span style="font-weight: bold; font-size: 13px; ">{{comment.author.nickname}}</span>
+            <span class="nickname-click" style="font-weight: bold; font-size: 13px; ">{{comment.author.nickname}}</span>
             <span>
                 <abbr class="timeago" timeago="{{comment.created_time|date:"c"}}" title="{{comment.created_time}}" style="display:inline;"></abbr>
             </span>
