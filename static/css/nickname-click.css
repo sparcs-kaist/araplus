@@ -1,19 +1,24 @@
+.nickname-click{
+}
+
+.nickname-click span{
+}
+
 .nickname-link{
     display: none;
     position: absolute;
+    z-index: 1;
     background-color: white;
-	width: 94px;
+    width: 93px;
     border-radius: 10px;
     border-width: 3px;
     border: solid #40E0D0;
-    margin-top: 5px;
-    margin-right: 100px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    margin-left: 5px;
+    padding: 1px;
 }
 
 .display-block{
-    display: block;
+    display: inline-block;
 }
 
 .nickname-link ul{
@@ -21,7 +26,7 @@
 }
 
 .nickname-link ul li{
-    margin: 10px;
+    margin: 8px;
 	font-weight: normal;
 	font-size: 12px;
 }

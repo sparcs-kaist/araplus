@@ -25,9 +25,9 @@
         </div>
         <div id="post-information">
             {% if post.is_anonymous %}
-			<h3>{{ post.username }}</h3>
+            <h3>{{ post.username }}</h3>
             {% else %}
-			<h3 class="nickname-click">{{ post.username }}</h3>
+            <h3 class="nickname-click">{{ post.username }}</h3>
             {% endif %}
             | {{ post.created_time }} | 조회 224 | 추천
             {% if post.vote.up > 0 %}
@@ -91,7 +91,7 @@
                 {% if comment.is_anonymous %}
                 <span class="comment-nickname">{{ comment.username }}</span>
                 {% else %}
-				<span class="comment-nickname nickname-click">{{ comment.username }}</span>
+                <span class="comment-nickname nickname-click">{{ comment.username }}</span>
                 {% endif %}
                 <span class="comment-time" >{{ comment.created_time }}</span>
                 <div class="comment-vote-wrapper">

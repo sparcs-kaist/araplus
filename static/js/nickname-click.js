@@ -29,7 +29,8 @@ $(document).ready(function(){
     for ( var i = 0 ; i < nicknames.length; i++ ) {
         var nick = nicknames[i];
         var nickname = nick.textContent;
-        nick.innerHTML = nickname + "<div class='nickname-link'><ul><li><a href='../all/?nickname=" + nickname + "' >작성 글 보기</a></li><li><a href='" + 'javascript:popupOpen("' + nickname + '");' + "'>쪽지 보내기</a></li></ul></div>";
+        nick.innerHTML = nickname + "<div class='nickname-link'><ul><li><a href='/board/all/?nickname=" + nickname + "' >작성 글 보기</a></li><li><a href='" + 'javascript:popupOpen("' + nickname + '");' + "'>쪽지 보내기</a></li></ul></div>";
+        
     }
 
     $('.nickname-click').click(function(){

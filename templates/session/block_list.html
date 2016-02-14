@@ -3,7 +3,7 @@
 <div class="container">
     <ul>
     {% for block in blocks %}
-        <li>{{ block.sender.nickname }}</li>
+        <li class="nickname-click">{{ block.sender.nickname }}</li>
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name='nickname' value={{ block.sender.nickname }} >

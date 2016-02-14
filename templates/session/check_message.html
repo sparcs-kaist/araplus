@@ -4,7 +4,7 @@
     {% for message in messages %}
         <div class="bubblebox">
             <div class="bubble">
-                <div class="info">From {{ message.sender.nickname }}</div>
+				<div class="info"><span style="display: inline;">From </span><div class="nickname-click" style="display: inline;">{{ message.sender.nickname }}</div></div>
                 {{ message.content }}
                 <div class="info">{{ message.created_time }}</div>
             </div>

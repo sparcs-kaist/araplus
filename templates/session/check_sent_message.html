@@ -4,7 +4,7 @@
     {% for message in messages %}
         <div class="bubblebox">
             <div class="bubble">
-                <div class="info">To {{ message.receiver.nickname }}</div>
+				<div class="info"><span style="display: inline;">To </span><span class="nickname-click" style="display: inline;">{{ message.receiver.nickname }}</span></div>
                 {{ message.content }}
                 <div class="info">{{ message.created_time }}</div>
                 {% if message.is_read %}

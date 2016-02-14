@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {%block css%}
+<link rel="stylesheet" type="text/css" href="/media/css/nickname-click.css">
 <link rel="stylesheet" type="text/css" href="/media/css/grill/list.css">
 {%endblock%}
 {%block js%}
+<script src="/media/js/nickname-click.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
 	jQuery(document).ready(function(){
@@ -41,7 +43,7 @@
 					<abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
 					</p>
 				</td>
-				<td width=15% style="color: #adadad;"><p align=left style="padding-left: 10%;">{{grill.author}}</p></td>
+				<td width=15% style="color: #adadad;"><p class="nickname-click" align=left style="padding-left: 10%;">{{grill.author}}</p></td>
 			</tr>
 			{% endfor %}
 		</ul>
