@@ -9,14 +9,13 @@
             {% for message in messages %}
                 {% ifchanged message.sender message.created_time.year message.created_time.month message.created_time.day message.created_time.hour message.created_time.minute %}
                     {% if forloop.counter != 1 %}
-                        </div>
+                    </div>
                     {% endif %}
                     {% if message.sender == me %}
-                        <div class="my bubblebox">
+                    <div class="my bubblebox"><div class="info">{{ message.sender.nickname }}</div>
                     {% else %}
-                        <div class="bubblebox">
+                    <div class="bubblebox"><div class="nickname-click info">{{ message.sender.nickname }}</div>
                     {% endif %}
-                    <div class="info">{{ message.sender.nickname }}</div>
                     <div class="info">{{ message.created_time }}</div>
                 {% endifchanged %}                
                 <div class="bubble">

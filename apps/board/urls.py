@@ -20,7 +20,6 @@ urlpatterns = [
     url(r'^create_board/$', 'apps.board.views.create_board'),
     url(r'^upload/$', 'apps.board.views.check_upload'),
     url(r'^trace/$', 'apps.board.views.trace'),
-    url(r'^send_message/$', 'apps.board.views.send_message_popup'),
     url(r'^([A-z]*)/remove_board/$', 'apps.board.views.remove_board'),
     url(r'^([A-z]*)/add_member/$', 'apps.board.views.add_member'),
     url(r'^([A-z]*)/add_member/change_permission/$', 'apps.board.views.change_permission'),
