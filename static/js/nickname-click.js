@@ -65,36 +65,30 @@ $(document).ready(function(){
 	});
 
     document.body.innerHTML +=
-            '<div class="modal fade" id="message-modal' + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'
-                +'<div class="modal-dialog">'
-                    +'<div class="modal-content">'
-                        +'<div class="modal-header">'
+        '<div class="modal fade" id="message-modal' + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'
+            +'<div class="modal-dialog">'
+                +'<div class="modal-content">'
+                    +'<div class="modal-header">'
                         +'<button style="float: right" type="button" class="close" data-dismiss="modal" aria-label="Close">'
                             +'<span aria-hidden="true">&times;</span>'
                         +'</button>'
                         +'<h4 class="modal-title">쪽지 보내기</h4>'
-	        		+'</div>'
-	        		+'<form id="message-form" method="POST">'
+                    +'</div>'
+                    +'<form id="message-form" method="POST">'
                         +'<input type="hidden" name="csrfmiddlewaretoken" value="' + csrftoken + '">'
                         +'<div class="modal-body">'
                             +'<div class="form-group">'
                                 +'<textarea class="form-control" name="content" cols=77 rows=7 placeholder="hello!"></textarea>'
                             +'</div>'
                         +'</div>'
-	        	    	+'<div class="modal-footer">'
+                        +'<div class="modal-footer">'
                             +'<button style="float: right;" type="submit" class="btn btn-default">전송</button>'
-	        	    	+'</div>'
+                        +'</div>'
                     +'</form>'
                 +'</div>'
             +'</div>'
         +'</div>';
 
-    $('#message-modal').on('show.bs.modal', function (e) {
-        var button = $(e.relatedTarget)
-        var recipient = button.data('whatever');
-        var modal = $(this);
-        modal.find('.nickname-input').val(recipient)
-    });
     var nicknames = document.getElementsByClassName('nickname-click');
     for ( var i = 0 ; i < nicknames.length; i++ ) {
         var nick = nicknames[i];
@@ -115,7 +109,7 @@ $(document).ready(function(){
         document.body.style.cursor = "default";
     });
 
-	$(document).click(function(e){
+    $(document).click(function(e){
         var elements = document.getElementsByClassName('nickname-click');
         for ( var i = 0; i < elements.length; i++ ) {
             var td = elements[i]
@@ -130,7 +124,7 @@ $(document).ready(function(){
         if ( $(links(this)[0]).hasClass("display-block")){
             fadeOut(links(this)[0]);
         }
-		else{
+        else{
             var elements = document.getElementsByClassName('nickname-click');
             for ( var i = 0; i < elements.length; i++ ) {
                 var td = elements[i]
@@ -148,7 +142,6 @@ $(document).ready(function(){
         $.ajax({
             url : "/session/message/send/",
             type : "POST",
-            //data : mes.serialize(),
             data : {nickname : recipient, content : $('textarea[name=content]').val()},
             success : function(){
             }
