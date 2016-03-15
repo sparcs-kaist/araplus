@@ -10,9 +10,8 @@
     z-index: 1;
     background-color: white;
     width: 93px;
-    border-radius: 10px;
-    border-width: 3px;
-    border: solid #40E0D0;
+    border-radius: 8px;
+    border: 1px solid #40E0D0;
     margin-left: 5px;
     padding: 1px;
 }
