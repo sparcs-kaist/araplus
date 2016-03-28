@@ -24,6 +24,20 @@ def validate_nickname(nickname):
         return False
     return True
 
+@login_required(login_url='/session/login/')
+def mypage(request):
+    return render(request, 'session/mypage.html', {'user': request.user})
+
+def changeinfo(request):
+    if request.method == "POST":
+        request.user.userprofile.signiture = request.POST['signature']
+        if request.POST['passwd'].len != 0:
+            request.user.set_password(request.POST['passwd'])
+        request.user.save()
+        request.user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, request.user)
+    return redirect('/session/mypage')
+
 
 def nickname_check(request):
     if validate_nickname(request.GET.get('nickname', '')):

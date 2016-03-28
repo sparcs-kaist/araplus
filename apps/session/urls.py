@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^login/callback/$', 'apps.session.views.user_login_callback'),
     url(r'^logout/$', 'apps.session.views.user_logout'),
     url(r'^register/$', 'apps.session.views.user_register'),
+    url(r'^mypage/$', 'apps.session.views.mypage'),
+    url(r'^changeinfo/$', 'apps.session.views.changeinfo'),
     url(r'^nickname-check/$', 'apps.session.views.nickname_check'),
     url(r'^message/', include('apps.session.message.urls')),
     url(r'^group/', include('apps.session.group.urls')),

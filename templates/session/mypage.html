@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% block content %}
+<script type="text/javascript">
+  function confirm_passwd() {
+    var password = document.getElementById("passwd").value;
+    var repassword = document.getElementById("repasswd").value;
+    if(password != repassword) {
+        alert("Passwords do not match.");
+        return false;
+    }
+    return true;
+  }
+</script>
+<form action="/session/changeinfo/" method="POST">
+  {% csrf_token %}
+  id : {{ user.username }}<br>
+  nickname : {{ user.userprofile.nickname }}<br>
+  password : <input type="password" name="passwd" id="passwd"><br>
+  password check : <input type="password" name="repasswd" id="repasswd"><br>
+  nickname : {{ user.userprofile.nickname }} <br>
+  signature : <textarea name="signature" rows="8" cols="60">{{ user.userprofile.signiture }} </textarea><br>
+  birthday : {{ user.userprofile.birthday }} <br>
+  points : {{ user.userprofile.points }} <br>
+  <input type="submit" value="change" onclick="return confirm_passwd()" />
+</form>
+{% endblock %}
+
