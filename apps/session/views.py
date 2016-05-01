@@ -31,7 +31,7 @@ def mypage(request):
 def changeinfo(request):
     if request.method == "POST":
         request.user.userprofile.signiture = request.POST['signature']
-        if request.POST['passwd'].len != 0:
+        if len(request.POST['passwd'].decode("utf-8")) != 0:
             request.user.set_password(request.POST['passwd'])
         request.user.save()
         request.user.backend = 'django.contrib.auth.backends.ModelBackend'
