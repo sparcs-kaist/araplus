@@ -7,6 +7,11 @@ from django.contrib.auth.decorators import login_required
 import re
 import json
 import urllib
+# Import sparcs-sso client class
+from sparcssso import Client
+
+# Make sso client with test mode (to be modified)
+SSO_CLIENT = Client(is_test=True)
 
 
 # Session main page
@@ -18,7 +23,6 @@ def validate_nickname(nickname):
     print nickname
     if not re.match(ur'[\w_-\uAC00\uD7AF]{2,30}', nickname, re.UNICODE):
         return False
-    print 'ki'
     user_profile = UserProfile.objects.filter(nickname=nickname)
     if len(user_profile) > 0:
         return False
@@ -48,17 +52,19 @@ def nickname_check(request):
 def user_login(request):
     if request.user.is_authenticated():
         return redirect('/')
-    return redirect('https://sso.sparcs.org/oauth/require/?app=araplus&url=' +
-                    request.build_absolute_uri('/session/login/callback/'))
+
+    # Make redirection url to sso server with callback.
+    redirect_url = SSO_CLIENT.get_login_url(
+        request.build_absolute_uri('/session/login/callback/'))
+    return redirect(redirect_url)
 
 
 def user_login_callback(request):
     if request.method == "GET":
         nexturl = request.GET.get('next', '/')
         tokenid = request.GET['tokenid']
-        sso_profile = urllib.urlopen('https://sso.sparcs.org/' +
-                                     'oauth/info?tokenid=' + tokenid)
-        sso_profile = json.load(sso_profile)
+        # Get sso profile with received token id
+        sso_profile = SSO_CLIENT.get_user_info(tokenid)
         username = sso_profile['sid']
         user_list = User.objects.filter(username=username)
         if len(user_list) == 0:
