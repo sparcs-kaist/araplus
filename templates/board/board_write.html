@@ -52,26 +52,30 @@
                 <h3>ATTRIBUTES</h3>
                 <div id="info-select">
                     <div id="adult" class="col-xs-2">
-                        {{ content_form.is_adult }}
+                        {{content_form.is_adult}}
                         <span>성인글</span>
                     </div>
                     {% if content_form.is_anonymous %}
                     <div id="anonymous" class="col-xs-3">
-                        {{ content_form.is_anonymous }}
+						{{content_form.is_anonymous}}
                         <span>익명글</span>
                     </div>
                     {% endif %}
                     {% if post_form.is_notice %}
                     <div id="notice" class="col-xs-2"> 
-                        {{ post_form.is_notice }}
+						{{post_form.is_notice}}
                         <span>공지글</span>
                     </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-        {{ content_form.content }}
-        <!-- attachment -->
+		{{ content_form.content }}
+		<div id="signiture_select">
+				{{content_form.use_signiture}}
+				<span>Use Signiture</span>
+		</div>
+		<!-- attachment -->
         {{ attachment_form }}
         <div id="board-write-tail">
             <button type="submit" id="board-write-btn">글 작성 완료</button>

@@ -100,6 +100,20 @@ textarea{
     float: left;
     display: inline-block;
 }
+#signiture_select{
+    height: 29px;
+    width: 100%;
+    margin-top: 4px;
+    display: inline-block;
+    float: left;
+}
+
+#signiture_select input{
+    display: inline-block;
+}
+#signiture_select span{
+    display: inline-block;
+}
 
 #board-write-tail{
     width: calc(100% - 30px);
@@ -107,6 +121,7 @@ textarea{
     margin: 15px 0px;
     float: left;
 }
+
 
 #board-write-btn{
     width: 110px;
