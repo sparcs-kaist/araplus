@@ -8,9 +8,10 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
-import json
-import datetime
 from django.core.paginator import Paginator
+from django.utils import timezone
+import json
+
 
 @login_required(login_url='/session/login/')
 #def home(request):
@@ -121,7 +122,7 @@ def add_comment(request, grill_id):
     new_comment = GrillComment(
         grill=grill, author=userprofile, content=post_data.get('new_content'))
     new_comment.save()
-    new_comment.grill.updated_time = datetime.datetime.now()
+    new_comment.grill.updated_time = timezone.now()
     new_comment.grill.save()
 
     ms = '<div id="comment-' + str(new_comment.order) +\
@@ -185,7 +186,7 @@ def refresh_comment(request, grill_id):
         grill_comment__grill=grill,
         created_time__gte=last_update
     ).values('grill_comment')
-    last_update = datetime.datetime.now()
+    last_update = timezone.now()
     votes = votes.annotate(new_count=Count('is_up'))
     # XXX: 어떻게 grill_comment가 알아서 order가 되지?
     # now, elem of votes : {'grill_comment', 'new_count'}
