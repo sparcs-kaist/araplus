@@ -2,7 +2,7 @@
     <div class="comment-container">
         <div class="comment-meta">
             <span id="comment_order_{{comment.order}}">{{ comment.order }}</span>
-            <span style="font-weight: bold; font-size: 13px; ">{{comment.author.nickname}}</span>
+            <span class="nickname-click" style="font-weight: bold; font-size: 13px; ">{{comment.author.nickname}}</span>
             <span>
                 <abbr class="timeago" timeago="{{comment.created_time|date:"c"}}" title="{{comment.created_time}}" style="display:inline;"></abbr>
             </span>
@@ -38,11 +38,16 @@
             </div>
             {% else %}
             <div class="comment-content">
-                <span id="comment{{comment.order}}">{{ comment.content|safe }}</span>
-             <!--   <div class="comment-vote-container">
+            <span id="comment{{comment.order}}">{{ comment.content|safe }}</span>
+                <div class="comment-vote-container">
+                    {% if comment.vote_disable %}
+                    <button class="vote-up btn btn-default" disabled> 추천 (+{{ comment.like }}) </button>
+                    <button class="vote-down btn btn-default" disabled> 반대 (-{{ comment.hate }}) </button>
+                    {% else %}
                     <button class="vote-up btn btn-default"> 추천 (+{{ comment.like }})</button>
                     <button class="vote-down btn btn-default"> 반대 (-{{ comment.hate }})</button>
-                </div>-->
+                    {% endif %}
+                </div>
             </div>
             {% endif %}
         </div>

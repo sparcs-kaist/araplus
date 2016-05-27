@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 import apps.session.models
-from araplus.settings import UPLOAD_DIR
 import json
 import re
 import cgi
-from django.core.files.storage import default_storage
-from django.core.files import File
+
 
 hashtag_regex = re.compile(ur'(^|(?<=\s))#(?P<target>\w+)', re.UNICODE)
 numtag_regex = re.compile(r'@(?P<target>\d+)')
@@ -27,7 +25,9 @@ def nicksub_regex_helper(match, comment_nickname_list):
     nick = match.group(1)
     order = nick_to_order(nick, comment_nickname_list)
     if order:
-        return '<a title="comment_' + order + '" class="comment_preview" href="#comment_order_' + order + '">' + match.group() + '</a>'
+        return '<a title="comment_' + order + \
+               '" class="comment_preview" href="#comment_order_' + \
+               order + '">' + match.group() + '</a>'
     else:
         return match.group()
 
@@ -72,26 +72,19 @@ class BoardContent(models.Model):
         return vote
 
     def replace_content_tags(self, type, comment_nickname_list):
-        # result = cgi.escape(self.content)
+        result = cgi.escape(self.content)
         result = self.content
         result = result.replace("\n", "<br />")
         if type == 'Comment':
             # 댓글 숫자 태그
             result = numtag_regex.sub(
-                '<a title="comment_\g<target>" class="comment_preview" href="#comment_order_\g<target>">@\g<target></a>', result)
+                '<a title="comment_\g<target>" class="comment_preview" ' +
+                'href="#comment_order_\g<target>">@\g<target></a>', result)
             # 댓글 닉네임 태그
             result = nicktag_regex.sub(lambda match:
                                        nicksub_regex_helper(
                                            match, comment_nickname_list),
                                        result)
-        """else:
-            # 글 작성 완료 했을 때 Image tag가 남아있는지 확인
-            img_tags = imtag_regex.findall(result)
-            print img_tags
-            for img_src in img_tags:
-                img_src = img_src.split('/')[2]
-                print default_storage.url(img_src)
-                print default_storage.path(img_src) """
         return hashtag_regex.sub(
             '\1<a href="../?tag=\g<target>">#\g<target></a>',
             result)
@@ -127,7 +120,6 @@ class Attachment(models.Model):
     board_content = models.ForeignKey('BoardContent',
                                       related_name="attachment",
                                       null=False)
-
 
 
 class BoardComment(models.Model):
@@ -273,7 +265,12 @@ class BoardPost(models.Model):
                                                              author)
 
     def get_notify_target(self):
-        return self.board_post_trace.filter(is_notified=True).select_related("userprofile").prefetch_related("userprofile__user")
+        return self.board_post_trace.filter(
+            is_notified=True).select_related(
+                "userprofile").prefetch_related("userprofile__user")
+
+    def get_comment_count(self):
+        return self.board_comment.count()
 
 
 class BoardPostIs_read(models.Model):

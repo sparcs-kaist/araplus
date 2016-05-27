@@ -1,24 +1,98 @@
 {% extends "base.html" %}
+{% block css %}
+<link type="text/css" rel="stylesheet" href="/media/css/main/main.css" />
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function(){
+        jQuery("span.timeago").timeago();
+    });
+</script>
+{% endblock %}
 {% block content %}
-ARAPLUS Alpha version
-본 서비스는 ARA+의 스팍스 내부 시험 서비스입니다.
-<br>
-1. 가입은 스팍스 SSO와 연동하여 가입 가능하며, SSO는실제 서비스 중인 서비스이기 때문에 아이디를 만드실 때 신중하게 해주시길 바랍니다.
-<br>
-   현재 Portal SSO를 통한 로그인은 지원하지않습니다.
-<br>
-2. ARA+의 닉네임은 현재 한글, 영어 2자 이상부터 가능합니다.
-<br>
-3. 사진을 올리실 때 사진에 한글이 들어가있으면 글을 작성 후 에러페이지로 넘어갑니다. 글은 성공적으로 작성됩니다.
-<br>
-4. 연재 게시판은 /channel/create url에서 만들어보실 수 있습니다.
-<br>
-5. 소모임 게시판(커스텀 게시판)은 /board/create_board url에서 만들어보실 수 있습니다. 아직 만들어진 보드에 대한 표시 기능이 없어서
- url을 공유하셔야만 다른 사람들이 알고 들어올 수 있습니다.
-<br>
-6. 시그니쳐 기능 자체는 구현되어 있으나 등록 부분이 아직 없습니다. 글을 쓸 때 최하단에 있는 체크박스가 시그니쳐 표시 여부를 결정하는 박스인데, 일단은 무시해주세요.
-<br><br>
-코멘트나 버그 제보는 Github의 이슈(https://github.com/sparcs-kaist/araplus/issues)나 메일링을 이용해주세요.
-<br><br>
-story. 
+
+<div id="content-wrapper">
+<div id="today" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">Today Best</th>
+		</thead>
+		<tbody>
+			{% for tl in today_best_list %}
+			<tr>
+				<td class="best_list"><a href="/board/{{tl.category}}/{{tl.id}}/"><span class="vote">{{tl.vote}}</span>  {{tl.title}}</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div id="weekly" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">Weekly Best</th>
+		</thead>
+		<tbody>
+			{% for tl in week_best_list %}
+			<tr>
+				<td class="best_list"><a href="/board/{{tl.category}}/{{tl.id}}/"><span class="vote">{{tl.vote}}</span>  {{tl.title}}</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div id="grill" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">요즘 핫한 불판</th>
+		</thead>
+		<tbody>
+			{% for gr in grill_list %}
+			<tr>
+				<td class="best_list"><a href="/grill/{{gr.id}}">{{gr.title}}</a></td>
+			</tr>
+			<tr>
+				<td class = "sub_list"> - {{gr.comment.content}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+
+
+<div id="gallery" class="best">
+	<ul class = "best_head" id = "gallery_header"><strong>Gallery</strong></ul>
+	
+	<ul id="total-gallery-wrapper">
+		{% for post in post_list %}
+        <li class="image">
+            <img src={{post.board_content.get_thumbnail}}></img>
+            <a href="/board/gallery/{{post.id}}">
+            <div class="hovered">
+                <span class="title">
+                    {{post.title}}
+                </span>
+                <span class="timeago" style="float: left; margin-top: 10px" timeago="{{post.board_content.created_time|date:"c"}}" title="{{post.board_content.created_time}}"></span>
+                <div class="vote" style="float: right; margin-top: 6px">
+                    <span>{{post.board_content.get_vote.up}}</span>
+                    <span>/ {{post.board_content.get_vote.down}}</span>
+                </div>
+                <span class="nickname" style="clear: both; padding-top: 6px">
+                    {% if post.board_content.is_anonymous %}
+                        {{post.board_content.is_anonymous}}
+                    {% else %}
+                        {{post.author.nickname}}
+                    {% endif %}
+                </span>
+            </div>
+        </a>
+        </li>
+        {% endfor %}
+	</ul>
+</div>
+</div>
+
 {% endblock %}

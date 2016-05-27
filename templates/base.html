@@ -50,7 +50,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <h3>내글보기</h3>
+                    <a href="/board/trace">
+                        <h3>내글보기</h3>
+                    </a>
                 </li>
                 <li class="nav-item">
                     <h3>갈피모음</h3>
@@ -73,7 +75,8 @@
                     1740 point
                 </h1>
             </div>
-        </div>
+		</div>
+		<div id="main-wrapper">
         <div id="menu-wrapper">
             <div id="board-wrapper" class="menu-vertical">
                 <h1 class="menu-title">
@@ -116,6 +119,7 @@
             </div>
         </div>
         {% block content %}
-        {% endblock %}
+		{% endblock %}
+		</div>
     </body>
 </html>

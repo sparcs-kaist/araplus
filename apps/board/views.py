@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from apps.session.models import UserProfile, Message
 from apps.board.models import *
 from apps.board.backend import (
     _get_post_list,
@@ -105,8 +106,12 @@ def post_write(request, board="All"):
         return HttpResponse('Invalid access')
     if request.user.userprofile.permission < 1:
         return redirect('../')
+    try:
+        board = Board.objects.get(url=board)
+    except:
+        board = Board.objects.get(id=1)
     if request.method == 'POST':
-        result = _write_post(request, board=board)
+        result = _write_post(request, board=board.url)
         if 'save' in result:
             board_post_trace = BoardPostTrace(
                 board_post=result['save'],
@@ -116,10 +121,6 @@ def post_write(request, board="All"):
         else:
             form_content, form_post, form_attachment = result['failed']
     else:
-        try:
-            board = Board.objects.get(url=board)
-        except:
-            board = Board.objects.get(id=1)
         form_content = BoardContentForm()
         form_post = BoardPostForm(initial={'board': board.id},
                                   is_staff=request.user.is_staff)
@@ -140,7 +141,7 @@ def post_modify(request, board_url, post_id=0):
         return redirect('../')
     if request.method == "POST":
         result = _write_post(request, True, post_instance,
-                             post_instance.board_content)
+                             post_instance.board_content, board=board_url)
         if 'save' in result:  # success modify
             return redirect('../')
         else:
@@ -164,7 +165,7 @@ def post_modify(request, board_url, post_id=0):
 def post_read(request, board_url, post_id):
     if not _check_valid(request, board_url):
         return HttpResponse('Invalid access')
-    post, comment_list, comment_page_range, comment_current_page, comment_page_left, comment_page_right = _get_content(request, post_id)
+    post, comment_list = _get_content(request, post_id)
     notice_list, post_list, pages, page = _get_post_list(request, board_url)
     board_list = Board.objects.all()
     search_category = request.GET.get('category', '')
@@ -206,11 +207,7 @@ def post_read(request, board_url, post_id):
                       'current_category': current_category,
                       # Below, there are things for comment_list
                       'comment_list': comment_list,
-                      'comment_pages': comment_page_range,
-                      'comment_current_page': comment_current_page,
-                      'comment_page_left': comment_page_left,
-                      'comment_page_right': comment_page_right,
-                       # Below thing is for attachment form for comment
+                      # Below thing is for attachment form for comment
                       'attachment_form': attachment_form
                   })
 
@@ -274,7 +271,7 @@ def post_list(request, board_url):
     except:
         current_category = None
     querystring = _get_querystring(request, 'best', 'page')
-    if current_board != None and current_board.is_gallery:
+    if current_board is not None and current_board.is_gallery:
         return render(request,
                       'board/board_list_gallery.html',
                       {'notice_list':  notice_list,
@@ -392,3 +389,28 @@ def set_adult_filter(request):
     userprofile.adult_filter = not userprofile.adult_filter
     userprofile.save()
     return redirect('../')
+
+
+def check_upload(request):
+    print request.FILES.getlist('files')
+
+
+@login_required(login_url='/session/login')
+def trace(request):
+    notice_list, post_list, pages, page = _get_post_list(
+        request, 'all', trace=True)
+    board_list = Board.objects.filter(is_official=True)
+    current_board = None
+    current_category = None
+    querystring = _get_querystring(request, 'page')
+    return render(request,
+                  'board/board_list.html',
+                  {'notice_list':  notice_list,
+                   'post_list': post_list,
+                   'board_list': board_list,
+                   'current_board': current_board,
+                   'pages': pages,
+                   'current_page': page,
+                   'querystring': querystring,
+                   'current_category': current_category,
+                   'trace': True})

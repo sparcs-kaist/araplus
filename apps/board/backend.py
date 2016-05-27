@@ -9,6 +9,10 @@ from itertools import izip
 from notifications import notify
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.utils import timezone
+from django.utils.encoding import uri_to_iri, iri_to_uri
+from django.utils.http import urlquote
+import django_summernote.models as summernote
 import re
 import os
 
@@ -23,8 +27,9 @@ POINTS_VOTE_DOWN = -1
 POINTS_VOTED_DOWN = -2
 
 
-def _get_post_list(request, board_url='', item_per_page=15):
-    adult_filter = request.GET.get('adult_filter')
+def _get_post_list(request, board_url='', item_per_page=15, trace=False):
+    # Adult filter 현재 사용하지 않음.
+    # adult_filter = request.GET.get('adult_filter')
     best_filter = bool(request.GET.get('best', False))
     page = int(request.GET.get('page', 1))
     search_tag = request.GET.get('tag', '')
@@ -37,32 +42,51 @@ def _get_post_list(request, board_url='', item_per_page=15):
             board = Board.objects.get(url=board_url)
         except:
             return ([], [], None, None)  # Wrong board request
-    if board_url == 'all':
-        board_post_notice = BoardPost.objects.filter(is_notice=True,
-                                                     board__is_deleted=False,
-                                                     board__is_official=True)
-        board_post = BoardPost.objects.filter(board__is_deleted=False,
-                                              board__is_official=True)
+    if trace:
+        board_post_notice = []
+        board_post = request.user.userprofile.board_post.all()
     else:
-        board_post_notice = BoardPost.objects.filter(is_notice=True,
-                                                     board=board)
-        board_post = BoardPost.objects.filter(board=board)
+        if board_url == 'all':
+            board_post_notice = BoardPost.objects.filter(
+                is_notice=True,
+                board__is_deleted=False,
+                board__is_official=True)
+            board_post = BoardPost.objects.filter(
+                board__is_deleted=False,
+                board__is_official=True)
+        else:
+            board_post_notice = BoardPost.objects.filter(is_notice=True,
+                                                         board=board)
+            board_post = BoardPost.objects.filter(board=board)
     # search
     if best_filter:
         board_post = board_post.filter(is_best=True)
+        board_post_notice = board_post_notice.filter(is_best=True)
+    
     if search_tag:
         board_post = board_post.filter(hashtag__tag_name=search_tag)
+        board_post_notice = board_post_notice.filter(hashtag__tag_name=search_tag)
+
     if search_title:
         board_post = board_post.filter(title__contains=search_title)
+        board_post_notice = board_post_notice.filter(title__contains=search_title)
+
     if search_content:
         board_post = board_post.filter(
             Q(board_content__content__contains=search_content)
             | Q(title__contains=search_content))
+        board_post_notice = board_post_notice.filter(
+            Q(board_content__content__contains=search_content)
+            | Q(title__contains=search_content))
+
     if search_nickname:
         board_post = board_post.filter(author__nickname=search_nickname,
                                        board_content__is_anonymous=None)
+        board_post_notice = board_post_notice.filter(author__nickname=search_nickname,
+                                       board_content__is_anonymous=None)
     if search_category:
         board_post = board_post.filter(board_category__name=search_category)
+        board_post_notice = board_post_notice.filter(board_category__name=search_category) 
     board_post_notice = board_post_notice[:5]
     post_paginator = Paginator(board_post, item_per_page)
     post_list = []
@@ -98,49 +122,36 @@ def _get_content(request, post_id, comment_per_page=10):
         board_post_is_read = BoardPostIs_read.objects.get(
             board_post=board_post,
             userprofile=request.user.userprofile)
+        last_read = board_post_is_read.last_read
     except ObjectDoesNotExist:
         board_post_is_read = BoardPostIs_read()
         board_post_is_read.board_post = board_post
         board_post_is_read.userprofile = request.user.userprofile
-    board_post_is_read.save()
+        last_read = timezone.now()
+    recent_comment = True
     post = _get_post(request, board_post, 'Post')
-    ##pagination of comments##
+    # pagination of comments
     board_comments = board_post.board_comment.all()
-    comment_page = int(request.GET.get('comment_page', 1))
-    comment_paginator = Paginator(board_comments, comment_per_page)
-    comment_paged = comment_paginator.page(comment_page)
-    current_page = comment_page
-    page_range = comment_paginator.page_range
-    page_left = 0
-    page_right = 0
-    if len(page_range) == 1:
-        page_range.remove(1)
-    if len(page_range) > 5:
-        last_page = len(page_range)
-        page_target = (current_page - 1) / 5
-        page_range = []
-        page_left = page_target * 5
-        page_right = page_target * 5 + 6
-        for i in range(page_left + 1, page_right):
-            if i > last_page:
-                page_right = 0
-                break
-            page_range.append(i)
     comment_list = []
     comment_nickname_list = []
     if board_post.board_content.is_anonymous is None:
         comment_nickname_list = [(board_post.author.nickname, 0)]
     order = 1
-    for board_comment in comment_paged:
+    for board_comment in board_comments:
         comment = _get_post(request, board_comment, 'Comment',
                             comment_nickname_list)
-        comment['order'] = comment_per_page * (current_page - 1) + order
+        comment['order'] = order
         comment_list.append(comment)
         # 현재 글에 달린 댓글의 닉네임 리스트
         if comment['is_anonymous'] is None:
             username = comment['username']
             comment_nickname_list.append((username, order))
         order = order + 1
+        if board_comment.board_content.created_time > last_read:
+            comment['recent_comment'] = recent_comment
+            recent_comment = False
+        else:
+            comment['recent_comment'] = False
     best_comment = {}
     best_vote = 0
     for comment in comment_list:
@@ -150,7 +161,8 @@ def _get_content(request, post_id, comment_per_page=10):
     if best_comment:
         best_comment['best_comment'] = True
         comment_list.insert(0, best_comment)
-    return (post, comment_list, page_range, current_page, page_left, page_right)
+    board_post_is_read.save()
+    return (post, comment_list)
 
 
 def _get_post(request, board_post, target_type, comment_nickname_list=[]):
@@ -234,6 +246,9 @@ def _write_post(request, is_modify=False, post=None,
         category_before = ""
     if (form_post.is_valid() and form_content.is_valid()
             and form_attachment.is_valid()):
+        images = imtag_regex.findall((form_content.cleaned_data['content']))
+        images = iri_to_uri(','.join(images))
+        images = images.split(iri_to_uri(','))
         if is_modify:
             try:
                 category_after = post.board_category.name
@@ -254,6 +269,20 @@ def _write_post(request, is_modify=False, post=None,
                           category_diff]]
             post.set_log(post_diff + post.get_log())
             content.set_log(content_diff + content.get_log())
+            # 위지윅으로 저장된 이미지들 확인
+            stored_image = Attachment.objects.filter(board_content=content)
+            delete_list = list(stored_image)
+            for image in stored_image:
+                name = image.file.url
+                if name in images:
+                    images.remove(name)
+                    delete_list.remove(image)
+            # 삭제된 이미지 클래스 삭제하기
+            for image in delete_list:
+                if image.file:
+                    if os.path.isfile(image.file.path):
+                        os.remove(image.file.path)
+                image.delete()
         else:
             request.user.userprofile.points += POINTS_POST_WRITE
             request.user.userprofile.save()
@@ -262,26 +291,30 @@ def _write_post(request, is_modify=False, post=None,
             content=form_content.save(post=post),
             board=board_instance)  # save
         board_content = board_post.board_content
+        board_name = board_post.board.eng_name
         HashTag.objects.filter(board_post=board_post).delete()
         hashs = board_content.get_hashtags()
-        # 위지귁으로 업로드 된 이미지 처리 
+        # 위지윅으로 업로드 된 이미지 처리
         content = board_content.content
-        for img_src in imtag_regex.findall(content):
-            src = img_src.split('/')[2]
-            print src
-            path_origin = unicode(default_storage.path(src))
-            file_origin = open(path_origin, "r")
-            file_content = ContentFile(file_origin.read())
-            attachment = Attachment(board_content=board_content)
-            new_path = unicode(str(board_post.id) + '/' + src)
-            attachment.file.save(new_path, file_content)
-            attachment.save()
-            file_origin.close()
+        for img_src in images:
+            if len(img_src) == 0:
+                continue
+            src = img_src.split(urlquote('/'))[-1]
+            path_origin = uri_to_iri(default_storage.path(uri_to_iri(src)))
+            with open(path_origin, "r") as file_origin:
+                file_content = ContentFile(file_origin.read())
+                attachment = Attachment(board_content=board_content)
+                new_path = '/'.join([board_name,
+                                     str(board_post.id),
+                                     path_origin.split('/')[-1]])
+                attachment.file.save(new_path, file_content)
+                attachment.save()
             if file_origin.closed:
                 os.remove(unicode(file_origin.name))
                 del file_origin
             content = content.replace(src, attachment.file.name)
-            print content
+        # Delete all django summernote attachment models
+        summernote.Attachment.objects.all().delete()
         board_content.content = content
         board_content.save()
         for tag in hashs:
@@ -307,7 +340,8 @@ def _write_comment(request, post_id, is_modify=False):
             content_before = board_comment.board_content.content
             form_attachment = AttachmentFormSet(
                 queryset=Attachment.objects.none())
-            if board_comment.author != user_profile and user_profile.permission < 4:
+            if (board_comment.author != user_profile
+                    and user_profile.permission < 4):
                 return  # wrong request
             content_form = BoardContentForm(
                 request.POST,
@@ -378,8 +412,8 @@ def _write_comment(request, post_id, is_modify=False):
                                 recipient=board_comment.board_post.author.user,
                                 verb='님이 태그했습니다.'.decode('utf-8'),
                                 post_title=board_comment.board_content.content,
-#                                post_title=target_post.title,
-#                                comment_content=board_comment.board_content.content,
+                                # post_title=target_post.title,
+                                # comment_content=board_comment.board_content.content,
                                 board_name=target_post.board.url,
                                 noti_category='mention',
                                 app_title='board',
@@ -391,8 +425,8 @@ def _write_comment(request, post_id, is_modify=False):
                                 recipient=target,
                                 verb='님이 태그했습니다.'.decode('utf-8'),
                                 post_title=board_comment.board_content.content,
-#                                post_title=target_post.title,
-#                                comment_content=board_comment.board_content.content,
+                                # post_title=target_post.title,
+                                # comment_content=board_comment.board_content.content,
                                 board_name=target_post.board.url,
                                 noti_category='mention',
                                 app_title='board',
@@ -426,8 +460,8 @@ def _write_comment(request, post_id, is_modify=False):
                         recipient=target,
                         verb='님이 태그했습니다.'.decode('utf-8'),
                         post_title=board_comment.board_content.content,
-#                        post_title=target_post.title,
-#                        comment_content=board_comment.board_content.content,
+                        # post_title=target_post.title,
+                        # comment_content=board_comment.board_content.content,
                         board_name=target_post.board.url,
                         noti_category='mention',
                         app_title='board',
@@ -449,7 +483,8 @@ def _delete_post(request):
         author = board_content.board_comment.author
     else:
         return 'invalid content'
-    if author != request.user.userprofile and request.user.userprofile.permission < 4:
+    if (author != request.user.userprofile
+            and request.user.userprofile.permission < 4):
         return 'not allowed'
     board_content.is_deleted = True
     board_content.save()

@@ -3,10 +3,12 @@
 ARA Plus Grill
 {% endblock %}
 {% block css %}
+<link rel="stylesheet" href="/media/css/nickname-click.css">
 <link rel="stylesheet" href="/media/css/grill/grill.css">
 {% endblock %}
 {% block js %}
 <script src="http://araplus.sparcs.org:9779/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/media/js/nickname-click.js"></script>
 <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
 <script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
@@ -49,6 +51,7 @@ ARA Plus Grill
                     </div>
                 </form>
             </div>
+        </div>
     </div>
     <div class="comment-list-container">
         <ul id="comment-content-list" class="list-group">

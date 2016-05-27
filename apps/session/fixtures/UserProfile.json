@@ -2,9 +2,10 @@
 {
 	"fields": {
 		"user": 1,
-        "nickname": "admin",
+    "nickname": "admin",
 		"points": 0,
-		"uid": "0"
+		"uid": "0",
+    "permission": 4
 	},
 	"model": "session.UserProfile",
 	"pk": 1
@@ -12,9 +13,10 @@
 {
 	"fields": {
 		"user": 2,
-        "nickname": "guest",
+    "nickname": "guest",
 		"points": 0,
-		"uid": "1"
+		"uid": "1",
+    "permission": 0
 	},
 	"model": "session.UserProfile",
 	"pk": 2

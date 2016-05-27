@@ -161,7 +161,21 @@ $(document).ready(function(){
             $("#btn-add-comment").click(function(event){
                 event.preventDefault();
                 add_comment(grill_id, socket);
-            });     
+            });
+            $("#new-content").on('keydown', function(e) {
+                if (window.navigator.userAgent.indexOf('Mac') != -1) {
+                    if (e.metaKey && e.keyCode == 13) {
+                        e.preventDefault();
+                        add_comment(grill_id, socket);
+                    }
+                } else {
+                  if (e.ctrlKey && e.keyCode == 13) {
+                      // User Operating System is not Macintosh
+                      e.preventDefault();
+                      add_comment(grill_id, socket);
+                  }
+                } 
+            });
 
             // 반대 많이 받은 댓글 다시 보여주기
             $(".open-comment").click(function(event){
