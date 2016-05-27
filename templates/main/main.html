@@ -1,3 +1,98 @@
 {% extends "base.html" %}
+{% block css %}
+<link type="text/css" rel="stylesheet" href="/media/css/main/main.css" />
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function(){
+        jQuery("span.timeago").timeago();
+    });
+</script>
+{% endblock %}
 {% block content %}
+
+<div id="content-wrapper">
+<div id="today" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">Today Best</th>
+		</thead>
+		<tbody>
+			{% for tl in today_best_list %}
+			<tr>
+				<td class="best_list"><a href="/board/{{tl.category}}/{{tl.id}}/"><span class="vote">{{tl.vote}}</span>  {{tl.title}}</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div id="weekly" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">Weekly Best</th>
+		</thead>
+		<tbody>
+			{% for tl in week_best_list %}
+			<tr>
+				<td class="best_list"><a href="/board/{{tl.category}}/{{tl.id}}/"><span class="vote">{{tl.vote}}</span>  {{tl.title}}</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div id="grill" class="best">
+	<table class="best_table">
+		<thead>
+			<th class="best_head">요즘 핫한 불판</th>
+		</thead>
+		<tbody>
+			{% for gr in grill_list %}
+			<tr>
+				<td class="best_list"><a href="/grill/{{gr.id}}">{{gr.title}}</a></td>
+			</tr>
+			<tr>
+				<td class = "sub_list"> - {{gr.comment.content}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+
+
+<div id="gallery" class="best">
+	<ul class = "best_head" id = "gallery_header"><strong>Gallery</strong></ul>
+	
+	<ul id="total-gallery-wrapper">
+		{% for post in post_list %}
+        <li class="image">
+            <img src={{post.board_content.get_thumbnail}}></img>
+            <a href="/board/gallery/{{post.id}}">
+            <div class="hovered">
+                <span class="title">
+                    {{post.title}}
+                </span>
+                <span class="timeago" style="float: left; margin-top: 10px" timeago="{{post.board_content.created_time|date:"c"}}" title="{{post.board_content.created_time}}"></span>
+                <div class="vote" style="float: right; margin-top: 6px">
+                    <span>{{post.board_content.get_vote.up}}</span>
+                    <span>/ {{post.board_content.get_vote.down}}</span>
+                </div>
+                <span class="nickname" style="clear: both; padding-top: 6px">
+                    {% if post.board_content.is_anonymous %}
+                        {{post.board_content.is_anonymous}}
+                    {% else %}
+                        {{post.author.nickname}}
+                    {% endif %}
+                </span>
+            </div>
+        </a>
+        </li>
+        {% endfor %}
+	</ul>
+</div>
+</div>
+
 {% endblock %}

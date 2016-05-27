@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/nickname-click.css">
+<link rel="stylesheet" type="text/css" href="/media/css/board/board_read.css">
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/media/js/nickname-click.js"></script>
+<script type="text/javascript" src="/media/js/board/hover.js"></script>
+<script type="text/javascript" src="/media/js/board/board.js"></script>
+<script type="text/javascript" src="/media/js/board/upload_handling.js"></script>
+{% endblock %}
+{% block content %}
+
+<div id="content-wrapper">
+    <div id="board-title">
+        {{current_board|default:'All'}} | ㅁㄴㅇㄹ
+    </div>
+    <div id="post-header-wrapper">
+        <div id="post-title">
+            {% if post.adult %}
+            <label style="color:red; display:inline-block">+19</label>
+            {% endif %}
+            {{post.title}}
+        </div>
+        <div id="post-information">
+            {% if post.is_anonymous %}
+            <h3>{{ post.username }}</h3>
+            {% else %}
+            <h3 class="nickname-click">{{ post.username }}</h3>
+            {% endif %}
+            | {{ post.created_time }} | 조회 224 | 추천
+            {% if post.vote.up > 0 %}
+            <span class="post-vote vote-color-up" id="post-vote-up-{{post.content_id}}">{{post.vote.up}}</span>
+            {% else %}
+            <span class="post-vote" id="post-vote-up-{{post.content_id}}">{{post.vote.up}}</span>
+            {% endif %}
+            / 반대
+            {% if post.vote.down > 0 %}
+            <span class="post-vote vote-color-down" id="post-vote-down-{{post.content_id}}">{{post.vote.down}}</span>
+            {% else %}
+            <span class="post-vote" id="post-vote-down-{{post.content_id}}">{{post.vote.down}}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="post-content-wrapper" id="comment_order_0">
+        {% if not post.deleted %}
+        <div id="post-content">
+            {{post.content | safe}}
+        </div>
+        <div id="post-vote-number">
+            <div class="vote-number vote-up-color" id="vote_up_{{post.content_id}}">{{post.vote.up}}</div>
+            <div class="vote-number vote-down-color" id="vote_down_{{post.content_id}}">{{post.vote.down}}</div>
+        </div>
+        <div id="post-function">
+            <!-- trace, 즐찾 기능 -->
+            {% if post.vote.is_up %}
+            <button class="post-vote-button up-button vote" id="up_{{post.content_id}}">▲ UP</button>
+            {% else %}
+            <button class="post-vote-button up-button vote" id="up_{{post.content_id}}">▲ UP</button>
+            {% endif %}
+            {% if post.vote.is_down %}
+            <button class="post-vote-button down-button vote" id="down_{{post.content_id}}">▼ DOWN</button>
+            {% else %}
+            <button class="post-vote-button down-button vote" id="down_{{post.content_id}}">▼ DOWN</button>
+            {% endif %}
+            <!-- 추천 반대 클릭한 표시-->
+            <!-- 신고 기능 -->
+            <!-- 수정, log, 삭제 -->
+		</div>
+		<div style="width:100%; text-align:left;">{{post.signiture}} </div>
+
+        {% else %}
+        <div id="post-content">
+        삭제된 글입니다.
+        </div>
+        {% endif %}
+    </div>
+    <div id="post-comment-wrapper">
+        {% for comment in comment_list %}
+        {% if comment.best_comment %}
+        <!-- best 댓글 기능-->
+        {% else %}
+        {% endif %}
+        <div class="post-comment">
+            <div class="comment-info">
+                {% if comment.recent_comment %}
+                <a name="recent_comment"></a>
+                {% endif %}
+                <span class="comment-order" id="comment_order_{{comment.order}}">{{ comment.order }}</span>
+                {% if comment.is_anonymous %}
+                <span class="comment-nickname">{{ comment.username }}</span>
+                {% else %}
+                <span class="comment-nickname nickname-click">{{ comment.username }}</span>
+                {% endif %}
+                <span class="comment-time" >{{ comment.created_time }}</span>
+                <div class="comment-vote-wrapper">
+                    <!-- 삭제된 글이면 추천반대 안되게 해야함-->
+                    <button class="vote-up-color inblock vote comment-button" id="up_{{comment.content_id}}">▲추천</button>
+                    <span class="inblock" id="vote_up_{{comment.content_id}}">{{comment.vote.up}}</span>
+                    <button style="margin-left: 10px" class="vote-down-color inblock vote comment-button" id="down_{{comment.content_id}}">▼반대</button>
+                    <span class="inblock" id="vote_down_{{comment.content_id}}">{{comment.vote.down}}</span>
+                </div>
+            </div>
+            <div id="comment_content{{ comment.order }}">
+                {% if request.user.userprofile.adult_filter and comment.adult %}
+                <div class="comment-content hiddenContent" id="comment{{comment.order}}" value="{{ comment.content | safe }}">
+                    성인 댓글 입니다.
+                </div>
+                {% else %}
+                <div class="comment-content" id="comment{{comment.order}}">{{ comment.content | safe}}</div>
+                {% endif %}
+                {% if not comment.deleted %}
+                <div class="comment-function">
+                    <!-- 신고 기능 작동 -->
+
+                   <button class="comment-button function-btn report" id="report_{{comment.content_id}}">[신고]</button>
+                   <button class="comment-button function-btn vote" id="adult_{{comment.content_id}}">[성인글]</button>
+                   <button class="comment-button function-btn vote" id="political_{{comment.content_id}}">[정치글]</button>   
+                    {% if request.user.userprofile == comment.board_comment.author %}
+                   <button class="comment-button function-btn comment" type="submit" id="btn-{{comment.order}}-{{comment.id}}">[수정]</button>
+                   <button class="comment-button function-btn delete" id="delete_{{comment.content_id}}">[삭제]</button>
+                   {% endif %}
+                   <a class="comment-button function-btn" href="../{{comment.id}}/comment-log/?board={{post.board_id}}" id="log_{{comment.content_id}}">[로그]</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+		{% endfor %}
+	</div>   
+
+	{%if not post.deleted%}
+        <div id="comment-write-wrapper">
+			<form id='comment-write' action="./comment/{{querystring}}comment_page={{comment_current_page}}" method="POST" enctype="multipart/form-data">
+                {%csrf_token%}
+                <input type="hidden" name="board_post_id" value="{{ post.id }}">
+                <textarea class="comment-textarea" rows="5" name="content" placeholder="댓글을 입력하세요."></textarea>
+                <!--
+                </div>
+                    <div id="attachment_handling">
+                        {{ attachment_form.management_form }}
+                        {% for form in attachment_form.forms %}
+                        <div class="attachment">
+                            {{ form|bootstrap }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                사진 업로드 기능
+                -->
+                <div id="comment-write-footer">
+                    <button type="submit" class="comment-write-button" class="btn btn-normal col-md-1 col-md-offset-11">댓글 남기기</button>
+                    <h3>성인</h3>
+                    <input type="checkbox" name="is_adult">
+                    <h3>익명</h3>
+                    <input type="checkbox" name="is_anonymous">
+                </div>
+        </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

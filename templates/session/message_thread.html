@@ -1,0 +1,33 @@
+{% extends "session/message_base.html" %}
+{% block message_content %}
+<div class="container">
+    {% if user != None %}
+        <h3>{{ you.nickname }}</h3>
+        <div>
+            {% for message in messages %}
+                {% ifchanged message.sender message.created_time.year message.created_time.month message.created_time.day message.created_time.hour message.created_time.minute %}
+                    {% if forloop.counter != 1 %}
+                        </div>
+                    {% endif %}
+                    {% if message.sender == me %}
+                        <div class="my bubblebox">
+                    {% else %}
+                        <div class="bubblebox">
+                    {% endif %}
+                    <div class="info">{{ message.created_time }}</div>
+                {% endifchanged %}                
+                <div class="bubble">
+                    {{ message.content }}
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" class="form-control" name="content" placeholder="message">
+            <button type="submit" class="btn btn-default">Send</button>
+        </form>
+    {% endif %}
+    {{error}}
+</div>    
+{% endblock %}

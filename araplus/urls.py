@@ -16,8 +16,9 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.http import HttpResponseRedirect
-from settings import BASE_DIR
+from settings import BASE_DIR, UPLOAD_DIR, MEDIA_ROOT
 import os
+import notifications
 
 urlpatterns = [
     # Araplus Apps
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^main/', include('apps.main.urls')),
 
     url(r'^$', lambda x: HttpResponseRedirect('main/')),
+    url(r'^inbox/notifications/', include(notifications.urls)),
 
     # Admin Page
     url(r'^admin/', include(admin.site.urls)),
@@ -34,5 +36,11 @@ urlpatterns = [
     # Media Root
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': os.path.join(BASE_DIR, 'static')}),
-]
 
+    url(r'^upload/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': MEDIA_ROOT}),
+
+    #summernote url
+    url(r'^summernote/', include('django_summernote.urls')),
+
+]

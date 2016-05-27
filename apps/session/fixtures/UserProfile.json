@@ -1,0 +1,22 @@
+[
+{
+	"fields": {
+		"user": 1,
+        "nickname": "admin",
+		"points": 0,
+        "permission": 4
+	},
+	"model": "session.UserProfile",
+	"pk": 1
+},
+{
+	"fields": {
+		"user": 2,
+        "nickname": "guest",
+		"points": 0,
+        "permission": 0
+	},
+	"model": "session.UserProfile",
+	"pk": 2
+}
+]

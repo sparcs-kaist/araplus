@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/nickname-click.css" />
+<style>
+    .bubblebox
+    {
+        margin: 4px 0px 4px 0px;
+        float: left;
+        clear: both;
+    }
+    .my.bubblebox
+    {
+        float: right;
+        text-align: right;
+    }
+    .bubble
+    {
+        margin: 0px 0px 3px 0px;
+        padding: 6px 16px 6px 16px;
+        background-color: #DDD;
+        border-radius: 11px;
+        float: left;
+        clear: both;
+    }
+    .my .bubble
+    {
+        color: #FFF;
+        background-color: #29F;
+        float: right;
+    }
+    .bubblebox .info
+    {
+        color: #666;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+{% block js %}
+<script src="/media/js/nickname-click.js"></script>
+{% endblock %}
+{% block content %}
+<li>
+    <a href="/session" class="btn btn-default"> Session main </a>
+    <a href="/session/group" class="btn btn-default"> Group list </a>
+</li>
+</br>
+{% block group_content%}
+{% endblock %}
+{% endblock %}

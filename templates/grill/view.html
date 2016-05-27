@@ -3,97 +3,61 @@
 ARA Plus Grill
 {% endblock %}
 {% block css %}
+<link rel="stylesheet" href="/media/css/nickname-click.css">
 <link rel="stylesheet" href="/media/css/grill/grill.css">
 {% endblock %}
 {% block js %}
 <script src="http://bit.sparcs.org:9779/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/media/js/nickname-click.js"></script>
 <script type="text/javascript" src="/media/js/grill/grill_refresher.js"></script>
+<script type="text/javascript" src="/media/js/board/hover.js"></script>
 <script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
 <script>
-    jQuery(document).ready(function() {
-        jQuery("abbr.timeago").timeago();
-    });
-    setInterval(function() {
-        jQuery("abbr.timeago").timeago();
-    }, 1000);
+	jQuery(document).ready(function() {
+		jQuery("abbr.timeago").timeago();
+	});
+	setInterval(function() {
+		jQuery("abbr.timeago").timeago();
+	}, 1000);
 </script>
 {% endblock %}
 {% block content %}
-<div class="container">
-    <div class="jumbotron">
-        <div>
-            <span class="col-md-2">제목:</span>
+<div class="content-wrapper">
+    <div class="header">
+		<div class="title">
             <span>{{ grill.title }}</span>
-        </div>
-        <div>
-            <span class="col-md-2">작성자:</span>
-            <span>{{ grill.author.nickname }}</span>
-        </div>
-        <div>
-            <span class="col-md-2">작성일:</span>
-            <span>
-                <abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
-            </span>
-        </div>
-        <div>
-            <span class="col-md-2">최근 댓글:</span>
-            <span>
-                <abbr class="timeago" timeago="{{ grill.updated_time|date:"c" }}" title="{{ grill.updated_time }}"></abbr>
-            </span>
-        </div>
-        <div>
-            <span class="col-md-2">내용:</span>
-            <span>{{ grill.content }}</span>
-        </div>
+		</div>
+		<div class="subtitle">
+			<span class="nickname nickname-click">{{ grill.author.nickname }}</span>
+			<span class="bar">|</span>
+			<span class="created_time">작성일:</span>
+			<span>
+				<abbr class="timeago" timeago="{{ grill.created_time|date:"c" }}" title="{{ grill.created_time }}"></abbr>
+			</span>
+			<span class="bar">|</span>
+		</div>
+		</div>
+		<div class="content">
+			<span>{{ grill.content }}</span>
+		</div>
+		<div class="comment-input-container">
+			<div class="comment-input">
+				<form class="input-form " method="POST">
+					{% csrf_token %}
+					<textarea id="new-content" class="form-control" rows="3" placeholder="고기를 구워주세요." style="resize: none;"></textarea>
+					<div class="button-line">
+						<span class="text-counter">140</span>
+						<button id="btn-add-comment" type="submit" class="btn btn-default">고기 올리기</button>
+					</div>
+				</form>
+			</div>
     </div>
-    <div id="comment-input-container">
-        <form method="POST">
-            {% csrf_token %}
-            <textarea id="new-content" class="form-control" rows="3" placeholder="댓글을 입력하세요." style="resize: none;"></textarea>
-            <button id="btn-add-comment" type="submit" class="btn btn-default">댓글달기</button>
-            <span id="text-counter">140</span>
-        </form>
-    </div>
-    <div id="comment-list-container">
-        <a id="btn-comment-first" href="#comment-1" class="btn btn-default">첫 댓글 보기</a>
+    <div class="comment-list-container">
         <ul id="comment-content-list" class="list-group">
-            {% if comments|length %}
             {% for comment in comments %}
-            {% include 'grill/comments.html' %}
+            	{% include 'grill/comments.html' %}
             {% endfor %}
-            {% else %}
-            <span>아직 작성된 댓글이 없습니다.</span>
-            {% endif %}
         </ul>
-    </div>
-    <!--
-    <div id="comment_container" class="comment-container">
-        <div id="comment_form_container comment_form" class="comment-form-container" method="POST">
-            <div id="comment_add_container" class="comment-add-container">
-                <textarea id="new_content" class="comment-addbox" placeholder="댓글을 입력하세요"></textarea>
-            </div>
-            <div id="comment_button_container" class="comment-button-container">
-                <a href="#comment_1"><button type="submit" id="first_comment_button" class="comment-button left">첫 코</button></a>
-                <div id="comment_right_container" class="comment-right-container">
-                    <div id="comment_length_container" class="comment-length-container">
-                        (<span id="text_counter">0</span>/140)
-                    </div>
-                    <button type="submit" id="add_comment_button" class="comment-button right">댓글달기</button>
-                </div>
-            </div>
-        </div>
-        <div id="comment_list_container" class="comment-list-container">
-            <ul id='result_list'>
-                {% if comments|length %}
-                {% for comment in comments %}
-                {% include 'grill/comments.html' %}
-                {% endfor %}
-                {% else %}
-                <span>글이 없습니다.</span>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-    -->
+	</div>
 </div>
 {% endblock %}

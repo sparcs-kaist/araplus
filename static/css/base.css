@@ -1,0 +1,191 @@
+*{
+    margin: 0;
+    padding: 0;
+    display: block;
+    box-sizing: border-box;
+}
+title, script{
+    display: none;
+}
+html{
+    height: 100%;
+    min-width: 1200px;
+    overflow-y: scroll;
+}
+body{
+    background: #fafafa;
+}
+a{
+    color: #000;
+    text-decoration: none;
+}
+
+style{
+    display: none;
+}
+
+#title-wrapper{
+    width: 100%;
+    height: 35px;
+    background: #5b5b5b;
+}
+#title{
+    width: 150px;
+    height: 100%;
+    margin-left: 10px;
+    overflow: visible;
+}
+#sparcs-title{
+    width: 150px;
+    height: 35px;
+    font-size: 14px;
+    line-height: 14px;
+    padding-top: 10px;
+    color: #fff;
+    float: left;
+}
+#header-wrapper{
+    width: 100%;
+    height: 80px;
+    background: #fff;
+}
+#main-wrapper{
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+    min-height: 550px;
+}
+#logo-wrapper{
+    width: 200px;
+    height: 100%;
+    padding-left: 10px;
+    overflow: visible;
+    float: left;
+}
+#logo{
+    width: 150px;
+    height: 80px;
+    font-size: 30px;
+    line-height: 30px;
+    padding-top: 25px;
+    color: #000;
+    float: left;
+}
+#menu-button-wrapper{
+    margin-top: 30px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    -webkit-border-radius: 2;
+    -moz-border-radius: 2;
+    border-radius: 2px;
+    border-style: dotted;
+    border-width: 0;
+    background: #fff;
+    outline: none;
+    text-decoration: none;
+}
+#menu-button-wrapper:hover{
+    -webkit-box-shadow: 0px 1px 2px #a3a3a3;
+    -moz-box-shadow: 0px 1px 2px #a3a3a3;
+    box-shadow: 0px 1px 2px #a3a3a3;
+    background: #f0f0f0;
+    outline: none;
+    text-decoration: none;
+}
+#menu-button{
+    background: no-repeat url(//s.ytimg.com/yts/imgbin/www-hitchhiker-vflVV84g4.webp) -424px -258px;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+}
+#nav-list{
+    float: left;
+    padding-left: 10px;
+}
+.nav-item{
+    float: left;
+    display: inline-block;
+    margin-right: 65px;
+}
+.nav-item h3{
+    font-size: 13px;
+    line-height: 13px;
+    color: #000;
+    height: 80px;
+    padding-top: 33px;
+}
+#user-wrapper{
+    height: 100%;
+    margin-right: 50px;
+    overflow: visible;
+    float: right;
+}
+#point{
+    height: 80px;
+    font-size: 13px;
+    line-height: 13px;
+    padding-top: 33px;
+    margin-right: 30px;
+    color: #000;
+    float: right;
+    display: inline-block;
+}
+#nickname{
+    height: 80px;
+    font-size: 13px;
+    line-height: 13px;
+    padding-top: 33px;
+    color: #000;
+    float: right;
+    display: inline-block;
+}
+#menu-wrapper{
+    width: 200px;
+    background: #fff;
+    margin-left: 0px;
+    float: left;
+    /*margin-top: -9999px;
+    margin-bottom: -9999px;
+    padding-top: 9999px;
+    padding-bottom: 9999px;*/
+    
+}
+.menu-vertical{
+    width: 100%;
+   /* height: 240px;*/
+}
+.menu-title{
+    width: 100%;
+    height: 20px;
+    font-size: 12px;
+    line-height: 12px;
+    padding-top: 4px;
+    margin-left: 15px;
+    color: #40e0d0;
+}
+#board-list{
+    list-style-type: none;
+    margin-top: 15px;
+    margin-left: 17px;
+}
+.board-item{
+    width: 100%;
+    margin-bottom: 15px;
+    display: inline-block;
+}
+.board-item h3{
+    height: 16px;
+    font-size: 12px;
+    line-height: 12px;
+    padding-top: 2px;
+    margin-left: 10px;
+    float: left;
+}
+#division-line{
+    background-color: #eaeaea;
+    width: 82%;
+    height: 1px;
+    margin-bottom: 10px;
+    margin-left: 9%;
+}

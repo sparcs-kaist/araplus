@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/board/list_gallery.css"> 
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function(){
+        jQuery("span.timeago").timeago();
+    });
+</script>
+{% endblock %}
+{% block content %}
+<!--
+<div class="container">
+    <div class="pull-right">
+        <a class="btn btn-default" href="../create_board/">소모임 만들기</a>
+        <a class="btn btn_default" href="./add_member/">멤버 추가</a>
+    </div>
+</div>
+-->
+{% include "board/list_gallery.html" %}
+{% endblock %}

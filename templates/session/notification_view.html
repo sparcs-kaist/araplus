@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/media/css/session.css">
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/media/js/jquery.timeago.js"></script>
+<script>
+    jQuery(document).ready(function(){
+        jQuery("span.timeago").timeago();
+    });
+</script>
+{% endblock %}
+{% block content %}
+	{% if unread|length %}
+    <div id="noread-wrapper"> 
+		{% for noti in unread %}
+            <div class="noti">
+                <div class="noti-category">
+                    {{noti.data.noti_category}}
+                </div>
+                <div class="noti-content-wrapper">
+                    <a class="noti-content" href="/board/{{noti.data.board_name}}/{{noti.data.post_id}}/?comment_page={{noti.data.comment_page}}"> {{noti.data.post_title}} <a>
+                    <a class="noti-time">
+                        <span class="timeago" timeago="{{noti.timestamp|date:'c'}}" title="{{noti.timestamp}}"> </span>
+                    </a>
+                </div>
+            </div>
+                {% endfor %}
+	</div>
+	{% endif %}
+	{% if read|length %}
+    <div id="read-wrapper"> 
+		{% for noti in read %}
+            <div class="noti">
+                <div class="noti-category">
+                    {{noti.data.noti_category}}
+                </div>
+                <div class="noti-content-wrapper">
+                    <a class="noti-content" href="/board/{{noti.data.board_name}}/{{noti.data.post_id}}/?comment_page={{noti.data.comment_page}}"> {{noti.data.post_title}} <a>
+                    <a class="noti-time">
+                        <span class="timeago" timeago="{{noti.timestamp|date:'c'}}" title="{{noti.timestamp}}"> </span>
+                    </a>
+                </div>
+            </div>
+	{% endfor %}
+	</div>
+	{% endif %}
+{% endblock %}

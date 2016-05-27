@@ -1,10 +1,15 @@
-{% extends "base.html" %}
-{% block content %}
-    <ul>
+{% extends "session/message_base.html" %}
+{% block message_content %}
+<div class="container">
     {% for message in messages %}
-        <li> Message from {{ message.sender.nickname }} to {{ message.receiver.nickname }} </li>
-        <li> Content : {{ message.content }} </li>
+        <div class="bubblebox">
+            <div class="bubble">
+				<div class="info"><span style="display: inline;">From </span><span class="nickname-click" style="display: inline;">{{ message.sender.nickname }}</span></div>
+                {{ message.content }}
+                <div class="info">{{ message.created_time }}</div>
+            </div>
+        </div>
     {% endfor %}
-    </ul>
+</div>
 {% endblock %}
 
