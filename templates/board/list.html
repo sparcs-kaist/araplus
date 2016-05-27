@@ -127,6 +127,7 @@
         {% if not trace %}
         <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
         <form name="searchbox" target="./" method="get">
+        {% endif %}
 	<input name="title" placeholder="검색" type="text" />
 	<input hidden id="board-search" placeholder="Search" type="submit" style="visibility:hidden"/>
     {% if request.user.userprofile.adult_filter %}
