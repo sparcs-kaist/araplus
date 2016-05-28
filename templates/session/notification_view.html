@@ -19,7 +19,7 @@
                     {{noti.data.noti_category}}
                 </div>
                 <div class="noti-content-wrapper">
-                    <a class="noti-content" href="/board/{{noti.data.board_name}}/{{noti.data.post_id}}/?comment_page={{noti.data.comment_page}}"> {{noti.data.post_title}} <a>
+                    <a class="noti-content" href="/inbox/notifications/mark-as-read/{{noti.slug}}/?next=/board/{{noti.data.board_name}}/{{noti.data.post_id}}/?comment_page={{noti.data.comment_page}}/"> {{noti.data.post_title}} </a>
                     <a class="noti-time">
                         <span class="timeago" timeago="{{noti.timestamp|date:'c'}}" title="{{noti.timestamp}}"> </span>
                     </a>
