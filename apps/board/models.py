@@ -37,7 +37,7 @@ class BoardContent(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False, null=False)
-    is_anonymous = models.TextField(default=None, null=True)
+    is_anonymous = models.TextField(default=None, null=True, blank = True);
     is_adult = models.BooleanField(default=False, null=False)
     modify_log = models.TextField(default='[]')
     use_signiture = models.BooleanField(default=False, null=False)
