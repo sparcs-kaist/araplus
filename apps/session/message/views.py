@@ -12,6 +12,12 @@ def send_message(request):
         to = request.GET.get('to', '')
         return render(request, 'session/write_message.html', {'to': to})
     sender = request.user.userprofile
+
+    # If sender try to send itself, reject it
+    if sender.nickname == request.POST['nickname']:
+        return render(request, 'session/write_message.html',
+                      {'error': "Can not sent message to yourself"})
+
     content = request.POST['content']
     try:
         receiver = UserProfile.objects.get(nickname=request.POST['nickname'])

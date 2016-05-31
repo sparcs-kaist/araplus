@@ -32,7 +32,7 @@ def home(request):
 	todaybest_num = 5
 	weekbest_num = 5
 
-	today = datetime.now()
+	today = timezone.now()
 	##todayprelist = BoardContent.objects.filter(created_time__year=today.year , created_time__month=today.month, created_time__day=today.day)
 	todayprelist = BoardContent.objects.filter(created_time__range=[today-timedelta(1), today])
 
