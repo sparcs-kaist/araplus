@@ -40,7 +40,10 @@
             {% endfor %}
         </ul>
         <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
-        <input id="board-search" placeholder="Search" type="text">
+        <form name="searchbox" target="./" method="get">
+            <input id="board-search" placeholder="Search" type="text">
+            <input hidden id="board-search" placeholder="Search" type="submit" style="visibility:hidden"/>
+
     </div>
 </div>
     <!-- 성인글 부분 수정 -->

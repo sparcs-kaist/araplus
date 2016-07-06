@@ -124,19 +124,28 @@
             {% endif %}
             {% endfor %}
         </ul>
+    </div>
+    <div id="search-and-write">
+        <form name="searchbox" target="./" method="get">
+        <input name="title" id="board-search-input" placeholder="검색" type="text" />
+        <input hidden id="board-search" placeholder="Search" type="submit"/>
         {% if not trace %}
         <a class="board-write-btn" href="/board/{{current_board.url|default:'all'}}/post">글쓰기</a>
-        <form name="searchbox" target="./" method="get">
+        <!--<form name="searchbox" target="./" method="get">-->
+        
         {% endif %}
-	<input name="title" placeholder="검색" type="text" />
-	<input hidden id="board-search" placeholder="Search" type="submit" style="visibility:hidden"/>
-    {% if request.user.userprofile.adult_filter %}
+    </div>
+
     <!-- 성인글 부분 수정 -->
-    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block" href="set_adult_filter/">성인글 필터링 해제</a>
-    {% else %}
-    <a style="width: 150px; height:20px; margin-top:15px; display:inline-block"href="set_adult_filter/">성인글 필터링</a>
-    {% endif %}
-<div>
+    <div class = "filtering">
+    
+        {% if request.user.userprofile.adult_filter %}
+        <a href="set_adult_filter/">성인글 필터링 해제</a>
+        {% else %}
+        <a href="set_adult_filter/">성인글 필터링</a>
+        {% endif %}
+    </div>
+</div>
 
 <!--
     <div class="pull-right btn-group" role="group">

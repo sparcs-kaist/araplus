@@ -88,25 +88,28 @@ a{
 }
 
 #board-pagination{
-    float: left;
     width: 100%;
     height: 21px;
     margin-top: 30px;
     padding-right: 30px;
+    text-align: center;
 }
 
 #board-pagination-number{
     width: 300px;
     height: 21px;
     float: left;
+    display: inline;
+    margin-right: calc(50% - 150px);
+    margin-left: calc(50% - 150px);
 }
 
 #board-pagination-number li{
-    height: 21px;
-    width: 15px;
-    font-size: 11px;
+    height: 28px;
+    width: 20px;
+    font-size: 15px;
     line-height: 11px;
-    padding-top: 5px;
+    padding-top: 9px;
     margin-right: 10px;
     text-align: center;
     display: inline-block;
@@ -116,17 +119,35 @@ a{
     background: #333;
     color: #fff;
 }
-
 #board-search{
-    width: 200px;
-    height: 21px;
-    float: right;
+    width: 55px;
+    height: 26px;
+    float: left;
     border-radius: 4px;
     border: solid 1px;
     padding: 1px;
     outline: none;
     background: #fff;
-    font-size: 12px;
+    background-color: black;
+    color: white;
+    padding-top:2px;
+    padding-bottom:3px;
+    font-size: 15px;
+    margin-top: -1px;
+}
+#board-search-input{
+    width: 160px;
+    height: 24px;
+    float: left;
+    margin-right: 1px;
+    margin-left: 25px;
+
+}
+
+#search-and-write{
+    width: 100%;
+    margin-top: 16px;
+    font-size: 15px;
 }
 /*
 #board-search:focus{
@@ -136,12 +157,13 @@ a{
 
 .board-write-btn{
     font-family: Arial;
-    width: 50px;
-    height: 21px;
-    font-size: 12px;
+    width: 70px;
+    text-align: center;
+    height: 24px;
     line-height: 12px;
-    padding: 4px 0px 0px 6px;
+    padding: 6px 0px 0px 3px;
     margin-left: 5px;
+    margin-right:40px;
     color: #fff;
     background: #000;
     text-decoration: none;
@@ -160,3 +182,17 @@ a{
 .list-title{
     width: calc(100% - 480px);
 }
+
+.filtering{
+    font-size: 15px;
+    width: 100%; 
+    height:20px; 
+    margin-top:10px; 
+    display:inline-block;
+    float: left;
+}
+.filtering a{
+    margin-left: 25px;
+    margin-right: 5px;
+}
+
