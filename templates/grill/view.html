@@ -36,23 +36,23 @@ ARA Plus Grill
             </span>
             <span class="bar">|</span>
         </div>
-        </div>
-        <div class="content">
-            <span>{{ grill.content }}</span>
-        </div>
-        <div class="comment-input-container">
-            <div class="comment-input">
-                <form class="input-form" id="reply-form" method="POST">
-                    {% csrf_token %}
-                    <textarea id="new-content" class="form-control" rows="3" placeholder="고기를 구워주세요." style="resize: none;"></textarea>
-                    <div class="button-line">
-                        <span class="text-counter">140</span>
-                        <button id="btn-add-comment" type="submit" class="btn btn-default">고기 올리기</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+	</div>
+	<div class="content">
+		<span>{{ grill.content }}</span>
     </div>
+    <div class="comment-input-container">
+		<div class="comment-input">
+			<form class="input-form" id="reply-form" method="POST">
+				{% csrf_token %}
+				<textarea id="new-content" class="form-control" rows="3" placeholder="고기를 구워주세요." style="resize: none;"></textarea>
+				<div class="button-line">
+					<span class="text-counter">140</span>
+					<button id="btn-add-comment" type="submit" class="btn btn-default">고기 올리기</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!--</div>-->
     <div class="comment-list-container">
         <ul id="comment-content-list" class="list-group">
             {% for comment in comments %}
