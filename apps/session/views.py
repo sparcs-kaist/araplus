@@ -20,7 +20,6 @@ def main(request):
 
 
 def validate_nickname(nickname):
-    print nickname
     if not re.match(ur'[\w_-\uAC00\uD7AF]{2,30}', nickname, re.UNICODE):
         return False
     user_profile = UserProfile.objects.filter(nickname=nickname)
